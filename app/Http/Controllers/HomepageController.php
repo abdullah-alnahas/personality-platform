@@ -29,8 +29,8 @@ class HomepageController extends Controller
             $processedSections = [];
 
             foreach ($sections as $section) {
-                $sectionData = $section->toArray();
-                $sectionData['items'] = [];
+                $sectionData = $section->toArray(); // Convert model attributes to array
+                $sectionData['items'] = []; // Initialize items array
 
                 switch ($section->section_type) {
                     case 'thematic_carousel':
@@ -71,9 +71,20 @@ class HomepageController extends Controller
                         // Fetching the quote here and adding it to the section data
                         $quote = Quote::published()->inRandomOrder()->first();
                         if ($quote) {
-                            $sectionData['quote_data'] = $quote->only(['text', 'source']);
+                            // Pass only specific fields needed by the frontend
+                            $sectionData['quote_data'] = [
+                                'text' => $quote->getTranslations('text'),
+                                'source' => $quote->getTranslations('source'),
+                            ];
                         }
                         break;
+                    case 'social_media_links':
+                        // No specific items needed here, section data (title) is sufficient.
+                        // Frontend will use globally shared social accounts.
+                        break;
+                     case 'vision':
+                         // No specific items needed here, section data (title, subtitle, config) is sufficient.
+                         break;
                     // Add other cases as needed
                 }
                 $processedSections[] = $sectionData;
@@ -81,12 +92,12 @@ class HomepageController extends Controller
             return $processedSections;
         });
 
-        // Generic featured items (can be removed if not needed alongside dynamic sections)
+        // Generic featured items (Can be kept or removed depending on whether homepage sections cover all needs)
         $genericFeaturedItems = ContentItem::published()
             ->where('is_featured_home', true)
             ->with(['media', 'category:id,name,slug'])
             ->latest('publish_date')
-            ->take(3)
+            ->take(3) // Example limit
             ->get()
             ->map(fn ($item) => [
                 'id' => $item->id,
@@ -102,10 +113,9 @@ class HomepageController extends Controller
         return Inertia::render('Welcome', [
             'settings' => $settings,
             'homepageSections' => $homepageSectionsData,
-            'genericFeaturedItems' => $genericFeaturedItems,
-            // Pass canLogin/canRegister based on actual route existence
-            'canLogin' => Route::has('login'), // Use the imported Facade
-            'canRegister' => Route::has('register'), // Use the imported Facade
+            'genericFeaturedItems' => $genericFeaturedItems, // Keep or remove as needed
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
         ]);
     }
 }
