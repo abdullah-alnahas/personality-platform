@@ -1,3 +1,4 @@
+// Edit file: resources/js/Pages/Welcome.jsx
 import React from "react";
 import { Head, Link as InertiaLink, usePage } from "@inertiajs/react";
 import PublicLayout from "@/Layouts/PublicLayout";
@@ -15,7 +16,7 @@ import {
     Divider,
     Tooltip,
     IconButton,
-} from "@mui/material"; // Added Tooltip, IconButton
+} from "@mui/material";
 import ContentCard from "@/Components/ContentCard";
 import ThematicSectionCarousel from "@/Components/ThematicSectionCarousel";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
@@ -24,7 +25,7 @@ import TwitterIcon from "@mui/icons-material/Twitter";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TelegramIcon from "@mui/icons-material/Telegram";
-import LinkedInIcon from "@mui/icons-material/LinkedIn"; // Added LinkedIn
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LinkIcon from "@mui/icons-material/Link";
 
 const SocialIcon = ({ platform }) => {
@@ -42,12 +43,11 @@ const SocialIcon = ({ platform }) => {
         case "telegram":
             return <TelegramIcon />;
         case "linkedin":
-            return <LinkedInIcon />; // Added LinkedIn case
+            return <LinkedInIcon />;
         default:
             return <LinkIcon />;
     }
 };
-
 const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
     const { props } = usePage();
     const currentLocale = props.locale || locale;
@@ -64,8 +64,6 @@ const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
         fallback
     );
 };
-
-// --- Section Specific Components ---
 
 const VisionSection = ({ section }) => (
     <Paper
@@ -85,7 +83,7 @@ const VisionSection = ({ section }) => (
         {section.config?.button_text && section.config?.button_link && (
             <Button
                 component={InertiaLink}
-                href={section.config.button_link} // Assuming direct link or pre-resolved route name
+                href={section.config.button_link}
                 variant="contained"
                 size="large"
             >
@@ -97,14 +95,12 @@ const VisionSection = ({ section }) => (
 
 const LatestNewsSection = ({ section }) => (
     <Box sx={{ mb: 4 }}>
-        {" "}
-        {/* Wrap section content in a Box */}
         <Typography variant="h5" component="h2" gutterBottom>
             {getTranslatedField(section.title)}
         </Typography>
         <Grid container spacing={2}>
             {section.items?.map((item) => (
-                <Grid item xs={12} sm={6} key={`news-${item.id}`}>
+                <Grid size={{ xs: 12, sm: 6 }} key={`news-${item.id}`}>
                     <Card variant="outlined">
                         <CardContent>
                             {item.category_name && (
@@ -133,14 +129,13 @@ const LatestNewsSection = ({ section }) => (
                 </Grid>
             ))}
             {section.items?.length === 0 && (
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                     <Typography sx={{ p: 2 }}>
                         No news items to display.
                     </Typography>
                 </Grid>
             )}
         </Grid>
-        {/* Consider adding a "View All News" link if applicable */}
     </Box>
 );
 
@@ -180,22 +175,21 @@ const FeaturedQuoteSection = ({ section }) =>
         </Paper>
     ) : null;
 
-// Updated: This component now renders based on globally shared accounts, but uses the section title
 const SocialMediaLinksSection = ({ section }) => {
-    const { socialAccounts } = usePage().props; // Get globally shared social accounts
+    const { socialAccounts } = usePage().props;
     if (!socialAccounts || socialAccounts.length === 0) return null;
 
     return (
         <Box sx={{ mb: 4 }}>
-            {" "}
-            {/* Wrap section content in a Box */}
             <Typography variant="h5" component="h2" gutterBottom>
-                {getTranslatedField(section.title)}{" "}
-                {/* Use title from section data */}
+                {getTranslatedField(section.title)}
             </Typography>
             <Grid container spacing={1}>
                 {socialAccounts.map((acc) => (
-                    <Grid item xs={12} sm={6} key={`social-link-${acc.id}`}>
+                    <Grid
+                        size={{ xs: 12, sm: 6 }}
+                        key={`social-link-${acc.id}`}
+                    >
                         <Card variant="outlined">
                             <CardActionArea
                                 component="a"
@@ -249,7 +243,6 @@ const SocialMediaLinksSection = ({ section }) => {
         </Box>
     );
 };
-// --- End Section Specific Components ---
 
 export default function Welcome({
     settings,
@@ -263,7 +256,6 @@ export default function Welcome({
     );
     const pageTitle = `Welcome - ${siteName}`;
 
-    // Helper to render a section based on its type
     const renderSection = (section) => {
         switch (section.section_type) {
             case "vision":
@@ -287,7 +279,6 @@ export default function Welcome({
                     </React.Fragment>
                 );
             case "latest_news":
-                // Wrap in Grid item if needed for layout, but rendering directly here
                 return (
                     <LatestNewsSection
                         key={`section-${section.id}`}
@@ -295,7 +286,6 @@ export default function Welcome({
                     />
                 );
             case "featured_quote":
-                // Render directly, assuming it's placed in a sidebar or specific layout area
                 return (
                     <FeaturedQuoteSection
                         key={`section-${section.id}`}
@@ -303,7 +293,6 @@ export default function Welcome({
                     />
                 );
             case "social_media_links":
-                // Render directly
                 return (
                     <SocialMediaLinksSection
                         key={`section-${section.id}`}
@@ -322,19 +311,15 @@ export default function Welcome({
     return (
         <>
             <Head title={pageTitle} />
-
-            {/* Render sections based on the order defined in homepageSections */}
             {homepageSections &&
                 homepageSections.map((section) => renderSection(section))}
-
-            {/* Optional: Render generic featured items if they exist and aren't covered by dynamic sections */}
             {genericFeaturedItems &&
                 genericFeaturedItems.length > 0 &&
                 !homepageSections.some((s) =>
                     ["thematic_carousel", "latest_news"].includes(
                         s.section_type,
                     ),
-                ) && ( // Example condition: only show if no dynamic content sections exist
+                ) && (
                     <Box sx={{ mt: 4 }}>
                         <Typography variant="h5" component="h2" gutterBottom>
                             Featured Content
@@ -342,10 +327,7 @@ export default function Welcome({
                         <Grid container spacing={3}>
                             {genericFeaturedItems.map((item) => (
                                 <Grid
-                                    item
-                                    xs={12}
-                                    sm={6}
-                                    md={4}
+                                    size={{ xs: 12, sm: 6, md: 4 }}
                                     key={`generic-featured-${item.id}`}
                                 >
                                     <ContentCard item={item} />
@@ -357,5 +339,4 @@ export default function Welcome({
         </>
     );
 }
-
 Welcome.layout = (page) => <PublicLayout children={page} />;

@@ -1,10 +1,11 @@
+// Edit file: resources/js/Layouts/PublicLayout.jsx
 import React, { useState, useEffect } from "react";
 import {
     Link as InertiaLink,
     usePage,
     useForm,
     router,
-} from "@inertiajs/react"; // Added router import
+} from "@inertiajs/react";
 import {
     AppBar,
     Box,
@@ -17,24 +18,31 @@ import {
     TextField,
     Button,
     Divider,
-    Tooltip, // Keep Tooltip
+    Tooltip,
     Snackbar,
     Alert,
     Menu,
     MenuItem,
     InputAdornment,
+    Drawer,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    ListItemIcon,
 } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter"; // Keep Twitter for X
+import TwitterIcon from "@mui/icons-material/Twitter";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TelegramIcon from "@mui/icons-material/Telegram";
-import LinkedInIcon from "@mui/icons-material/LinkedIn"; // Keep LinkedIn
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import LinkIcon from "@mui/icons-material/Link";
 import SearchIcon from "@mui/icons-material/Search";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 
-// SocialIcon component remains the same
 const SocialIcon = ({ platform }) => {
     switch (platform?.toLowerCase()) {
         case "facebook":
@@ -56,7 +64,6 @@ const SocialIcon = ({ platform }) => {
     }
 };
 
-// getTranslatedField helper remains the same
 const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
     const { props } = usePage();
     const currentLocale = props.locale || locale;
@@ -74,18 +81,17 @@ const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
     );
 };
 
-// NavLink component remains the same
-const NavLink = ({ item, isMenuItem = false }) => {
+const NavLink = ({ item, isMenuItem = false, isDrawerItem = false }) => {
     const label = getTranslatedField(item.label);
     const commonProps = {
-        color: isMenuItem ? "inherit" : "text.secondary",
+        color: isMenuItem || isDrawerItem ? "inherit" : "text.secondary",
         underline: "hover",
         target: item.target,
         rel: item.target === "_blank" ? "noopener noreferrer" : undefined,
         sx: {
             display: "block",
-            py: isMenuItem ? 1 : 0.5,
-            px: isMenuItem ? 2 : 0,
+            py: isMenuItem ? 1 : isDrawerItem ? 1.5 : 0.5,
+            px: isMenuItem || isDrawerItem ? 2 : 0,
             fontSize: "0.875rem",
             width: "100%",
             textAlign: "left",
@@ -101,7 +107,11 @@ const NavLink = ({ item, isMenuItem = false }) => {
         );
     } else {
         try {
-            if (typeof route !== "undefined" && !item.url.includes("/")) {
+            if (
+                typeof route !== "undefined" &&
+                !item.url.includes("/") &&
+                route().has(item.url)
+            ) {
                 return (
                     <MuiLink
                         component={InertiaLink}
@@ -114,7 +124,7 @@ const NavLink = ({ item, isMenuItem = false }) => {
             }
         } catch (e) {
             console.warn(
-                `Ziggy route() failed for URL: ${item.url}. Falling back to direct path.`,
+                `Ziggy route() failed for NavLink name: ${item.url}. Falling back to path.`,
             );
         }
         return (
@@ -125,7 +135,6 @@ const NavLink = ({ item, isMenuItem = false }) => {
     }
 };
 
-// HeaderNavLink component remains the same
 const HeaderNavLink = ({ item }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -152,12 +161,16 @@ const HeaderNavLink = ({ item }) => {
     let linkHref = item.url;
     if (!hasChildren && !isExternal) {
         try {
-            if (typeof route !== "undefined" && !item.url.includes("/")) {
+            if (
+                typeof route !== "undefined" &&
+                !item.url.includes("/") &&
+                route().has(item.url)
+            ) {
                 linkHref = route(item.url);
             }
         } catch (e) {
             console.warn(
-                `Ziggy route() failed for header URL: ${item.url}. Falling back to direct path.`,
+                `Ziggy route() failed for HeaderNavLink name: ${item.url}. Falling back to path.`,
             );
             linkHref = item.url;
         }
@@ -214,13 +227,12 @@ export default function PublicLayout({ children }) {
     const {
         socialAccounts,
         auth,
-        errors: pageErrors,
         navigationItems,
         settings,
         flash,
         query: currentSearchQuery,
         locale: currentLocale,
-    } = usePage().props; // Added locale
+    } = usePage().props;
     const {
         data: subData,
         setData: setSubData,
@@ -237,20 +249,30 @@ export default function PublicLayout({ children }) {
         settings?.site_name?.value,
         currentLocale,
         "Personality Platform",
-    ); // Use currentLocale
+    );
     const headerNavItems = navigationItems?.header ?? [];
     const footerCol1Items =
         navigationItems?.footer_col1?.filter((item) => !item.parent_id) ?? [];
     const footerCol2Items =
         navigationItems?.footer_col2?.filter((item) => !item.parent_id) ?? [];
     const [searchQuery, setSearchQuery] = useState(currentSearchQuery || "");
+    const [mobileOpen, setMobileOpen] = useState(false);
+
+    const handleDrawerToggle = () => {
+        setMobileOpen((prevState) => !prevState);
+    };
+
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
             router.get(
                 route("search"),
                 { q: searchQuery },
-                { preserveState: true, replace: route().current("search") },
+                {
+                    preserveState: true,
+                    replace: route().current("search"),
+                    onSuccess: () => setMobileOpen(false),
+                },
             );
         }
     };
@@ -289,6 +311,141 @@ export default function PublicLayout({ children }) {
         setSearchQuery(currentSearchQuery || "");
     }, [currentSearchQuery]);
 
+    const getDrawerLinkHref = (url) => {
+        if (!url) return "#";
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+            return url;
+        }
+        if (
+            typeof route !== "undefined" &&
+            !url.includes("/") &&
+            route().has(url)
+        ) {
+            try {
+                return route(url);
+            } catch (e) {
+                console.warn(
+                    `Ziggy route() failed for drawer link name: ${url}. Falling back to path.`,
+                );
+                return url;
+            }
+        }
+        return url;
+    };
+    const getDrawerLinkComponent = (url) => {
+        if (!url || url.startsWith("http://") || url.startsWith("https://")) {
+            return "a";
+        }
+        return InertiaLink;
+    };
+
+    const drawer = (
+        <Box onClick={handleDrawerToggle} sx={{ textAlign: "center", p: 2 }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 2,
+                }}
+            >
+                <Typography variant="h6" sx={{ my: 0 }}>
+                    {" "}
+                    {siteName}{" "}
+                </Typography>
+                <IconButton onClick={handleDrawerToggle}>
+                    {" "}
+                    <CloseIcon />{" "}
+                </IconButton>
+            </Box>
+            <Divider />
+            <List>
+                <ListItem>
+                    <Box
+                        component="form"
+                        onSubmit={handleSearchSubmit}
+                        sx={{ width: "100%" }}
+                    >
+                        <TextField
+                            size="small"
+                            variant="outlined"
+                            placeholder="Search…"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        {" "}
+                                        <SearchIcon />{" "}
+                                    </InputAdornment>
+                                ),
+                            }}
+                            fullWidth
+                        />
+                    </Box>
+                </ListItem>
+                <Divider sx={{ my: 1 }} />
+                {headerNavItems.map((item) => (
+                    <ListItem key={item.id} disablePadding>
+                        <ListItemButton
+                            component={getDrawerLinkComponent(item.url)}
+                            href={getDrawerLinkHref(item.url)}
+                            {...(getDrawerLinkComponent(item.url) === "a" && {
+                                target: "_blank",
+                                rel: "noopener noreferrer",
+                            })}
+                            sx={{ textAlign: "left" }}
+                        >
+                            <ListItemText
+                                primary={getTranslatedField(
+                                    item.label,
+                                    currentLocale,
+                                )}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+                <Divider sx={{ my: 1 }} />
+                {auth.user ? (
+                    <ListItem disablePadding>
+                        <ListItemButton
+                            component={InertiaLink}
+                            href={route("admin.dashboard")}
+                            sx={{ textAlign: "left" }}
+                        >
+                            <ListItemText primary="Dashboard" />
+                        </ListItemButton>
+                    </ListItem>
+                ) : (
+                    <>
+                        {route().has("login") && (
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    component={InertiaLink}
+                                    href={route("login")}
+                                    sx={{ textAlign: "left" }}
+                                >
+                                    <ListItemText primary="Login" />
+                                </ListItemButton>
+                            </ListItem>
+                        )}
+                        {route().has("register") && (
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    component={InertiaLink}
+                                    href={route("register")}
+                                    sx={{ textAlign: "left" }}
+                                >
+                                    <ListItemText primary="Register" />
+                                </ListItemButton>
+                            </ListItem>
+                        )}
+                    </>
+                )}
+            </List>
+        </Box>
+    );
+
     return (
         <Box
             sx={{
@@ -305,6 +462,15 @@ export default function PublicLayout({ children }) {
             >
                 <Container maxWidth="lg">
                     <Toolbar disableGutters>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            edge="start"
+                            onClick={handleDrawerToggle}
+                            sx={{ mr: 2, display: { md: "none" } }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
                         <Typography
                             variant="h6"
                             component={InertiaLink}
@@ -313,10 +479,10 @@ export default function PublicLayout({ children }) {
                                 textDecoration: "none",
                                 color: "inherit",
                                 mr: 2,
+                                flexGrow: { xs: 1, md: 0 },
                             }}
                         >
-                            {" "}
-                            {siteName}{" "}
+                            {siteName}
                         </Typography>
                         <Box
                             sx={{
@@ -325,17 +491,19 @@ export default function PublicLayout({ children }) {
                                 gap: 1,
                             }}
                         >
-                            {" "}
                             {headerNavItems.map((item) => (
                                 <HeaderNavLink key={item.id} item={item} />
-                            ))}{" "}
+                            ))}
                         </Box>
                         <Box
                             component="form"
                             onSubmit={handleSearchSubmit}
-                            sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
+                            sx={{
+                                mr: { xs: 0, md: 2 },
+                                ml: { xs: 1 },
+                                display: { xs: "none", md: "flex" },
+                            }}
                         >
-                            {" "}
                             <TextField
                                 size="small"
                                 variant="outlined"
@@ -345,37 +513,54 @@ export default function PublicLayout({ children }) {
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            {" "}
-                                            <SearchIcon />{" "}
+                                            <SearchIcon />
                                         </InputAdornment>
                                     ),
                                 }}
-                            />{" "}
+                            />
                         </Box>
-                        {auth.user ? (
-                            <Button
-                                component={InertiaLink}
-                                href={route("admin.dashboard")}
-                                color="primary"
-                                variant="outlined"
-                                size="small"
-                                sx={{ ml: "auto" }}
-                            >
-                                Dashboard
-                            </Button>
-                        ) : (
-                            <Box sx={{ ml: "auto" }}></Box>
-                        )}
+                        <Box sx={{ display: { xs: "none", md: "block" } }}>
+                            {auth.user ? (
+                                <Button
+                                    component={InertiaLink}
+                                    href={route("admin.dashboard")}
+                                    color="primary"
+                                    variant="outlined"
+                                    size="small"
+                                >
+                                    Dashboard
+                                </Button>
+                            ) : (
+                                <> </>
+                            )}
+                        </Box>
                     </Toolbar>
                 </Container>
             </AppBar>
+            <Box component="nav">
+                <Drawer
+                    variant="temporary"
+                    open={mobileOpen}
+                    onClose={handleDrawerToggle}
+                    ModalProps={{ keepMounted: true }}
+                    sx={{
+                        display: { xs: "block", md: "none" },
+                        "& .MuiDrawer-paper": {
+                            boxSizing: "border-box",
+                            width: 280,
+                        },
+                    }}
+                >
+                    {drawer}
+                </Drawer>
+            </Box>
+
             <Container
                 component="main"
                 maxWidth="lg"
                 sx={{ mt: 4, mb: 4, flexGrow: 1 }}
             >
-                {" "}
-                {children}{" "}
+                {children}
             </Container>
             <Box
                 component="footer"
@@ -387,12 +572,8 @@ export default function PublicLayout({ children }) {
                 }}
             >
                 <Container maxWidth="lg">
-                    {/* Grid container - Removed 'item' prop from children */}
                     <Grid container spacing={4} justifyContent="space-between">
-                        {/* Grid item - Removed 'item' prop */}
-                        <Grid xs={12} md={4}>
-                            {" "}
-                            {/* Use direct responsive props */}
+                        <Grid size={{ xs: 12, md: 4 }}>
                             <Typography variant="h6" gutterBottom>
                                 {siteName}
                             </Typography>
@@ -402,10 +583,7 @@ export default function PublicLayout({ children }) {
                             </Typography>
                         </Grid>
                         {footerCol1Items.length > 0 && (
-                            /* Grid item - Removed 'item' prop */
-                            <Grid xs={6} sm={3} md={2}>
-                                {" "}
-                                {/* Use direct responsive props */}
+                            <Grid size={{ xs: 6, sm: 3, md: 2 }}>
                                 <Typography variant="subtitle1" gutterBottom>
                                     Links
                                 </Typography>
@@ -415,10 +593,7 @@ export default function PublicLayout({ children }) {
                             </Grid>
                         )}
                         {footerCol2Items.length > 0 && (
-                            /* Grid item - Removed 'item' prop */
-                            <Grid xs={6} sm={3} md={2}>
-                                {" "}
-                                {/* Use direct responsive props */}
+                            <Grid size={{ xs: 6, sm: 3, md: 2 }}>
                                 <Typography variant="subtitle1" gutterBottom>
                                     Resources
                                 </Typography>
@@ -427,22 +602,17 @@ export default function PublicLayout({ children }) {
                                 ))}
                             </Grid>
                         )}
-                        {/* Grid item - Removed 'item' prop */}
-                        <Grid xs={12} md={4}>
-                            {" "}
-                            {/* Use direct responsive props */}
+                        <Grid size={{ xs: 12, md: 4 }}>
                             {socialAccounts && socialAccounts.length > 0 && (
                                 <>
-                                    {" "}
                                     <Typography
                                         variant="subtitle1"
                                         gutterBottom
                                     >
                                         Connect
-                                    </Typography>{" "}
+                                    </Typography>
                                     <Box sx={{ mb: 2 }}>
                                         {socialAccounts.map((acc) => (
-                                            // ** Tooltip Fix: Wrap IconButton in a span **
                                             <Tooltip
                                                 title={
                                                     getTranslatedField(
@@ -453,8 +623,6 @@ export default function PublicLayout({ children }) {
                                                 key={acc.id}
                                             >
                                                 <span>
-                                                    {" "}
-                                                    {/* <-- Add wrapper span */}
                                                     <IconButton
                                                         component="a"
                                                         href={acc.url}
@@ -467,7 +635,6 @@ export default function PublicLayout({ children }) {
                                                                 currentLocale,
                                                             ) || acc.platform
                                                         }
-                                                        // Disable button if href is invalid/missing (optional)
                                                         disabled={!acc.url}
                                                     >
                                                         <SocialIcon
@@ -477,10 +644,9 @@ export default function PublicLayout({ children }) {
                                                         />
                                                     </IconButton>
                                                 </span>
-                                                {/* <-- Close wrapper span */}
                                             </Tooltip>
                                         ))}
-                                    </Box>{" "}
+                                    </Box>
                                 </>
                             )}
                             <Typography variant="subtitle1" gutterBottom>
@@ -533,7 +699,6 @@ export default function PublicLayout({ children }) {
                     </Typography>
                 </Container>
             </Box>
-            {/* Snackbar remains the same */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={6000}
@@ -547,8 +712,7 @@ export default function PublicLayout({ children }) {
                     sx={{ width: "100%" }}
                     variant="filled"
                 >
-                    {" "}
-                    {snackbarMessage}{" "}
+                    {snackbarMessage}
                 </Alert>
             </Snackbar>
         </Box>
