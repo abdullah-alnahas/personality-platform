@@ -1,45 +1,30 @@
 <?php
-// Create/Edit file: app/Models/Quote.php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations; // Import HasTranslations
-
-class Quote extends Model
-{
-    use HasFactory, HasTranslations; // Add HasTranslations
-
-    // Define fillable fields based on migration
-    protected $fillable = [
-        'text',
-        'source',
-        'is_featured',
-        'status',
-    ];
-
-    // Define translatable fields
-    public array $translatable = [
-        'text',
-        'source',
-    ];
-
-    // Define casts, especially for translatable JSON and boolean
-    protected $casts = [
-        'text' => 'array',
-        'source' => 'array',
-        'is_featured' => 'boolean',
-    ];
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create("quotes", function (Blueprint $table) {
+            $table->id();
+            $table->json("text"); // Translatable
+            $table->json("source")->nullable(); // Translatable
+            $table->boolean("is_featured")->default(false);
+            $table->string("status")->default("draft"); // e.g., draft, pending, published
+            $table->timestamps();
+        });
+    }
 
     /**
-     * Scope a query to only include published quotes.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * Reverse the migrations.
      */
-    public function scopePublished($query)
+    public function down(): void
     {
-        return $query->where('status', 'published');
+        Schema::dropIfExists("quotes");
     }
-}
+};

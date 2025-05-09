@@ -12,23 +12,20 @@ class Quote extends Model
 
     // Define fillable fields based on migration
     protected $fillable = [
-        'text',
-        'source',
-        'is_featured', // Note: This field exists but might not be used if status handles visibility
-        'status',
+        "text",
+        "source",
+        "is_featured", // Note: This field exists but might not be used if status handles visibility
+        "status",
     ];
 
     // Define translatable fields
-    public array $translatable = [
-        'text',
-        'source',
-    ];
+    public array $translatable = ["text", "source"];
 
     // Define casts, especially for translatable JSON and boolean
     protected $casts = [
-        'text' => 'array',
-        'source' => 'array',
-        'is_featured' => 'boolean',
+        "text" => "array",
+        "source" => "array",
+        "is_featured" => "boolean",
     ];
 
     /**
@@ -42,6 +39,6 @@ class Quote extends Model
     {
         // Make sure the 'status' column exists in your 'quotes' table migration
         // If not, you might need to add it or adjust this scope.
-        return $query->where('status', 'published');
+        return $query->where("status", "published");
     }
 }
