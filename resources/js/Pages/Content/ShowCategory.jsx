@@ -1,6 +1,5 @@
-// Edit file: resources/js/Pages/Content/ShowCategory.jsx
 import React from "react";
-import { Head, Link as InertiaLink, usePage } from "@inertiajs/react";
+import { Head, Link as InertiaLink, usePage } from "@inertiajs/react"; // usePage is fine inside the component itself
 import PublicLayout from "@/Layouts/PublicLayout";
 import {
     Box,
@@ -12,10 +11,11 @@ import {
     Link,
     Button,
     Pagination,
-} from "@mui/material"; // Pagination is MUI, not Inertia's component
+} from "@mui/material";
 import ContentCard from "@/Components/ContentCard";
 import HomeIcon from "@mui/icons-material/Home";
 
+// getTranslatedField is still used within the ShowCategory component body correctly
 const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
     const { props } = usePage();
     const currentLocale = props.locale || locale;
@@ -34,8 +34,8 @@ const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
 };
 
 export default function ShowCategory({ category, items }) {
-    const { data, links, current_page, last_page } = items; // last_page is for MUI Pagination
-    const categoryName = getTranslatedField(category.name);
+    const { data, links, current_page, last_page } = items;
+    const categoryName = getTranslatedField(category.name); // Fine here
 
     return (
         <>
@@ -86,13 +86,13 @@ export default function ShowCategory({ category, items }) {
                 )}
             </Grid>
 
-            {links.length > 3 && ( // Standard Inertia pagination links
+            {links.length > 3 && (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
                     <Box sx={{ display: "flex", gap: 1 }}>
                         {links.map((link, index) => (
                             <Button
                                 key={index}
-                                component={link.url ? InertiaLink : "button"} // Use button if URL is null
+                                component={link.url ? InertiaLink : "button"}
                                 href={link.url}
                                 disabled={!link.url || link.active}
                                 size="small"
@@ -108,9 +108,20 @@ export default function ShowCategory({ category, items }) {
         </>
     );
 }
-ShowCategory.layout = (page) => (
-    <PublicLayout
-        children={page}
-        title={getTranslatedField(page.props.category?.name)}
-    />
-);
+
+// Corrected Layout Assignment:
+ShowCategory.layout = (page) => {
+    // Safely derive title from page.props for the layout
+    const categoryNameObject = page.props.category?.name;
+    let titleForLayout = "Category"; // Default title
+    if (categoryNameObject && typeof categoryNameObject === "object") {
+        const currentLocale = page.props.locale || "en"; // Get locale from page.props
+        titleForLayout =
+            categoryNameObject[currentLocale] ||
+            Object.values(categoryNameObject)[0] ||
+            "Category";
+    } else if (categoryNameObject) {
+        titleForLayout = String(categoryNameObject);
+    }
+    return <PublicLayout children={page} title={titleForLayout} />;
+};

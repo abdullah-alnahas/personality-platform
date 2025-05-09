@@ -16,6 +16,7 @@ use App\Http\Controllers\ContactPageController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\QuoteController;
+use App\Http\Controllers\Admin\MediaController;
 
 // --- Public Routes ---
 Route::get("/", HomepageController::class)->name("home");
@@ -108,6 +109,13 @@ Route::prefix("admin")
             Route::resource("quotes", QuoteController::class)->middleware(
                 "can:manage quotes"
             ); // Apply permission to resource
+            // Media Library Routes (Requires 'manage media' permission)
+            Route::get("media", [MediaController::class, "index"])
+                ->name("media.index")
+                ->middleware("can:manage media");
+            Route::delete("media/{medium}", [MediaController::class, "destroy"]) // Use {medium} to match variable name in controller
+                ->name("media.destroy")
+                ->middleware("can:manage media");
         });
     });
 
