@@ -38,6 +38,30 @@ class ContentItem extends Model implements HasMedia
         "is_featured_home" => "boolean",
     ];
 
+    public function setContentAttribute($value)
+    {
+        if (is_array($value)) {
+            $cleanedTranslations = [];
+            foreach ($value as $locale => $htmlContent) {
+                // Cleanse only if it's a non-null string
+                $cleanedTranslations[$locale] = is_string($htmlContent)
+                    ? clean($htmlContent)
+                    : $htmlContent;
+            }
+            $this->attributes["content"] = json_encode($cleanedTranslations);
+        } elseif (is_string($value)) {
+            // This case should ideally not happen if form sends structured translations
+            // but as a fallback, clean it and set for the current locale.
+            // For safety, ensure it's stored in the JSON structure.
+            $locale = app()->getLocale();
+            $this->attributes["content"] = json_encode([
+                $locale => clean($value),
+            ]);
+        } else {
+            $this->attributes["content"] = $value; // Or json_encode($value) if it should always be JSON
+        }
+    }
+
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()

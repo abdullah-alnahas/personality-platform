@@ -37,54 +37,56 @@ class SettingController extends Controller
         Gate::authorize("manage settings");
 
         $validatedData = $request->validated();
-        $translatableSettingsConfig = config(
-            "translatable.setting_attributes",
-            ["value"]
-        ); // Default to 'value'
+        $defaultLocale = config("app.locale", "en");
 
-        foreach ($validatedData as $key => $value) {
+        foreach ($validatedData as $key => $valueFromRequest) {
             $setting = Setting::firstOrNew(["key" => $key]);
 
-            // Determine if the current setting key is configured to be translatable
-            // For simplicity, we assume all settings store their main data in the 'value' field.
-            // If other fields were translatable, this logic would need to be more complex.
-            $isTranslatableValue = true; // By default, assume 'value' field is always translatable for settings
+            // Prepare the value to be saved, applying sanitization if needed
+            $valueToSave = $valueFromRequest;
 
-            if ($isTranslatableValue && is_array($value)) {
-                // If the value from the form is an array, set translations for the 'value' attribute
-                $setting->setTranslations("value", $value);
-            } elseif (!$isTranslatableValue && !is_array($value)) {
-                // If not translatable and not an array, set directly (assuming it's a simple string/number)
-                // This case assumes single-language non-JSON values might also be stored in value['en'] by form.
-                // Or, if your form sends non-translatable values directly:
-                // $setting->value = ['en' => $value]; // Store as array for consistency if 'value' cast to array
-                $setting->value = $value; // If 'value' is NOT cast to array and is simple string
-            } else {
-                // If it's a simple value for a translatable field, wrap it for the default locale
-                // This handles cases like a non-translatable boolean or number being sent for a 'value' field.
-                // We wrap in default locale to maintain structure if 'value' is JSON.
-                // However, the seeder and form should ideally send structured data.
-                // For boolean or number from switch/number input not wrapped in lang array:
-                if (
-                    is_bool($value) ||
-                    is_numeric($value) ||
-                    is_string($value)
-                ) {
-                    // For non-translatable types like boolean/number, we store it simply.
-                    // The Setting model's $casts should handle 'value' as 'array' if it's always JSON.
-                    // If value is not meant to be an array (e.g. a simple string '12' for posts_per_page)
-                    // this needs careful handling based on how $casts['value'] is defined.
-                    // Assuming 'value' is always JSON/array in DB due to HasTranslations.
-                    $defaultLocale = config("app.locale");
-                    $setting->value = [$defaultLocale => $value];
+            if ($setting->type === "richtext") {
+                if (is_array($valueFromRequest)) {
+                    $cleanedTranslations = [];
+                    foreach ($valueFromRequest as $locale => $htmlContent) {
+                        $cleanedTranslations[$locale] = is_string($htmlContent)
+                            ? clean($htmlContent)
+                            : $htmlContent;
+                    }
+                    $valueToSave = $cleanedTranslations;
+                } elseif (is_string($valueFromRequest)) {
+                    // Fallback if a non-array value is sent for a richtext field
+                    $valueToSave = [$defaultLocale => clean($valueFromRequest)];
                 }
+            } elseif ($setting->type === "boolean") {
+                // Ensure boolean is stored consistently (e.g., as a string '1' or '0' in default locale for JSON)
+                // UpdateSettingsRequest already prepares boolean directly for $data array in frontend
+                // The form now sends a direct boolean for 'boolean' types.
+                // We need to store it in the expected JSON structure for translatable 'value' field.
+                $valueToSave = [
+                    $defaultLocale => $valueFromRequest ? "1" : "0",
+                ];
             }
+            // For other types like text, email, number, if they are translatable,
+            // they are already expected as arrays from the form and UpdateSettingsRequest.
+
+            // The Setting model uses HasTranslations for the 'value' attribute,
+            // so assign the (potentially cleaned) array directly.
+            $setting->value = $valueToSave;
             $setting->save();
         }
 
-        Cache::forget("site_settings_all"); // Clear general settings cache used by HomepageController
-        Cache::forget("active_social_accounts"); // Clear social accounts cache from HandleInertiaRequests
-        Cache::forget("published_navigation_items_structured"); // Clear navigation cache
+        // Clear relevant caches
+        Cache::forget("site_settings_all");
+        Cache::forget("active_social_accounts");
+        Cache::forget("published_navigation_items_structured");
+        // Specific setting caches (observers will also handle this, but belt-and-suspenders here is fine)
+        if (isset($validatedData["about_page_content"])) {
+            Cache::forget("setting_about_page_content");
+        }
+        if (isset($validatedData["site_name"])) {
+            Cache::forget("setting_site_name");
+        }
 
         return redirect()
             ->route("admin.settings.edit")
