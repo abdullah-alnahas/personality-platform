@@ -27,6 +27,7 @@
         "@mui/x-data-grid": "^8.2.0",
         "@mui/x-date-pickers": "^8.2.0",
         "dayjs": "^1.11.13",
+        "react-quill": "^2.0.0",
         "react-slick": "^0.30.3",
         "slick-carousel": "^1.8.1"
     }

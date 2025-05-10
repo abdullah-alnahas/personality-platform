@@ -1,6 +1,7 @@
 import React from "react";
 import { Head, usePage, useForm } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
+import RichTextEditor from "@/Components/RichTextEditor"; // <-- Import RichTextEditor
 import {
     Box,
     Typography,
@@ -18,21 +19,25 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-export default function Edit({ settings, groupedSettings, activeLanguages }) {
+export default function Edit({
+    settings,
+    groupedSettings,
+    activeLanguages: propActiveLanguages,
+}) {
     const { props } = usePage();
     const defaultLocale = props.locale || "en";
+    const activeLanguages = Array.isArray(propActiveLanguages)
+        ? propActiveLanguages
+        : props.activeLanguages || ["en", "ar", "tr"];
 
-    // Initialize form data dynamically from all settings
     const initialFormData = {};
-    Object.values(settings).forEach((setting) => {
+    // Ensure settings is an object before calling Object.values
+    Object.values(settings || {}).forEach((setting) => {
         const key = setting.key;
         const type = setting.type;
-        const value = setting.value; // This is the JSON object like {en: "val", ar: "val_ar"} or simple for boolean
+        const value = setting.value;
 
         if (type === "boolean") {
-            // Booleans are expected to be true/false directly from form,
-            // but stored as "1"/"0" in the default locale by seeder.
-            // Controller's UpdateSettingsRequest handles boolean cast.
             let boolValue = false;
             if (
                 value &&
@@ -40,10 +45,9 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
                 value[defaultLocale] !== undefined
             ) {
                 boolValue =
-                    value[defaultLocale] === "1" ||
+                    String(value[defaultLocale]) === "1" ||
                     value[defaultLocale] === true;
             } else if (typeof value === "string") {
-                // Non-translatable boolean might be stored as direct string
                 boolValue = value === "1";
             } else if (typeof value === "boolean") {
                 boolValue = value;
@@ -52,19 +56,12 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
         } else if (
             ["text", "textarea", "richtext", "email", "number"].includes(type)
         ) {
-            // These are expected to be objects with language keys by the form,
-            // as 'value' is a translatable JSON field in the Setting model.
-            initialFormData[key] = (
-                Array.isArray(activeLanguages) ? activeLanguages : []
-            ).reduce((acc, lang) => {
+            initialFormData[key] = activeLanguages.reduce((acc, lang) => {
                 acc[lang] = value?.[lang] ?? "";
                 return acc;
             }, {});
         } else {
-            // Fallback for unknown types, treat as simple text for now (might need adjustment)
-            initialFormData[key] = (
-                Array.isArray(activeLanguages) ? activeLanguages : []
-            ).reduce((acc, lang) => {
+            initialFormData[key] = activeLanguages.reduce((acc, lang) => {
                 acc[lang] = value?.[lang] ?? "";
                 return acc;
             }, {});
@@ -76,16 +73,39 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        // Prepare data for submission, especially for boolean values
+        const dataToSubmit = { ...data };
+        Object.values(settings || {}).forEach((setting) => {
+            if (setting.type === "boolean") {
+                // Store booleans as '1' or '0' string in the default locale, as per seeder
+                dataToSubmit[setting.key] = {
+                    [defaultLocale]: data[setting.key] ? "1" : "0",
+                };
+            }
+        });
+
         put(route("admin.settings.update"), {
+            data: dataToSubmit, // Send prepared data
             preserveScroll: true,
         });
     };
 
-    const handleFieldChange = (key, langCode, value, type) => {
+    // Updated to handle direct value from RTE and Switch, and event from TextField
+    const handleFieldChange = (key, langCode, valueOrEvent, type) => {
         if (type === "boolean") {
-            setData(key, value); // Direct boolean value
-        } else {
-            setData(key, { ...data[key], [langCode]: value });
+            setData(key, valueOrEvent); // valueOrEvent is the boolean from Switch's event.target.checked
+        } else if (
+            type === "richtext" ||
+            (valueOrEvent && typeof valueOrEvent !== "object")
+        ) {
+            // Direct value from RTE or simple input
+            setData(key, { ...data[key], [langCode]: valueOrEvent });
+        } else if (valueOrEvent && valueOrEvent.target) {
+            // Event from TextField
+            setData(key, {
+                ...data[key],
+                [langCode]: valueOrEvent.target.value,
+            });
         }
     };
 
@@ -103,7 +123,7 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
                         <FormControlLabel
                             control={
                                 <Switch
-                                    checked={!!data[key]} // Ensure it's boolean
+                                    checked={!!data[key]}
                                     onChange={(e) =>
                                         handleFieldChange(
                                             key,
@@ -118,7 +138,11 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
                             label={labelBase}
                         />
                         {errors[key] && (
-                            <FormHelperText error>{errors[key]}</FormHelperText>
+                            <FormHelperText error>
+                                {typeof errors[key] === "object"
+                                    ? errors[key][defaultLocale]
+                                    : errors[key]}
+                            </FormHelperText>
                         )}
                     </Grid>
                 );
@@ -145,12 +169,7 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
                             label={`<span class="math-inline">\{labelBase\} \(</span>{lang.toUpperCase()})`}
                             value={data[key]?.[lang] ?? ""}
                             onChange={(e) =>
-                                handleFieldChange(
-                                    key,
-                                    lang,
-                                    e.target.value,
-                                    type,
-                                )
+                                handleFieldChange(key, lang, e, type)
                             }
                             error={
                                 !!errors[
@@ -167,7 +186,6 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
                     </Grid>
                 ));
             case "textarea":
-            case "richtext": // Treat richtext as textarea for now
                 return activeLanguages.map((lang) => (
                     <Grid
                         item
@@ -178,17 +196,12 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
                         <TextField
                             fullWidth
                             multiline
-                            rows={type === "richtext" ? 8 : 4}
+                            rows={4}
                             id={`<span class="math-inline">\{key\}\-</span>{lang}`}
-                            label={`<span class="math-inline">\{labelBase\} \(</span>{lang.toUpperCase()})${type === "richtext" ? " (Basic Text)" : ""}`}
+                            label={`<span class="math-inline">\{labelBase\} \(</span>{lang.toUpperCase()})`}
                             value={data[key]?.[lang] ?? ""}
                             onChange={(e) =>
-                                handleFieldChange(
-                                    key,
-                                    lang,
-                                    e.target.value,
-                                    type,
-                                )
+                                handleFieldChange(key, lang, e, type)
                             }
                             error={
                                 !!errors[
@@ -201,6 +214,39 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
                                 ]
                             }
                             sx={{ mb: 2 }}
+                        />
+                    </Grid>
+                ));
+            case "richtext": // Use RichTextEditor for 'richtext' type
+                return activeLanguages.map((lang) => (
+                    <Grid
+                        item
+                        xs={12}
+                        md={activeLanguages.length > 1 ? 4 : 12}
+                        key={`<span class="math-inline">\{key\}\-</span>{lang}`}
+                    >
+                        <Typography
+                            variant="caption"
+                            display="block"
+                            gutterBottom
+                        >{`<span class="math-inline">\{labelBase\} \(</span>{lang.toUpperCase()})`}</Typography>
+                        <RichTextEditor
+                            value={data[key]?.[lang] || ""}
+                            onChange={(value) =>
+                                handleFieldChange(key, lang, value, type)
+                            }
+                            placeholder={`Enter content for <span class="math-inline">\{labelBase\} \(</span>{lang.toUpperCase()})...`}
+                            direction={lang === "ar" ? "rtl" : "ltr"}
+                            error={
+                                !!errors[
+                                    `<span class="math-inline">\{key\}\.</span>{lang}`
+                                ]
+                            }
+                            helperText={
+                                errors[
+                                    `<span class="math-inline">\{key\}\.</span>{lang}`
+                                ]
+                            }
                         />
                     </Grid>
                 ));
@@ -219,9 +265,9 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
         <>
             <Head title="Site Settings" />
             <Typography variant="h4" gutterBottom>
-                Site Settings
+                {" "}
+                Site Settings{" "}
             </Typography>
-
             <Box
                 component="form"
                 onSubmit={handleSubmit}
@@ -258,7 +304,6 @@ export default function Edit({ settings, groupedSettings, activeLanguages }) {
                         </Accordion>
                     ),
                 )}
-
                 <Grid
                     item
                     xs={12}
