@@ -1,117 +1,136 @@
-import { useEffect } from 'react';
-import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import React, { useEffect } from "react"; // Added React for hooks
+import { Head, Link as InertiaLink, useForm } from "@inertiajs/react";
+import {
+    TextField,
+    Button,
+    Box,
+    Typography,
+    Grid,
+    Link as MuiLink,
+} from "@mui/material";
+import GuestLayout from "@/Layouts/GuestLayout"; // Already uses MUI
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
     });
 
     useEffect(() => {
         return () => {
-            reset('password', 'password_confirmation');
+            reset("password", "password_confirmation");
         };
     }, []);
 
     const submit = (e) => {
         e.preventDefault();
-
-        post(route('register'));
+        post(route("register"));
     };
 
     return (
         <GuestLayout>
             <Head title="Register" />
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
+            <Typography
+                component="h1"
+                variant="h5"
+                sx={{ textAlign: "center", mb: 2 }}
+            >
+                Register
+            </Typography>
 
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
-                        autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.name} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password_confirmation} className="mt-2" />
-                </div>
-
-                <div className="flex items-center justify-end mt-4">
-                    <Link
-                        href={route('login')}
-                        className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            <Box component="form" onSubmit={submit} noValidate sx={{ mt: 1 }}>
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="name"
+                    label="Name"
+                    name="name"
+                    autoComplete="name"
+                    autoFocus
+                    value={data.name}
+                    onChange={(e) => setData("name", e.target.value)}
+                    error={!!errors.name}
+                    helperText={errors.name}
+                    disabled={processing}
+                />
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    value={data.email}
+                    onChange={(e) => setData("email", e.target.value)}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                    disabled={processing}
+                />
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="new-password"
+                    value={data.password}
+                    onChange={(e) => setData("password", e.target.value)}
+                    error={!!errors.password}
+                    helperText={errors.password}
+                    disabled={processing}
+                />
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password_confirmation"
+                    label="Confirm Password"
+                    type="password"
+                    id="password_confirmation"
+                    autoComplete="new-password"
+                    value={data.password_confirmation}
+                    onChange={(e) =>
+                        setData("password_confirmation", e.target.value)
+                    }
+                    error={!!errors.password_confirmation}
+                    helperText={errors.password_confirmation}
+                    disabled={processing}
+                />
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        mt: 3,
+                        mb: 2,
+                    }}
+                >
+                    <MuiLink
+                        component={InertiaLink}
+                        href={route("login")}
+                        variant="body2"
+                        sx={{ mr: "auto" }}
                     >
                         Already registered?
-                    </Link>
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
-                    </PrimaryButton>
-                </div>
-            </form>
+                    </MuiLink>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={processing}
+                        sx={{ ml: 2 }}
+                    >
+                        {processing ? "Registering..." : "Register"}
+                    </Button>
+                </Box>
+            </Box>
         </GuestLayout>
     );
 }
