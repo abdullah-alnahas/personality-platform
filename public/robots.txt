@@ -1,2 +1,17 @@
 User-agent: *
-Disallow:
+Allow: /
+Allow: /item/
+Allow: /category/
+Allow: /about
+Allow: /contact
+Allow: /search
+
+Disallow: /admin
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /confirm-password
+Disallow: /email/verify
+
+Sitemap: http://localhost/sitemap.xml
