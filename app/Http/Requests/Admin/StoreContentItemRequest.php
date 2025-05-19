@@ -1,11 +1,9 @@
 <?php
-// Edit file: app/Http/Requests/Admin/StoreContentItemRequest.php
 
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule; // Import Rule for 'in' validation
-// use Illuminate\Support\Facades\Gate; // Optional for Policy-based authorization
+use Illuminate\Validation\Rule;
 
 class StoreContentItemRequest extends FormRequest
 {
@@ -15,11 +13,7 @@ class StoreContentItemRequest extends FormRequest
     public function authorize(): bool
     {
         // Check if the user has the permission to manage content items
-        // Replace with a more specific permission like 'create content items' if defined
-        return $this->user()->can('manage content items');
-
-        // Example using Policy (if you create a ContentItemPolicy later):
-        // return Gate::allows('create', \App\Models\ContentItem::class);
+        return $this->user()->can("manage content items");
     }
 
     /**
@@ -30,29 +24,49 @@ class StoreContentItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'                 => ['required', 'array'],
-            // Ensure at least one language title is provided
-            'title.*'               => ['required_without_all:'.implode(',', $this->getOtherLanguageKeys('title')), 'nullable', 'string', 'max:255'],
+            "title" => ["required", "array"],
+            // Ensure at least one language title is provided (example for default locale 'en')
+            // A more robust rule might check if at least one of the configured locales has a title.
+            "title." . config("app.locale", "en") => [
+                "required",
+                "string",
+                "max:255",
+            ],
+            "title.*" => ["nullable", "string", "max:255"], // Allow other locales to be nullable if default is present
 
-            'content_category_id'   => ['required', 'integer', 'exists:content_categories,id'],
+            "content_category_id" => [
+                "required",
+                "integer",
+                "exists:content_categories,id",
+            ],
 
-            'content'               => ['nullable', 'array'],
-            'content.*'             => ['nullable', 'string'], // Consider max length if needed
+            "content" => ["nullable", "array"],
+            "content.*" => ["nullable", "string"], // Consider max length if needed
 
-            'excerpt'               => ['nullable', 'array'],
-            'excerpt.*'             => ['nullable', 'string', 'max:500'], // Example max length
+            "excerpt" => ["nullable", "array"],
+            "excerpt.*" => ["nullable", "string", "max:1000"], // Example max length for excerpt
 
-            'status'                => ['required', 'string', Rule::in(['published', 'draft', 'pending'])],
-            'publish_date'          => ['nullable', 'date'],
-            'is_featured_home'      => ['sometimes', 'boolean'], // Handles true/false/1/0/'1'/'0'/null
+            "featured_image_alt_text" => ["nullable", "array"], // New field for alt text
+            "featured_image_alt_text.*" => ["nullable", "string", "max:255"], // Alt text for each language
 
-            // Add validation for the featured image (used in Task 3)
-            'featured_image'        => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'], // 2MB Max
+            "status" => [
+                "required",
+                "string",
+                Rule::in(["published", "draft", "pending"]),
+            ],
+            "publish_date" => [
+                "nullable",
+                "date_format:Y-m-d H:i:s",
+                "after_or_equal:today",
+            ], // Ensure correct format if sent
+            "is_featured_home" => ["sometimes", "boolean"],
 
-            // Potential future meta fields validation
-            // 'meta_fields'           => ['nullable', 'array'],
-            // 'meta_fields.*.title'   => ['nullable', 'string', 'max:255'],
-            // 'meta_fields.*.description' => ['nullable', 'string', 'max:160'],
+            "featured_image" => [
+                "nullable",
+                "image",
+                "mimes:jpeg,png,jpg,gif,webp",
+                "max:2048",
+            ], // 2MB Max
         ];
     }
 
@@ -63,25 +77,49 @@ class StoreContentItemRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'is_featured_home' => $this->boolean('is_featured_home'),
+            "is_featured_home" => $this->boolean("is_featured_home"),
+            // If publish_date is sent as a non-ISO string from DateTimePicker, it might need formatting here
+            // However, if dayjs.toISOString() is used on frontend, it should be fine.
         ]);
     }
 
     /**
-    * Helper to get keys for other languages for required_without_all rule.
-    * TODO: Refactor this to use dynamically fetched active languages later.
-    */
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        $attributes = [];
+        foreach (
+            config("translatable.locales", ["en", "ar", "tr"])
+            as $locale
+        ) {
+            $attributes["title.{$locale}"] = "title ({$locale})";
+            $attributes["content.{$locale}"] = "content ({$locale})";
+            $attributes["excerpt.{$locale}"] = "excerpt ({$locale})";
+            $attributes[
+                "featured_image_alt_text.{$locale}"
+            ] = "featured image alt text ({$locale})";
+        }
+        return $attributes;
+    }
+
+    /**
+     * Helper to get keys for other languages for required_without_all rule.
+     * This is a simplified version. For robust 'at least one locale required'
+     * you might need a custom validation rule or more complex logic.
+     */
     protected function getOtherLanguageKeys(string $field): array
     {
         $keys = [];
-        // Assuming active languages are available (e.g., from config or DB)
-        // Replace with actual logic to get active language codes
-        $activeLanguages = ['en', 'ar', 'tr']; // Example - Fetch dynamically later
+        $activeLanguages = config("translatable.locales", ["en", "ar", "tr"]); // Fallback if not configured
         foreach ($activeLanguages as $langCode) {
-             $keys[] = $field . '.' . $langCode;
+            if ($langCode !== config("app.locale", "en")) {
+                // Exclude default locale for required_without_all
+                $keys[] = $field . "." . $langCode;
+            }
         }
-        // Filter out the current language being validated if necessary,
-        // but required_without_all handles this implicitly.
         return $keys;
     }
 }

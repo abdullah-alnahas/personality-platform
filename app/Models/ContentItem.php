@@ -21,23 +21,32 @@ class ContentItem extends Model implements HasMedia
         "slug",
         "content",
         "excerpt",
+        "featured_image_alt_text", // <-- ADDED
         "status",
         "publish_date",
         "meta_fields",
         "is_featured_home",
     ];
 
-    public array $translatable = ["title", "content", "excerpt", "meta_fields"];
+    public array $translatable = [
+        "title",
+        "content",
+        "excerpt",
+        "meta_fields",
+        "featured_image_alt_text", // <-- ADDED
+    ];
 
     protected $casts = [
         "title" => "array",
         "content" => "array",
         "excerpt" => "array",
         "meta_fields" => "array",
+        "featured_image_alt_text" => "array", // <-- ADDED
         "publish_date" => "datetime",
         "is_featured_home" => "boolean",
     ];
 
+    // ... (setContentAttribute, getSlugOptions, relationships, registerMediaCollections, registerMediaConversions remain the same) ...
     public function setContentAttribute($value)
     {
         if (is_array($value)) {
@@ -81,59 +90,46 @@ class ContentItem extends Model implements HasMedia
         $this->addMediaCollection("featured_image")
             ->singleFile()
             ->useDisk("public");
-        // Conversions will be defined in registerMediaConversions
     }
 
-    // This model-level method defines conversions for all media in this model,
-    // or you can define them per-collection in registerMediaCollections if preferred.
     public function registerMediaConversions(SpatieMedia $media = null): void
     {
-        // Thumbnail
         $this->addMediaConversion("thumbnail")
             ->width(150)
             ->height(150)
             ->sharpen(10)
-            ->format("webp") // Attempt to create a WebP version
+            ->format("webp")
             ->performOnCollections("featured_image");
-        $this->addMediaConversion("thumbnail_jpg") // Fallback JPG thumbnail
+        $this->addMediaConversion("thumbnail_jpg")
             ->width(150)
             ->height(150)
             ->sharpen(10)
             ->format("jpg")
             ->performOnCollections("featured_image");
-
-        // Small responsive size
         $this->addMediaConversion("responsive_sm")
             ->width(320)
-            ->format("webp") // Attempt to create a WebP version
+            ->format("webp")
             ->performOnCollections("featured_image");
-        $this->addMediaConversion("responsive_sm_jpg") // Fallback JPG
+        $this->addMediaConversion("responsive_sm_jpg")
             ->width(320)
             ->format("jpg")
             ->performOnCollections("featured_image");
-
-        // Medium responsive size
         $this->addMediaConversion("responsive_md")
             ->width(768)
-            ->format("webp") // Attempt to create a WebP version
+            ->format("webp")
             ->performOnCollections("featured_image");
-        $this->addMediaConversion("responsive_md_jpg") // Fallback JPG
+        $this->addMediaConversion("responsive_md_jpg")
             ->width(768)
             ->format("jpg")
             ->performOnCollections("featured_image");
-
-        // Large responsive size (example)
         $this->addMediaConversion("responsive_lg")
             ->width(1200)
-            ->format("webp") // Attempt to create a WebP version
+            ->format("webp")
             ->performOnCollections("featured_image");
-        $this->addMediaConversion("responsive_lg_jpg") // Fallback JPG
+        $this->addMediaConversion("responsive_lg_jpg")
             ->width(1200)
             ->format("jpg")
             ->performOnCollections("featured_image");
-
-        // Optionally, you can add ->nonQueued() to conversions if they must be immediate,
-        // but queuing is generally better for performance during uploads.
     }
 
     public function getOriginalFeaturedImageUrlAttribute(): ?string
@@ -141,33 +137,23 @@ class ContentItem extends Model implements HasMedia
         return $this->getFirstMediaUrl("featured_image");
     }
 
-    // This specific accessor for thumbnail_featured_image_url might need adjustment
-    // if we now have multiple thumbnail formats (webp, jpg).
-    // The frontend will need to be smarter about choosing.
-    // For simplicity, let's keep it pointing to the original thumbnail logic (getFirstUrl usually prefers original or first conversion)
-    // or decide on a primary thumbnail format.
     public function getThumbnailFeaturedImageUrlAttribute(): ?string
     {
-        // Prefer WebP thumbnail if available, otherwise fallback to JPG thumbnail
         if ($this->hasMedia("featured_image")) {
             $media = $this->getFirstMedia("featured_image");
             if ($media->hasGeneratedConversion("thumbnail")) {
-                // WebP version
                 return $media->getUrl("thumbnail");
             }
             if ($media->hasGeneratedConversion("thumbnail_jpg")) {
-                // JPG fallback
                 return $media->getUrl("thumbnail_jpg");
             }
         }
-        return $this->getFirstMediaUrl("featured_image", "thumbnail_jpg"); // Fallback if no specific found
+        return $this->getFirstMediaUrl("featured_image", "thumbnail_jpg");
     }
 
     protected $appends = [
         "original_featured_image_url",
         "thumbnail_featured_image_url",
-        // We will add more specific URLs for srcset in the controller/resource if needed
-        // or the frontend will construct them using getUrl for each conversion.
     ];
 
     public function scopePublished($query)
