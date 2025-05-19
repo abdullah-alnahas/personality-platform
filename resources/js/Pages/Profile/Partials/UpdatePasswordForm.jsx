@@ -1,113 +1,157 @@
-import { useRef } from 'react';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { useForm } from '@inertiajs/react';
-import { Transition } from '@headlessui/react';
+import React, { useRef } from "react"; // Removed useState as Transition is replaced
+import { useForm } from "@inertiajs/react";
+import {
+    TextField,
+    Button,
+    Box,
+    Typography,
+    Grid,
+    Fade, // MUI's alternative for simple fade transitions
+} from "@mui/material";
 
-export default function UpdatePasswordForm({ className = '' }) {
+export default function UpdatePasswordForm({ className = "" }) {
     const passwordInput = useRef();
     const currentPasswordInput = useRef();
 
-    const { data, setData, errors, put, reset, processing, recentlySuccessful } = useForm({
-        current_password: '',
-        password: '',
-        password_confirmation: '',
+    const {
+        data,
+        setData,
+        errors,
+        put,
+        reset,
+        processing,
+        recentlySuccessful,
+    } = useForm({
+        current_password: "",
+        password: "",
+        password_confirmation: "",
     });
 
     const updatePassword = (e) => {
         e.preventDefault();
 
-        put(route('password.update'), {
+        put(route("password.update"), {
             preserveScroll: true,
             onSuccess: () => reset(),
-            onError: (errors) => {
-                if (errors.password) {
-                    reset('password', 'password_confirmation');
-                    passwordInput.current.focus();
+            onError: (formErrors) => {
+                // Renamed errors to formErrors to avoid conflict with errors from useForm
+                if (formErrors.password) {
+                    reset("password", "password_confirmation");
+                    passwordInput.current?.focus(); // Added optional chaining
                 }
 
-                if (errors.current_password) {
-                    reset('current_password');
-                    currentPasswordInput.current.focus();
+                if (formErrors.current_password) {
+                    reset("current_password");
+                    currentPasswordInput.current?.focus(); // Added optional chaining
                 }
             },
         });
     };
 
     return (
-        <section className={className}>
+        <Box component="section" className={className} sx={{ maxWidth: "xl" }}>
+            {" "}
+            {/* Use sx for max-width if needed */}
             <header>
-                <h2 className="text-lg font-medium text-gray-900">Update Password</h2>
-
-                <p className="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay secure.
-                </p>
+                <Typography variant="h6" component="h2" gutterBottom>
+                    Update Password
+                </Typography>
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                >
+                    Ensure your account is using a long, random password to stay
+                    secure.
+                </Typography>
             </header>
+            <form onSubmit={updatePassword}>
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            id="current_password"
+                            name="current_password"
+                            label="Current Password"
+                            type="password"
+                            inputRef={currentPasswordInput} // Use inputRef for MUI TextField
+                            value={data.current_password}
+                            onChange={(e) =>
+                                setData("current_password", e.target.value)
+                            }
+                            autoComplete="current-password"
+                            error={!!errors.current_password}
+                            helperText={errors.current_password}
+                            disabled={processing}
+                        />
+                    </Grid>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="current_password" value="Current Password" />
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            id="password"
+                            name="password"
+                            label="New Password"
+                            type="password"
+                            inputRef={passwordInput} // Use inputRef for MUI TextField
+                            value={data.password}
+                            onChange={(e) =>
+                                setData("password", e.target.value)
+                            }
+                            autoComplete="new-password"
+                            error={!!errors.password}
+                            helperText={errors.password}
+                            disabled={processing}
+                        />
+                    </Grid>
 
-                    <TextInput
-                        id="current_password"
-                        ref={currentPasswordInput}
-                        value={data.current_password}
-                        onChange={(e) => setData('current_password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                    />
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            id="password_confirmation"
+                            name="password_confirmation"
+                            label="Confirm New Password"
+                            type="password"
+                            value={data.password_confirmation}
+                            onChange={(e) =>
+                                setData("password_confirmation", e.target.value)
+                            }
+                            autoComplete="new-password"
+                            error={!!errors.password_confirmation}
+                            helperText={errors.password_confirmation}
+                            disabled={processing}
+                        />
+                    </Grid>
 
-                    <InputError message={errors.current_password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password" value="New Password" />
-
-                    <TextInput
-                        id="password"
-                        ref={passwordInput}
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
-                    <TextInput
-                        id="password_confirmation"
-                        value={data.password_confirmation}
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError message={errors.password_confirmation} className="mt-2" />
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
+                    <Grid
+                        item
+                        xs={12}
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                            mt: 2,
+                        }}
                     >
-                        <p className="text-sm text-gray-600">Saved.</p>
-                    </Transition>
-                </div>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={processing}
+                        >
+                            Save
+                        </Button>
+
+                        <Fade in={recentlySuccessful}>
+                            <Typography
+                                variant="body2"
+                                sx={{ color: "success.main" }}
+                            >
+                                Saved.
+                            </Typography>
+                        </Fade>
+                    </Grid>
+                </Grid>
             </form>
-        </section>
+        </Box>
     );
 }
