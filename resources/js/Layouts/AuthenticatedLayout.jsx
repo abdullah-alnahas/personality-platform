@@ -1,125 +1,318 @@
-import { useState } from 'react';
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from '@inertiajs/react';
+import React, { useState } from "react";
+import ApplicationLogo from "@/Components/ApplicationLogo";
+import { Link as InertiaLink, usePage } from "@inertiajs/react";
+import {
+    AppBar,
+    Box,
+    Toolbar,
+    Typography,
+    Button,
+    IconButton,
+    Menu,
+    MenuItem,
+    Container,
+    Divider,
+    Drawer,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    ListItemIcon,
+    ThemeProvider,
+    createTheme,
+    CssBaseline,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import DashboardIcon from "@mui/icons-material/Dashboard"; // Example icon
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import PersonIcon from "@mui/icons-material/Person";
 
-export default function Authenticated({ user, header, children }) {
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+// A minimal theme for authenticated user pages, can be expanded or use the main theme
+// For now, using a simple theme, assuming main theme is in Public/Admin layouts
+const authTheme = createTheme({
+    palette: {
+        mode: "light",
+        background: {
+            default: "#f4f6f8", // A light grey background
+        },
+        primary: {
+            main: "#008080", // Align with app.jsx
+        },
+        secondary: {
+            main: "#f5f5dc", // Align with app.jsx
+        },
+    },
+    typography: {
+        fontFamily:
+            '"Cairo", "Tajawal", "Noto Sans Arabic", "Roboto", "Helvetica Neue", Arial, sans-serif',
+    },
+});
+
+export default function AuthenticatedLayout({ user, header, children }) {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const { muiTheme: pageTheme } = usePage().props;
+    const activeTheme = pageTheme || authTheme;
+
+    const handleMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleDrawerToggle = () => {
+        setMobileOpen((prevState) => !prevState);
+    };
+
+    const navLinks = [
+        {
+            href: route("dashboard"),
+            label: "Dashboard",
+            icon: <DashboardIcon />,
+        },
+        // Add other authenticated non-admin links here if needed
+    ];
+
+    const userMenuItems = [
+        { href: route("profile.edit"), label: "Profile", icon: <PersonIcon /> },
+        {
+            action: () => router.post(route("logout")),
+            label: "Log Out",
+            icon: <ExitToAppIcon />,
+            isLogout: true,
+        },
+    ];
+
+    const drawer = (
+        <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
+            <Typography variant="h6" sx={{ my: 2 }}>
+                Menu
+            </Typography>
+            <Divider />
+            <List>
+                {navLinks.map((link) => (
+                    <ListItem key={link.label} disablePadding>
+                        <ListItemButton
+                            component={InertiaLink}
+                            href={link.href}
+                        >
+                            <ListItemIcon>{link.icon}</ListItemIcon>
+                            <ListItemText primary={link.label} />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+                <Divider sx={{ my: 1 }} />
+                {userMenuItems.map((item) => (
+                    <ListItem key={item.label} disablePadding>
+                        <ListItemButton
+                            component={item.href ? InertiaLink : "div"}
+                            href={item.href ? item.href : undefined}
+                            onClick={item.action ? item.action : undefined}
+                        >
+                            <ListItemIcon>{item.icon}</ListItemIcon>
+                            <ListItemText primary={item.label} />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+            </List>
+        </Box>
+    );
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="bg-white border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex">
-                            <div className="shrink-0 flex items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
-
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                    Dashboard
-                                </NavLink>
-                            </div>
-                        </div>
-
-                        <div className="hidden sm:flex sm:items-center sm:ms-6">
-                            <div className="ms-3 relative">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="ms-2 -me-0.5 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                        <Dropdown.Link href={route('logout')} method="post" as="button">
-                                            Log Out
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() => setShowingNavigationDropdown((previousState) => !previousState)}
-                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
+        <ThemeProvider theme={activeTheme}>
+            <CssBaseline />
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    minHeight: "100vh",
+                }}
+            >
+                <AppBar position="static" color="default" elevation={1}>
+                    <Container maxWidth="xl">
+                        <Toolbar disableGutters>
+                            <IconButton
+                                color="inherit"
+                                aria-label="open drawer"
+                                edge="start"
+                                onClick={handleDrawerToggle}
+                                sx={{ mr: 2, display: { sm: "none" } }}
                             >
-                                <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path
-                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                                <MenuIcon />
+                            </IconButton>
 
-                <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
-                    <div className="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
+                            <InertiaLink href="/">
+                                <ApplicationLogo
+                                    sx={{
+                                        display: { xs: "none", sm: "flex" },
+                                        mr: 1,
+                                        height: 32,
+                                    }}
+                                />
+                            </InertiaLink>
 
-                    <div className="pt-4 pb-1 border-t border-gray-200">
-                        <div className="px-4">
-                            <div className="font-medium text-base text-gray-800">{user.name}</div>
-                            <div className="font-medium text-sm text-gray-500">{user.email}</div>
-                        </div>
+                            <Typography
+                                variant="h6"
+                                component="div"
+                                sx={{
+                                    flexGrow: 1,
+                                    display: { xs: "flex", sm: "none" },
+                                }}
+                            >
+                                <InertiaLink href="/">
+                                    <ApplicationLogo sx={{ height: 32 }} />
+                                </InertiaLink>
+                            </Typography>
 
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
-                            <ResponsiveNavLink method="post" href={route('logout')} as="button">
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+                            <Box
+                                sx={{
+                                    flexGrow: 1,
+                                    display: { xs: "none", sm: "flex" },
+                                    gap: 2,
+                                    ml: 2,
+                                }}
+                            >
+                                {navLinks.map((link) => (
+                                    <Button
+                                        key={link.label}
+                                        component={InertiaLink}
+                                        href={link.href}
+                                        color={
+                                            route().current(
+                                                link.href.substring(
+                                                    link.href.lastIndexOf("/") +
+                                                        1,
+                                                ),
+                                            )
+                                                ? "primary"
+                                                : "inherit"
+                                        }
+                                        variant={
+                                            route().current(
+                                                link.href.substring(
+                                                    link.href.lastIndexOf("/") +
+                                                        1,
+                                                ),
+                                            )
+                                                ? "outlined"
+                                                : "text"
+                                        }
+                                    >
+                                        {link.label}
+                                    </Button>
+                                ))}
+                            </Box>
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
-                </header>
-            )}
+                            <Box sx={{ flexGrow: 0 }}>
+                                <Button
+                                    aria-label="account of current user"
+                                    aria-controls="menu-appbar"
+                                    aria-haspopup="true"
+                                    onClick={handleMenu}
+                                    color="inherit"
+                                    endIcon={<AccountCircle />}
+                                >
+                                    {user.name}
+                                </Button>
+                                <Menu
+                                    id="menu-appbar"
+                                    anchorEl={anchorEl}
+                                    anchorOrigin={{
+                                        vertical: "bottom",
+                                        horizontal: "right",
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: "top",
+                                        horizontal: "right",
+                                    }}
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleClose}
+                                >
+                                    {userMenuItems.map((item) => (
+                                        <MenuItem
+                                            key={item.label}
+                                            onClick={
+                                                item.action
+                                                    ? () => {
+                                                          item.action();
+                                                          handleClose();
+                                                      }
+                                                    : handleClose
+                                            }
+                                            component={
+                                                item.href ? InertiaLink : "div"
+                                            }
+                                            href={
+                                                item.href
+                                                    ? item.href
+                                                    : undefined
+                                            }
+                                            sx={{ gap: 1 }}
+                                        >
+                                            {item.icon} {item.label}
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
+                            </Box>
+                        </Toolbar>
+                    </Container>
+                </AppBar>
 
-            <main>{children}</main>
-        </div>
+                <Drawer
+                    variant="temporary"
+                    open={mobileOpen}
+                    onClose={handleDrawerToggle}
+                    ModalProps={{
+                        keepMounted: true, // Better open performance on mobile.
+                    }}
+                    sx={{
+                        display: { xs: "block", sm: "none" },
+                        "& .MuiDrawer-paper": {
+                            boxSizing: "border-box",
+                            width: 240,
+                        },
+                    }}
+                >
+                    {drawer}
+                </Drawer>
+
+                {header && (
+                    <Box
+                        component="header"
+                        sx={{ bgcolor: "background.paper", boxShadow: 1 }}
+                    >
+                        <Container
+                            maxWidth="xl"
+                            sx={{ py: 2, px: { xs: 2, sm: 3 } }}
+                        >
+                            {/* The header prop is expected to be a ReactNode, often Typography */}
+                            {header}
+                        </Container>
+                    </Box>
+                )}
+
+                <Box
+                    component="main"
+                    sx={{ flexGrow: 1, py: { xs: 2, sm: 3 } }}
+                >
+                    <Container maxWidth="xl">{children}</Container>
+                </Box>
+
+                {/* Optional: Footer for Authenticated Layout */}
+                {/*
+                <Box component="footer" sx={{ bgcolor: 'background.paper', p: 2, mt: 'auto', borderTop: '1px solid', borderColor: 'divider' }}>
+                    <Container maxWidth="xl">
+                        <Typography variant="body2" color="text.secondary" align="center">
+                            © {new Date().getFullYear()} Your Company
+                        </Typography>
+                    </Container>
+                </Box>
+                */}
+            </Box>
+        </ThemeProvider>
     );
 }
