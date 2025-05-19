@@ -5,10 +5,10 @@ import {
     Box,
     Typography,
     Chip,
-    CardMedia,
+    // CardMedia, // No longer directly using CardMedia for the main image container
     Paper,
     Breadcrumbs,
-    Link as MuiLink, // Renamed to avoid conflict
+    Link as MuiLink,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 
@@ -26,34 +26,34 @@ const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
     );
 };
 
-// Helper to construct srcset string
 const buildSrcSet = (sources) => {
-    if (!sources || sources.length === 0) return "";
+    if (!sources || !Array.isArray(sources) || sources.length === 0) return "";
     return sources.map((source) => `${source.url} ${source.width}w`).join(", ");
 };
 
 export default function ShowItem({ item }) {
-    const { props } = usePage();
+    const { props: pageProps } = usePage(); // Renamed to avoid conflict in layout function
     if (!item) return null;
 
-    const title = getTranslatedField(item.title, props.locale);
-    const content = getTranslatedField(item.content, props.locale); // Assuming content is plain text or sanitized HTML for dangerouslySetInnerHTML
-    const categoryName = getTranslatedField(item.category_name, props.locale);
+    const title = getTranslatedField(item.title, pageProps.locale);
+    const content = getTranslatedField(item.content, pageProps.locale);
+    const categoryName = getTranslatedField(
+        item.category_name,
+        pageProps.locale,
+    );
     const metaDescription =
-        getTranslatedField(item.meta_fields, props.locale, "").description ||
-        getTranslatedField(item.excerpt, props.locale);
+        getTranslatedField(item.meta_fields, pageProps.locale, "")
+            .description || getTranslatedField(item.excerpt, pageProps.locale);
 
     const imageDetails = item.image_details;
     let webpSrcSet = null;
     let jpgSrcSet = null;
-    let fallbackImageSrc = imageDetails?.original_url; // Default fallback
+    let fallbackImageSrc = imageDetails?.original_url;
 
     if (imageDetails) {
         webpSrcSet = buildSrcSet(imageDetails.webp_sources);
         jpgSrcSet = buildSrcSet(imageDetails.jpg_sources);
-        // Determine a good fallback for the <img> src attribute
         if (imageDetails.jpg_sources && imageDetails.jpg_sources.length > 0) {
-            // Use the largest JPG source or a medium one as fallback
             fallbackImageSrc =
                 imageDetails.jpg_sources[imageDetails.jpg_sources.length - 1]
                     ?.url || imageDetails.original_url;
@@ -66,6 +66,9 @@ export default function ShowItem({ item }) {
                     ?.url || imageDetails.original_url;
         }
     }
+
+    // Define desired aspect ratio (e.g., 4:3 => 3/4 * 100 = 75%)
+    const aspectRatioPaddingTop = "75%"; // For 4:3 ratio
 
     return (
         <>
@@ -101,39 +104,50 @@ export default function ShowItem({ item }) {
                     <Box
                         sx={{
                             mb: 3,
-                            maxHeight: { xs: 300, sm: 400, md: 500 }, // Responsive max height
-                            overflow: "hidden",
                             borderRadius: 1,
-                            width: "100%", // Ensure Box takes width for picture to fill
+                            overflow: "hidden", // Keep overflow hidden for rounded corners with object-fit
+                            width: "100%",
+                            position: "relative", // For aspect ratio trick
+                            paddingTop: aspectRatioPaddingTop, // Enforce aspect ratio
                         }}
                     >
-                        <picture style={{ width: "100%", display: "block" }}>
+                        <picture
+                            style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                            }}
+                        >
                             {webpSrcSet && (
                                 <source
                                     srcSet={webpSrcSet}
                                     type="image/webp"
-                                    sizes="(max-width: 600px) 90vw, (max-width: 900px) 80vw, 1200px"
+                                    sizes="(max-width: 600px) 90vw, (max-width: 960px) 80vw, 1200px"
                                 />
-                            )}
+                            )}{" "}
+                            {/* Adjusted sizes example */}
                             {jpgSrcSet && (
                                 <source
                                     srcSet={jpgSrcSet}
                                     type="image/jpeg"
-                                    sizes="(max-width: 600px) 90vw, (max-width: 900px) 80vw, 1200px"
+                                    sizes="(max-width: 600px) 90vw, (max-width: 960px) 80vw, 1200px"
                                 />
                             )}
                             <img
                                 src={fallbackImageSrc}
                                 alt={imageDetails.alt || title}
                                 style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
                                     width: "100%",
-                                    height: "auto",
+                                    height: "100%",
                                     display: "block",
-                                    objectFit: "cover",
-                                    maxHeight: "inherit",
+                                    objectFit: "cover", // Ensures image covers the area, maintains aspect ratio, crops if needed
                                 }}
-                                // The sizes attribute helps browser pick correct image from srcset
-                                sizes="(max-width: 600px) 90vw, (max-width: 900px) 80vw, 1200px"
+                                sizes="(max-width: 600px) 90vw, (max-width: 960px) 80vw, 1200px" // Match source sizes
                             />
                         </picture>
                     </Box>
@@ -182,14 +196,12 @@ export default function ShowItem({ item }) {
                     )}
                 </Box>
 
-                {/* For HTML content from RTE, ensure it's sanitized on backend */}
                 <Box
                     sx={{
                         mt: 3,
                         "& p": { mb: 2 },
                         lineHeight: 1.7,
                         wordBreak: "break-word",
-                        // Basic styling for HTML content
                         "& h1": { typography: "h3", mt: 3, mb: 1 },
                         "& h2": { typography: "h4", mt: 3, mb: 1 },
                         "& h3": { typography: "h5", mt: 2, mb: 1 },
