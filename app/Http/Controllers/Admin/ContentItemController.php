@@ -4,50 +4,55 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContentItem;
-use App\Models\ContentCategory; // Ensure this is imported
+use App\Models\ContentCategory;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth; // Ensure this is imported
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Admin\StoreContentItemRequest;
 use App\Http\Requests\Admin\UpdateContentItemRequest;
 use Inertia\Inertia;
-use Inertia\Response;
+use Inertia\Response as InertiaResponse; // Aliased to avoid conflict with Illuminate\Http\Response
+use Illuminate\Support\Facades\Gate; // For authorization
 
+/**
+ * Handles CRUD operations for Content Items in the Admin panel.
+ */
 class ContentItemController extends Controller
 {
-    public function index(): Response
+    /**
+     * Display a listing of the content items.
+     *
+     * @return InertiaResponse
+     */
+    public function index(): InertiaResponse
     {
-        // Gate check is preferred over direct auth()->user()->can() in controller if policies are set up
-        // For now, assuming 'manage content items' permission exists and is sufficient via middleware or this check.
-        // $this->authorize('viewAny', ContentItem::class);
+        Gate::authorize("manage content items"); // Or $this->authorize('viewAny', ContentItem::class); if Policy exists
 
         $items = ContentItem::with([
-            "category:id,name",
-            "author:id,name",
+            "category:id,name", // Eager load category name and id
+            "author:id,name", // Eager load author name and id
             "media" => fn($query) => $query->where(
                 "collection_name",
                 "featured_image"
-            ),
+            ), // Only featured image media
         ])
-            ->latest("publish_date") // Consider latest('updated_at') or latest('id') for more general "latest"
+            ->latest("publish_date") // Order by publish date by default
             ->paginate(15)
-            ->withQueryString();
+            ->withQueryString(); // Append query strings to pagination links
 
+        // Transform data for the frontend
         $items->through(
-            fn($item) => [
+            fn(ContentItem $item) => [
+                // Type hint $item
                 "id" => $item->id,
                 "title" => $item->getTranslations("title"),
                 "slug" => $item->slug,
                 "status" => $item->status,
-                "publish_date" => $item->publish_date?->toDateString(),
-                "category_name" => $item->category?->getTranslations("name"), // Default locale will be picked by getTranslatedField
+                "publish_date" => $item->publish_date?->toDateString(), // Format date
+                "category_name" => $item->category?->getTranslations("name"),
                 "author_name" => $item->author?->name,
-                "featured_image_thumb_url" => $item->getFirstMediaUrl(
-                    "featured_image",
-                    "thumbnail"
-                ),
-                "featured_image_url" => $item->getFirstMediaUrl(
-                    "featured_image"
-                ),
+                "featured_image_thumb_url" =>
+                    $item->thumbnail_featured_image_url, // Use accessor
+                "featured_image_url" => $item->original_featured_image_url, // Use accessor
                 "created_at" => $item->created_at->toDateTimeString(),
                 "updated_at" => $item->updated_at->toDateTimeString(),
             ]
@@ -56,36 +61,53 @@ class ContentItemController extends Controller
         return Inertia::render("Admin/ContentItems/Index", [
             "items" => $items,
             "can" => [
-                "create_item" => auth()->user()->can("manage content items"), // Example
-                "edit_item" => auth()->user()->can("manage content items"),
-                "delete_item" => auth()->user()->can("manage content items"),
+                // Pass relevant permissions for UI conditional rendering
+                "create_item" => Auth::user()->can("manage content items"), // Example, could be more granular
+                "edit_item" => Auth::user()->can("manage content items"),
+                "delete_item" => Auth::user()->can("manage content items"),
             ],
         ]);
     }
 
-    public function create(): Response
+    /**
+     * Show the form for creating a new content item.
+     *
+     * @return InertiaResponse
+     */
+    public function create(): InertiaResponse
     {
-        $this->authorize("manage content items"); // Or specific 'create content items' permission
+        Gate::authorize("manage content items");
+
         return Inertia::render("Admin/ContentItems/Form", [
-            "item" => null,
+            "item" => null, // No item data for create form
             "categories" => ContentCategory::orderByTranslatable("name")->get([
                 "id",
                 "name",
-            ]),
-            "featured_image_url" => null,
-            "activeLanguages" => config("translatable.locales"),
+            ]), // Pass categories for select dropdown
+            "featured_image_url" => null, // No existing image for create form
+            "activeLanguages" => config("translatable.locales"), // Pass active languages for translatable fields
         ]);
     }
 
+    /**
+     * Store a newly created content item in storage.
+     *
+     * @param  StoreContentItemRequest  $request
+     * @return RedirectResponse
+     */
     public function store(StoreContentItemRequest $request): RedirectResponse
     {
-        $validatedData = $request->validated();
-        $validatedData["user_id"] = Auth::id();
+        // Authorization is handled by StoreContentItemRequest
 
+        $validatedData = $request->validated();
+        $validatedData["user_id"] = Auth::id(); // Assign current user as author
+
+        // Unset image fields as they are handled separately by MediaLibrary
         unset($validatedData["featured_image"]);
 
         $item = ContentItem::create($validatedData);
 
+        // Handle featured image upload if present
         if (
             $request->hasFile("featured_image") &&
             $request->file("featured_image")->isValid()
@@ -100,52 +122,72 @@ class ContentItemController extends Controller
             ->with("success", "Content item created successfully.");
     }
 
+    /**
+     * Display the specified content item (redirects to edit).
+     *
+     * @param  ContentItem  $content_item The content item instance (route model binding).
+     * @return RedirectResponse
+     */
     public function show(ContentItem $content_item): RedirectResponse
     {
-        // Changed from $contentItem to match route param
-        // Changed from $contentItem to match route param
-        $this->authorize("manage content items"); // Or 'view content items'
+        Gate::authorize("manage content items"); // Or 'view' if a policy exists
         return redirect()->route("admin.content-items.edit", $content_item);
     }
 
-    public function edit(ContentItem $content_item): Response
+    /**
+     * Show the form for editing the specified content item.
+     *
+     * @param  ContentItem  $content_item
+     * @return InertiaResponse
+     */
+    public function edit(ContentItem $content_item): InertiaResponse
     {
-        $this->authorize("manage content items"); // Or 'update content items'
-        $content_item->load("media", "category:id,name");
+        Gate::authorize("manage content items"); // Or 'update' permission via policy on $content_item
+        $content_item->load("media", "category:id,name"); // Eager load necessary relations
 
         return Inertia::render("Admin/ContentItems/Form", [
-            "item" => $content_item->append([
-                "original_featured_image_url",
-                "thumbnail_featured_image_url",
-            ]),
+            "item" => $content_item->append(
+                [
+                    // "original_featured_image_url", // Already appended via $appends in model
+                    // "thumbnail_featured_image_url",
+                ] // Append accessors if not automatically appended globally
+            ),
             "categories" => ContentCategory::orderByTranslatable("name")->get([
                 "id",
                 "name",
             ]),
-            "featured_image_url" => $content_item->getFirstMediaUrl(
-                "featured_image"
-            ),
-            // 'featured_image_thumb_url' => $content_item->getFirstMediaUrl('featured_image', 'thumbnail'), // Already in item via append
-            "activeLanguages" => config("translatable.locales"), // <-- Pass this
+            "featured_image_url" => $content_item->original_featured_image_url, // Use accessor
+            "activeLanguages" => config("translatable.locales"),
         ]);
     }
 
+    /**
+     * Update the specified content item in storage.
+     *
+     * @param  UpdateContentItemRequest  $request
+     * @param  ContentItem  $content_item
+     * @return RedirectResponse
+     */
     public function update(
         UpdateContentItemRequest $request,
         ContentItem $content_item
     ): RedirectResponse {
+        // Authorization is handled by UpdateContentItemRequest
+
         $validatedData = $request->validated();
         unset($validatedData["featured_image"]);
         unset($validatedData["remove_featured_image"]);
 
         $content_item->update($validatedData);
 
+        // Handle featured image update/removal
         if ($request->boolean("remove_featured_image")) {
             $content_item->clearMediaCollection("featured_image");
         } elseif (
             $request->hasFile("featured_image") &&
             $request->file("featured_image")->isValid()
         ) {
+            // Replace existing image by clearing collection first, then adding new one
             $content_item->clearMediaCollection("featured_image");
             $content_item
                 ->addMediaFromRequest("featured_image")
@@ -157,10 +199,17 @@ class ContentItemController extends Controller
             ->with("success", "Content item updated successfully.");
     }
 
+    /**
+     * Remove the specified content item from storage.
+     *
+     * @param  ContentItem  $content_item
+     * @return RedirectResponse
+     */
     public function destroy(ContentItem $content_item): RedirectResponse
     {
-        $this->authorize("manage content items"); // Or 'delete content items'
-        $content_item->delete();
+        Gate::authorize("manage content items"); // Or 'delete' permission via policy on $content_item
+        $content_item->delete(); // Soft delete
+
         return redirect()
             ->route("admin.content-items.index")
             ->with("success", "Content item deleted successfully.");
