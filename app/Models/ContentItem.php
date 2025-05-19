@@ -8,7 +8,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use Spatie\MediaLibrary\MediaCollections\Models\Media as SpatieMedia; // Alias to avoid confusion if needed, or use FQCN
+use Spatie\MediaLibrary\MediaCollections\Models\Media as SpatieMedia;
 
 class ContentItem extends Model implements HasMedia
 {
@@ -43,22 +43,18 @@ class ContentItem extends Model implements HasMedia
         if (is_array($value)) {
             $cleanedTranslations = [];
             foreach ($value as $locale => $htmlContent) {
-                // Cleanse only if it's a non-null string
                 $cleanedTranslations[$locale] = is_string($htmlContent)
-                    ? clean($htmlContent)
+                    ? clean($htmlContent) // Assumes mews/purifier's clean() helper
                     : $htmlContent;
             }
             $this->attributes["content"] = json_encode($cleanedTranslations);
         } elseif (is_string($value)) {
-            // This case should ideally not happen if form sends structured translations
-            // but as a fallback, clean it and set for the current locale.
-            // For safety, ensure it's stored in the JSON structure.
             $locale = app()->getLocale();
             $this->attributes["content"] = json_encode([
                 $locale => clean($value),
             ]);
         } else {
-            $this->attributes["content"] = $value; // Or json_encode($value) if it should always be JSON
+            $this->attributes["content"] = $value;
         }
     }
 
@@ -84,55 +80,94 @@ class ContentItem extends Model implements HasMedia
     {
         $this->addMediaCollection("featured_image")
             ->singleFile()
-            ->useDisk("public")
-            // The registerMediaConversions method on the *collection* object takes a closure.
-            // The type hint for $media in this closure must be Spatie's Media class.
-            ->registerMediaConversions(function (SpatieMedia $media = null) {
-                // Use aliased or FQCN
-                $this->addMediaConversion("thumbnail")
-                    ->width(150)
-                    ->height(150)
-                    ->sharpen(10);
-            });
-        // If you have ->withResponsiveImages(), that should come before ->registerMediaConversions
-        // Example:
-        // $this->addMediaCollection('featured_image')
-        //    ->singleFile()
-        //    ->useDisk('public')
-        //    ->withResponsiveImages() // If you use this, ensure necessary libraries like GD/Imagick are set up
-        //    ->registerMediaConversions(function (SpatieMedia $media = null) { ... });
+            ->useDisk("public");
+        // Conversions will be defined in registerMediaConversions
     }
 
-    // This is a separate model-level method, also called by the Spatie package,
-    // IF you want to define conversions globally for all collections on this model,
-    // or if you don't define them per-collection.
-    // If you define them per collection (as above), this might not be strictly necessary
-    // unless you have other collections or want global fallbacks.
-    // For clarity, let's ensure it's also correctly type-hinted if present.
-    /*
+    // This model-level method defines conversions for all media in this model,
+    // or you can define them per-collection in registerMediaCollections if preferred.
     public function registerMediaConversions(SpatieMedia $media = null): void
     {
-        $this->addMediaConversion('thumbnail') // This would be a global "thumbnail"
-              ->width(150)
-              ->height(150)
-              ->sharpen(10);
+        // Thumbnail
+        $this->addMediaConversion("thumbnail")
+            ->width(150)
+            ->height(150)
+            ->sharpen(10)
+            ->format("webp") // Attempt to create a WebP version
+            ->performOnCollections("featured_image");
+        $this->addMediaConversion("thumbnail_jpg") // Fallback JPG thumbnail
+            ->width(150)
+            ->height(150)
+            ->sharpen(10)
+            ->format("jpg")
+            ->performOnCollections("featured_image");
+
+        // Small responsive size
+        $this->addMediaConversion("responsive_sm")
+            ->width(320)
+            ->format("webp") // Attempt to create a WebP version
+            ->performOnCollections("featured_image");
+        $this->addMediaConversion("responsive_sm_jpg") // Fallback JPG
+            ->width(320)
+            ->format("jpg")
+            ->performOnCollections("featured_image");
+
+        // Medium responsive size
+        $this->addMediaConversion("responsive_md")
+            ->width(768)
+            ->format("webp") // Attempt to create a WebP version
+            ->performOnCollections("featured_image");
+        $this->addMediaConversion("responsive_md_jpg") // Fallback JPG
+            ->width(768)
+            ->format("jpg")
+            ->performOnCollections("featured_image");
+
+        // Large responsive size (example)
+        $this->addMediaConversion("responsive_lg")
+            ->width(1200)
+            ->format("webp") // Attempt to create a WebP version
+            ->performOnCollections("featured_image");
+        $this->addMediaConversion("responsive_lg_jpg") // Fallback JPG
+            ->width(1200)
+            ->format("jpg")
+            ->performOnCollections("featured_image");
+
+        // Optionally, you can add ->nonQueued() to conversions if they must be immediate,
+        // but queuing is generally better for performance during uploads.
     }
-    */
 
     public function getOriginalFeaturedImageUrlAttribute(): ?string
     {
         return $this->getFirstMediaUrl("featured_image");
     }
 
+    // This specific accessor for thumbnail_featured_image_url might need adjustment
+    // if we now have multiple thumbnail formats (webp, jpg).
+    // The frontend will need to be smarter about choosing.
+    // For simplicity, let's keep it pointing to the original thumbnail logic (getFirstUrl usually prefers original or first conversion)
+    // or decide on a primary thumbnail format.
     public function getThumbnailFeaturedImageUrlAttribute(): ?string
     {
-        // Ensure 'thumbnail' conversion is defined in registerMediaConversions for the 'featured_image' collection
-        return $this->getFirstMediaUrl("featured_image", "thumbnail");
+        // Prefer WebP thumbnail if available, otherwise fallback to JPG thumbnail
+        if ($this->hasMedia("featured_image")) {
+            $media = $this->getFirstMedia("featured_image");
+            if ($media->hasGeneratedConversion("thumbnail")) {
+                // WebP version
+                return $media->getUrl("thumbnail");
+            }
+            if ($media->hasGeneratedConversion("thumbnail_jpg")) {
+                // JPG fallback
+                return $media->getUrl("thumbnail_jpg");
+            }
+        }
+        return $this->getFirstMediaUrl("featured_image", "thumbnail_jpg"); // Fallback if no specific found
     }
 
     protected $appends = [
         "original_featured_image_url",
         "thumbnail_featured_image_url",
+        // We will add more specific URLs for srcset in the controller/resource if needed
+        // or the frontend will construct them using getUrl for each conversion.
     ];
 
     public function scopePublished($query)
