@@ -1,18 +1,72 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
+import React from "react";
+import ApplicationLogo from "@/Components/ApplicationLogo"; // Assuming this is a style-agnostic SVG logo
+import { Link as InertiaLink } from "@inertiajs/react";
+import {
+    Container,
+    Box,
+    Paper,
+    CssBaseline,
+    ThemeProvider,
+    createTheme,
+} from "@mui/material";
+import { usePage } from "@inertiajs/react"; // To access theme from props if available
 
-export default function Guest({ children }) {
+// A minimal theme for guest pages, can be expanded or use the main theme
+// For now, using a simple theme, assuming main theme is in Public/Admin layouts
+const guestTheme = createTheme({
+    palette: {
+        mode: "light", // Or 'dark' based on preference
+        background: {
+            default: "#f4f6f8", // A light grey background
+        },
+        primary: {
+            main: "#008080", // Example primary color, align with app.jsx
+        },
+    },
+    typography: {
+        fontFamily:
+            '"Cairo", "Tajawal", "Noto Sans Arabic", "Roboto", "Helvetica Neue", Arial, sans-serif',
+    },
+});
+
+export default function GuestLayout({ children }) {
+    // Check if a theme is passed via page props, otherwise use default guestTheme
+    // This allows for potential theme sharing from app.jsx if GuestLayout is wrapped differently later
+    const { muiTheme: pageTheme } = usePage().props;
+    const activeTheme = pageTheme || guestTheme;
+
     return (
-        <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <Link href="/">
-                    <ApplicationLogo className="w-20 h-20 fill-current text-gray-500" />
-                </Link>
-            </div>
-
-            <div className="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {children}
-            </div>
-        </div>
+        <ThemeProvider theme={activeTheme}>
+            <CssBaseline />
+            <Container component="main" maxWidth="xs">
+                <Box
+                    sx={{
+                        marginTop: 8,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                    }}
+                >
+                    <InertiaLink href="/">
+                        <ApplicationLogo
+                            sx={{ m: 1, width: "auto", height: 50 }}
+                        />
+                    </InertiaLink>
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            mt: 3,
+                            p: 4,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            width: "100%", // Ensure paper takes full width of container
+                        }}
+                    >
+                        {children}
+                    </Paper>
+                </Box>
+            </Container>
+        </ThemeProvider>
     );
 }
