@@ -1,50 +1,75 @@
-import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Head, useForm } from '@inertiajs/react';
+import React from "react"; // Added React for hooks
+import { Head, useForm } from "@inertiajs/react";
+import { TextField, Button, Box, Typography, Alert } from "@mui/material";
+import GuestLayout from "@/Layouts/GuestLayout"; // Already uses MUI
 
 export default function ForgotPassword({ status }) {
     const { data, setData, post, processing, errors } = useForm({
-        email: '',
+        email: "",
     });
 
     const submit = (e) => {
         e.preventDefault();
-
-        post(route('password.email'));
+        post(route("password.email"));
     };
 
     return (
         <GuestLayout>
             <Head title="Forgot Password" />
 
-            <div className="mb-4 text-sm text-gray-600">
-                Forgot your password? No problem. Just let us know your email address and we will email you a password
-                reset link that will allow you to choose a new one.
-            </div>
+            <Typography
+                component="h1"
+                variant="h5"
+                sx={{ textAlign: "center", mb: 2 }}
+            >
+                Forgot Password
+            </Typography>
 
-            {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
+            <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 2, textAlign: "center" }}
+            >
+                Forgot your password? No problem. Just let us know your email
+                address and we will email you a password reset link that will
+                allow you to choose a new one.
+            </Typography>
 
-            <form onSubmit={submit}>
-                <TextInput
+            {status && (
+                <Alert severity="success" sx={{ mb: 2, width: "100%" }}>
+                    {status}
+                </Alert>
+            )}
+
+            <Box component="form" onSubmit={submit} noValidate sx={{ mt: 1 }}>
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
                     id="email"
-                    type="email"
+                    label="Email Address"
                     name="email"
+                    type="email"
+                    autoComplete="email"
+                    autoFocus
                     value={data.email}
-                    className="mt-1 block w-full"
-                    isFocused={true}
-                    onChange={(e) => setData('email', e.target.value)}
+                    onChange={(e) => setData("email", e.target.value)}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                    disabled={processing}
                 />
-
-                <InputError message={errors.email} className="mt-2" />
-
-                <div className="flex items-center justify-end mt-4">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Email Password Reset Link
-                    </PrimaryButton>
-                </div>
-            </form>
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                    disabled={processing}
+                >
+                    {processing
+                        ? "Sending Link..."
+                        : "Email Password Reset Link"}
+                </Button>
+            </Box>
         </GuestLayout>
     );
 }
