@@ -1,45 +1,88 @@
-import GuestLayout from '@/Layouts/GuestLayout';
-import PrimaryButton from '@/Components/PrimaryButton';
-import { Head, Link, useForm } from '@inertiajs/react';
+import React from "react"; // Added React for hooks
+import { Head, Link as InertiaLink, useForm } from "@inertiajs/react";
+import { Button, Box, Typography, Alert, Link as MuiLink } from "@mui/material";
+import GuestLayout from "@/Layouts/GuestLayout"; // Already uses MUI
 
 export default function VerifyEmail({ status }) {
     const { post, processing } = useForm({});
 
     const submit = (e) => {
         e.preventDefault();
-
-        post(route('verification.send'));
+        post(route("verification.send"));
     };
 
     return (
         <GuestLayout>
             <Head title="Email Verification" />
 
-            <div className="mb-4 text-sm text-gray-600">
-                Thanks for signing up! Before getting started, could you verify your email address by clicking on the
-                link we just emailed to you? If you didn't receive the email, we will gladly send you another.
-            </div>
+            <Typography
+                component="h1"
+                variant="h5"
+                sx={{ textAlign: "center", mb: 2 }}
+            >
+                Verify Your Email Address
+            </Typography>
 
-            {status === 'verification-link-sent' && (
-                <div className="mb-4 font-medium text-sm text-green-600">
-                    A new verification link has been sent to the email address you provided during registration.
-                </div>
+            <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 2, textAlign: "center" }}
+            >
+                Thanks for signing up! Before getting started, could you verify
+                your email address by clicking on the link we just emailed to
+                you? If you didn't receive the email, we will gladly send you
+                another.
+            </Typography>
+
+            {status === "verification-link-sent" && (
+                <Alert severity="success" sx={{ mb: 2, width: "100%" }}>
+                    A new verification link has been sent to the email address
+                    you provided during registration.
+                </Alert>
             )}
 
-            <form onSubmit={submit}>
-                <div className="mt-4 flex items-center justify-between">
-                    <PrimaryButton disabled={processing}>Resend Verification Email</PrimaryButton>
+            <Box component="form" onSubmit={submit} sx={{ mt: 1 }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        mt: 4,
+                    }}
+                >
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={processing}
+                    >
+                        {processing
+                            ? "Resending..."
+                            : "Resend Verification Email"}
+                    </Button>
 
-                    <Link
-                        href={route('logout')}
+                    <MuiLink
+                        component={InertiaLink}
+                        href={route("logout")}
                         method="post"
-                        as="button"
-                        className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        as="button" /* Important for InertiaLink to function like a button with method="post" */
+                        variant="body2"
+                        underline="hover"
+                        sx={{
+                            color: "text.secondary",
+                            border: "none",
+                            background: "none",
+                            cursor: "pointer",
+                            padding: 0,
+                            font: "inherit",
+                            "&:hover": {
+                                color: "primary.main",
+                            },
+                        }}
                     >
                         Log Out
-                    </Link>
-                </div>
-            </form>
+                    </MuiLink>
+                </Box>
+            </Box>
         </GuestLayout>
     );
 }
