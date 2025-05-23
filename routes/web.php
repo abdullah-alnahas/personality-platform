@@ -17,6 +17,7 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\LanguageController;
 
 // --- Public Routes ---
 Route::get("/", HomepageController::class)->name("home");
@@ -116,6 +117,10 @@ Route::prefix("admin")
             Route::delete("media/{medium}", [MediaController::class, "destroy"]) // Use {medium} to match variable name in controller
                 ->name("media.destroy")
                 ->middleware("can:manage media");
+            // Languages CRUD (Requires 'manage languages' permission)
+            Route::resource("languages", LanguageController::class)
+                ->except(["show"]) // 'show' action is often not needed for admin CRUD
+                ->middleware("can:manage languages");
         });
     });
 
