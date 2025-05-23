@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react"; // Added useState, useEffect
 import { Head, Link as InertiaLink, useForm } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import {
@@ -11,20 +11,61 @@ import {
     Switch,
     FormControlLabel,
     FormHelperText,
+    Autocomplete, // <-- Import Autocomplete
 } from "@mui/material";
 
-export default function Form({ language }) {
+export default function Form({ language, knownLanguages }) {
+    // language is null when creating, knownLanguages is new prop
     const isEditing = !!language;
+    const [selectedKnownLanguage, setSelectedKnownLanguage] = useState(null);
+    // Determine if the current language code matches one from the knownLanguages list (on edit)
+    // or if a known language has been selected (on create or after selection)
+    const isCodeFromKnownList = isEditing
+        ? knownLanguages.some((kl) => kl.code === language?.code)
+        : !!selectedKnownLanguage;
 
-    const { data, setData, post, put, processing, errors } = useForm({
-        // Removed reset as it's not used
+    const { data, setData, post, put, processing, errors, reset } = useForm({
         code: language?.code ?? "",
         name: language?.name ?? "",
         native_name: language?.native_name ?? "",
         is_active: language?.is_active ?? true,
-        // is_rtl: language?.is_rtl ?? false, // REMOVED - will be inferred
         _method: isEditing ? "PUT" : "POST",
     });
+
+    // Effect to populate form if editing an existing language that matches a known one
+    useEffect(() => {
+        if (isEditing && language) {
+            const matchingKnownLanguage = knownLanguages.find(
+                (kl) => kl.code === language.code,
+            );
+            if (matchingKnownLanguage) {
+                setSelectedKnownLanguage(matchingKnownLanguage);
+                // No need to setData here if language prop already populates data correctly
+            }
+        }
+    }, [isEditing, language, knownLanguages]);
+
+    const handleKnownLanguageChange = (event, newValue) => {
+        setSelectedKnownLanguage(newValue);
+        if (newValue) {
+            setData({
+                ...data, // Keep other data like is_active
+                code: newValue.code,
+                name: newValue.name,
+                native_name: newValue.native_name,
+            });
+        } else {
+            // If cleared, allow manual input (optionally reset fields or keep them)
+            // For now, we keep them, user can clear manually if they wish to start fresh
+            // Or, to reset:
+            // setData({
+            //     ...data,
+            //     code: '',
+            //     name: '',
+            //     native_name: '',
+            // });
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -62,7 +103,37 @@ export default function Form({ language }) {
                     sx={{ mt: 1 }}
                 >
                     <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6}>
+                        {!isEditing && ( // Show Autocomplete only when creating a new language
+                            <Grid item xs={12}>
+                                <Autocomplete
+                                    options={knownLanguages}
+                                    getOptionLabel={(option) =>
+                                        `${option.native_name} (${option.name}) - [${option.code}]`
+                                    }
+                                    value={selectedKnownLanguage}
+                                    onChange={handleKnownLanguageChange}
+                                    isOptionEqualToValue={(option, value) =>
+                                        option.code === value.code
+                                    }
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Choose from common languages (Optional)"
+                                            helperText="Selecting a language will pre-fill Code, Name, and Native Name."
+                                        />
+                                    )}
+                                    disabled={processing}
+                                />
+                            </Grid>
+                        )}
+
+                        <Grid
+                            item
+                            xs={12}
+                            sm={isEditing || !selectedKnownLanguage ? 6 : 12}
+                        >
+                            {" "}
+                            {/* Adjust grid based on Autocomplete visibility */}
                             <TextField
                                 required
                                 fullWidth
@@ -76,9 +147,19 @@ export default function Form({ language }) {
                                 error={!!errors.code}
                                 helperText={
                                     errors.code ||
-                                    "Short, unique identifier (e.g., 'en', 'fr', 'ar-EG'). Cannot be changed after creation."
+                                    "Short, unique identifier. Cannot be changed after creation if selected from list."
                                 }
-                                disabled={isEditing || processing}
+                                disabled={
+                                    isEditing ||
+                                    processing ||
+                                    (!!selectedKnownLanguage && !isEditing)
+                                } // Disabled if editing, or processing, or a known lang is selected on create
+                                InputLabelProps={{
+                                    shrink:
+                                        isEditing || data.code
+                                            ? true
+                                            : undefined,
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -94,7 +175,19 @@ export default function Form({ language }) {
                                 }
                                 error={!!errors.name}
                                 helperText={errors.name}
-                                disabled={processing}
+                                disabled={
+                                    processing ||
+                                    (!!selectedKnownLanguage &&
+                                        !isEditing &&
+                                        data.code ===
+                                            selectedKnownLanguage.code)
+                                }
+                                InputLabelProps={{
+                                    shrink:
+                                        isEditing || data.name
+                                            ? true
+                                            : undefined,
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -110,12 +203,22 @@ export default function Form({ language }) {
                                 }
                                 error={!!errors.native_name}
                                 helperText={errors.native_name}
-                                disabled={processing}
+                                disabled={
+                                    processing ||
+                                    (!!selectedKnownLanguage &&
+                                        !isEditing &&
+                                        data.code ===
+                                            selectedKnownLanguage.code)
+                                }
+                                InputLabelProps={{
+                                    shrink:
+                                        isEditing || data.native_name
+                                            ? true
+                                            : undefined,
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            {" "}
-                            {/* Adjusted grid size */}
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -138,7 +241,6 @@ export default function Form({ language }) {
                                 </FormHelperText>
                             )}
                         </Grid>
-                        {/* is_rtl Switch removed */}
 
                         <Grid
                             item
