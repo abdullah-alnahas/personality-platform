@@ -5,13 +5,30 @@ import {
     Box,
     Typography,
     Chip,
-    // CardMedia, // No longer directly using CardMedia for the main image container
     Paper,
     Breadcrumbs,
     Link as MuiLink,
 } from "@mui/material";
+import { styled } from "@mui/material/styles"; // Import styled utility
 import HomeIcon from "@mui/icons-material/Home";
 
+// Styled components for <picture> and <img>
+const StyledPictureElement = styled("picture")({
+    width: "100%",
+    display: "block", // Ensure picture element behaves as a block for sizing
+});
+
+const StyledImgElement = styled("img")({
+    width: "100%",
+    height: "100%", // Make height 100% to fill the aspect ratio box
+    display: "block",
+    objectFit: "cover", // Ensures image covers the area, maintains aspect ratio
+    position: "absolute", // Positioned within the relative parent Box
+    top: 0,
+    left: 0,
+});
+
+// getTranslatedField and buildSrcSet helpers remain the same
 const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
     const { props } = usePage();
     const currentLocale = props.locale || locale;
@@ -32,7 +49,7 @@ const buildSrcSet = (sources) => {
 };
 
 export default function ShowItem({ item }) {
-    const { props: pageProps } = usePage(); // Renamed to avoid conflict in layout function
+    const { props: pageProps } = usePage();
     if (!item) return null;
 
     const title = getTranslatedField(item.title, pageProps.locale);
@@ -67,12 +84,12 @@ export default function ShowItem({ item }) {
         }
     }
 
-    // Define desired aspect ratio (e.g., 4:3 => 3/4 * 100 = 75%)
     const aspectRatioPaddingTop = "75%"; // For 4:3 ratio
 
     return (
         <>
             <Head title={title} description={metaDescription} />
+            {/* Breadcrumbs remain the same */}
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
                 <MuiLink
                     component={InertiaLink}
@@ -105,29 +122,22 @@ export default function ShowItem({ item }) {
                         sx={{
                             mb: 3,
                             borderRadius: 1,
-                            overflow: "hidden", // Keep overflow hidden for rounded corners with object-fit
+                            overflow: "hidden",
                             width: "100%",
-                            position: "relative", // For aspect ratio trick
-                            paddingTop: aspectRatioPaddingTop, // Enforce aspect ratio
+                            position: "relative",
+                            paddingTop: aspectRatioPaddingTop,
                         }}
                     >
-                        <picture
-                            style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                width: "100%",
-                                height: "100%",
-                            }}
-                        >
+                        <StyledPictureElement>
+                            {" "}
+                            {/* Use styled component */}
                             {webpSrcSet && (
                                 <source
                                     srcSet={webpSrcSet}
                                     type="image/webp"
                                     sizes="(max-width: 600px) 90vw, (max-width: 960px) 80vw, 1200px"
                                 />
-                            )}{" "}
-                            {/* Adjusted sizes example */}
+                            )}
                             {jpgSrcSet && (
                                 <source
                                     srcSet={jpgSrcSet}
@@ -135,24 +145,16 @@ export default function ShowItem({ item }) {
                                     sizes="(max-width: 600px) 90vw, (max-width: 960px) 80vw, 1200px"
                                 />
                             )}
-                            <img
+                            <StyledImgElement // Use styled component for img
                                 src={fallbackImageSrc}
                                 alt={imageDetails.alt || title}
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
-                                    height: "100%",
-                                    display: "block",
-                                    objectFit: "cover", // Ensures image covers the area, maintains aspect ratio, crops if needed
-                                }}
-                                sizes="(max-width: 600px) 90vw, (max-width: 960px) 80vw, 1200px" // Match source sizes
+                                sizes="(max-width: 600px) 90vw, (max-width: 960px) 80vw, 1200px"
                             />
-                        </picture>
+                        </StyledPictureElement>
                     </Box>
                 )}
 
+                {/* Rest of the component (Typography for title, metadata, content Box) remains the same */}
                 <Typography
                     variant="h3"
                     component="h1"
@@ -161,7 +163,6 @@ export default function ShowItem({ item }) {
                 >
                     {title}
                 </Typography>
-
                 <Box
                     sx={{
                         display: "flex",
@@ -195,7 +196,6 @@ export default function ShowItem({ item }) {
                         </Typography>
                     )}
                 </Box>
-
                 <Box
                     sx={{
                         mt: 3,
@@ -243,6 +243,7 @@ export default function ShowItem({ item }) {
 }
 
 ShowItem.layout = (page) => {
+    // page.props will contain pageProps needed by getTranslatedField
     const itemTitleObject = page.props.item?.title;
     let titleForLayout = "Content";
     if (itemTitleObject && typeof itemTitleObject === "object") {

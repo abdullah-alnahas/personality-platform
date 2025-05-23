@@ -1,10 +1,9 @@
-// Edit file: resources/js/Layouts/PublicLayout.jsx
 import React, { useState, useEffect } from "react";
 import {
     Link as InertiaLink,
     usePage,
     useForm,
-    router,
+    router, // Keep router for search submit and language change
 } from "@inertiajs/react";
 import {
     AppBar,
@@ -30,25 +29,29 @@ import {
     ListItemButton,
     ListItemText,
     ListItemIcon,
+    Select,
+    FormControl,
+    InputLabel, // <-- Added Select, FormControl, InputLabel
 } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
+import TwitterIcon from "@mui/icons-material/Twitter"; // Replaces X for icon name consistency
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import LinkIcon from "@mui/icons-material/Link";
+import LanguageIcon from "@mui/icons-material/Language"; // For the language switcher button/icon
+import LinkIconOriginal from "@mui/icons-material/Link"; // Renamed to avoid conflict if 'LinkIcon' is used elsewhere as component name
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 const SocialIcon = ({ platform }) => {
     switch (platform?.toLowerCase()) {
         case "facebook":
             return <FacebookIcon />;
         case "x":
-            return <TwitterIcon />;
+            return <TwitterIcon />; // Using Twitter for X
         case "twitter":
             return <TwitterIcon />;
         case "youtube":
@@ -60,29 +63,32 @@ const SocialIcon = ({ platform }) => {
         case "linkedin":
             return <LinkedInIcon />;
         default:
-            return <LinkIcon />;
+            return <LinkIconOriginal />;
     }
 };
 
-const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
-    const { props } = usePage();
-    const currentLocale = props.locale || locale;
-    if (fieldObject == null) {
-        return fallback;
-    }
-    if (typeof fieldObject !== "object") {
-        return String(fieldObject) || fallback;
-    }
+const getTranslatedField = (fieldObject, pageProps, fallback = "") => {
+    const currentLocale = pageProps.current_locale || "en"; // Use current_locale from pageProps
+    if (fieldObject == null) return fallback;
+    if (typeof fieldObject !== "object") return String(fieldObject) || fallback;
     return (
         fieldObject[currentLocale] ||
-        fieldObject[locale] ||
-        Object.values(fieldObject)[0] ||
+        fieldObject[Object.keys(fieldObject)[0]] ||
         fallback
-    );
+    ); // Fallback to first available if current not found
 };
 
-const NavLink = ({ item, isMenuItem = false, isDrawerItem = false }) => {
-    const label = getTranslatedField(item.label);
+// NavigationLink component (for Header and Footer general links)
+const NavLink = ({
+    item,
+    isMenuItem = false,
+    isDrawerItem = false,
+    currentLocale,
+}) => {
+    const label = getTranslatedField(item.label, {
+        current_locale: currentLocale,
+    }); // Pass currentLocale to helper
+
     const commonProps = {
         color: isMenuItem || isDrawerItem ? "inherit" : "text.secondary",
         underline: "hover",
@@ -91,14 +97,16 @@ const NavLink = ({ item, isMenuItem = false, isDrawerItem = false }) => {
         sx: {
             display: "block",
             py: isMenuItem ? 1 : isDrawerItem ? 1.5 : 0.5,
-            px: isMenuItem || isDrawerItem ? 2 : 0,
+            px: isMenuItem || isDrawerItem ? 2 : isDrawerItem ? 0 : 0.5, // Adjust padding
             fontSize: "0.875rem",
             width: "100%",
-            textAlign: "left",
+            textAlign: isDrawerItem ? "left" : "center", // Center for header, left for drawer/footer
         },
     };
+
     const isExternal =
         item.url.startsWith("http://") || item.url.startsWith("https://");
+
     if (isExternal || item.target === "_blank") {
         return (
             <MuiLink href={item.url} {...commonProps}>
@@ -135,30 +143,41 @@ const NavLink = ({ item, isMenuItem = false, isDrawerItem = false }) => {
     }
 };
 
-const HeaderNavLink = ({ item }) => {
+// Header specific NavLink with dropdown support
+const HeaderNavLink = ({ item, currentLocale }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const hasChildren = item.children && item.children.length > 0;
+
     const handleClick = (event) => {
         if (hasChildren) {
             setAnchorEl(event.currentTarget);
         }
     };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-    const label = getTranslatedField(item.label);
+    const handleClose = () => setAnchorEl(null);
+
+    const label = getTranslatedField(item.label, {
+        current_locale: currentLocale,
+    });
+
     const commonProps = {
         color: "inherit",
         underline: "hover",
         target: item.target,
         rel: item.target === "_blank" ? "noopener noreferrer" : undefined,
-        sx: { p: 1, textTransform: "none", color: "text.primary" },
+        sx: {
+            p: 1,
+            textTransform: "none",
+            color: "text.primary",
+            display: "flex",
+            alignItems: "center",
+        },
     };
+
     const isExternal =
         item.url.startsWith("http://") || item.url.startsWith("https://");
-    const Component = hasChildren ? Button : MuiLink;
     let linkHref = item.url;
+
     if (!hasChildren && !isExternal) {
         try {
             if (
@@ -172,9 +191,10 @@ const HeaderNavLink = ({ item }) => {
             console.warn(
                 `Ziggy route() failed for HeaderNavLink name: ${item.url}. Falling back to path.`,
             );
-            linkHref = item.url;
         }
     }
+
+    const Component = hasChildren ? Button : MuiLink;
     const componentSpecificProps = hasChildren
         ? {
               onClick: handleClick,
@@ -188,13 +208,12 @@ const HeaderNavLink = ({ item }) => {
                   isExternal || item.target === "_blank" ? "a" : InertiaLink,
               href: linkHref,
           };
+
     return (
         <>
-            {" "}
             <Component {...commonProps} {...componentSpecificProps}>
-                {" "}
-                {label}{" "}
-            </Component>{" "}
+                {label}
+            </Component>
             {hasChildren && (
                 <Menu
                     id={`menu-${item.id}`}
@@ -205,7 +224,6 @@ const HeaderNavLink = ({ item }) => {
                     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     transformOrigin={{ vertical: "top", horizontal: "right" }}
                 >
-                    {" "}
                     {item.children.map((child) => (
                         <MenuItem
                             key={child.id}
@@ -213,26 +231,32 @@ const HeaderNavLink = ({ item }) => {
                             disableRipple
                             sx={{ p: 0 }}
                         >
-                            {" "}
-                            <NavLink item={child} isMenuItem={true} />{" "}
+                            <NavLink
+                                item={child}
+                                isMenuItem={true}
+                                currentLocale={currentLocale}
+                            />
                         </MenuItem>
-                    ))}{" "}
+                    ))}
                 </Menu>
-            )}{" "}
+            )}
         </>
     );
 };
 
-export default function PublicLayout({ children }) {
+export default function PublicLayout({ children, title: pageTitle }) {
+    // Renamed title prop
     const {
         socialAccounts,
         auth,
         navigationItems,
         settings,
         flash,
-        query: currentSearchQuery,
-        locale: currentLocale,
+        ziggy, // ziggy contains current URL and query params
+        available_locales: availableLocales, // Renamed for clarity
+        current_locale: currentLocale, // Renamed for clarity
     } = usePage().props;
+
     const {
         data: subData,
         setData: setSubData,
@@ -245,22 +269,23 @@ export default function PublicLayout({ children }) {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
     const siteName = getTranslatedField(
         settings?.site_name?.value,
-        currentLocale,
+        { current_locale: currentLocale },
         "Personality Platform",
     );
+
     const headerNavItems = navigationItems?.header ?? [];
     const footerCol1Items =
         navigationItems?.footer_col1?.filter((item) => !item.parent_id) ?? [];
     const footerCol2Items =
         navigationItems?.footer_col2?.filter((item) => !item.parent_id) ?? [];
-    const [searchQuery, setSearchQuery] = useState(currentSearchQuery || "");
+
+    const [searchQuery, setSearchQuery] = useState(ziggy?.query?.q || "");
     const [mobileOpen, setMobileOpen] = useState(false);
 
-    const handleDrawerToggle = () => {
-        setMobileOpen((prevState) => !prevState);
-    };
+    const handleDrawerToggle = () => setMobileOpen((prevState) => !prevState);
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
@@ -276,15 +301,16 @@ export default function PublicLayout({ children }) {
             );
         }
     };
+
     useEffect(() => {
-        if (subRecentlySuccessful) {
-            subReset("email");
-        }
+        if (subRecentlySuccessful) subReset("email");
     }, [subRecentlySuccessful, subReset]);
+
     const handleSubscribe = (e) => {
         e.preventDefault();
         subPost(route("subscribe"), { preserveScroll: true });
     };
+
     useEffect(() => {
         const successMessage = flash?.success;
         const errorMessage = flash?.error;
@@ -303,19 +329,41 @@ export default function PublicLayout({ children }) {
             setSnackbarOpen(true);
         }
     }, [flash, subErrors, subRecentlySuccessful]);
+
     const handleSnackbarClose = (event, reason) => {
         if (reason === "clickaway") return;
         setSnackbarOpen(false);
     };
+
     useEffect(() => {
-        setSearchQuery(currentSearchQuery || "");
-    }, [currentSearchQuery]);
+        setSearchQuery(ziggy?.query?.q || "");
+    }, [ziggy?.query?.q]);
+
+    const handleLanguageChange = (event) => {
+        const newLocale = event.target.value;
+        if (newLocale && newLocale !== currentLocale) {
+            // Preserve existing query parameters, only changing/adding 'lang'
+            const currentQuery = { ...ziggy.query };
+            currentQuery.lang = newLocale;
+
+            // Remove undefined keys from query, Inertia might not like them
+            Object.keys(currentQuery).forEach(
+                (key) =>
+                    currentQuery[key] === undefined && delete currentQuery[key],
+            );
+
+            router.get(ziggy.location.split("?")[0], currentQuery, {
+                // Use base URL without query string
+                preserveState: true, // Keep component state if possible
+                preserveScroll: true, // Keep scroll position
+                replace: true, // Avoid adding to browser history for language change
+            });
+        }
+    };
 
     const getDrawerLinkHref = (url) => {
         if (!url) return "#";
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-            return url;
-        }
+        if (url.startsWith("http://") || url.startsWith("https://")) return url;
         if (
             typeof route !== "undefined" &&
             !url.includes("/") &&
@@ -325,17 +373,15 @@ export default function PublicLayout({ children }) {
                 return route(url);
             } catch (e) {
                 console.warn(
-                    `Ziggy route() failed for drawer link name: ${url}. Falling back to path.`,
+                    `Ziggy route() failed for drawer link name: ${url}.`,
                 );
-                return url;
             }
         }
         return url;
     };
     const getDrawerLinkComponent = (url) => {
-        if (!url || url.startsWith("http://") || url.startsWith("https://")) {
+        if (!url || url.startsWith("http://") || url.startsWith("https://"))
             return "a";
-        }
         return InertiaLink;
     };
 
@@ -350,17 +396,17 @@ export default function PublicLayout({ children }) {
                 }}
             >
                 <Typography variant="h6" sx={{ my: 0 }}>
-                    {" "}
-                    {siteName}{" "}
+                    {siteName}
                 </Typography>
                 <IconButton onClick={handleDrawerToggle}>
-                    {" "}
-                    <CloseIcon />{" "}
+                    <CloseIcon />
                 </IconButton>
             </Box>
             <Divider />
             <List>
                 <ListItem>
+                    {" "}
+                    {/* Search in Drawer */}
                     <Box
                         component="form"
                         onSubmit={handleSearchSubmit}
@@ -375,8 +421,7 @@ export default function PublicLayout({ children }) {
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        {" "}
-                                        <SearchIcon />{" "}
+                                        <SearchIcon />
                                     </InputAdornment>
                                 ),
                             }}
@@ -386,7 +431,7 @@ export default function PublicLayout({ children }) {
                 </ListItem>
                 <Divider sx={{ my: 1 }} />
                 {headerNavItems.map((item) => (
-                    <ListItem key={item.id} disablePadding>
+                    <ListItem key={`drawer-${item.id}`} disablePadding>
                         <ListItemButton
                             component={getDrawerLinkComponent(item.url)}
                             href={getDrawerLinkHref(item.url)}
@@ -397,14 +442,86 @@ export default function PublicLayout({ children }) {
                             sx={{ textAlign: "left" }}
                         >
                             <ListItemText
-                                primary={getTranslatedField(
-                                    item.label,
-                                    currentLocale,
-                                )}
+                                primary={getTranslatedField(item.label, {
+                                    current_locale: currentLocale,
+                                })}
                             />
                         </ListItemButton>
+                        {/* Basic support for one level of children in drawer */}
+                        {item.children && item.children.length > 0 && (
+                            <List component="div" disablePadding sx={{ pl: 2 }}>
+                                {item.children.map((child) => (
+                                    <ListItem
+                                        key={`drawer-child-${child.id}`}
+                                        disablePadding
+                                    >
+                                        <ListItemButton
+                                            dense
+                                            component={getDrawerLinkComponent(
+                                                child.url,
+                                            )}
+                                            href={getDrawerLinkHref(child.url)}
+                                            {...(getDrawerLinkComponent(
+                                                child.url,
+                                            ) === "a" && {
+                                                target:
+                                                    child.target || "_blank",
+                                                rel: "noopener noreferrer",
+                                            })}
+                                            sx={{ textAlign: "left" }}
+                                        >
+                                            <ListItemText
+                                                primary={getTranslatedField(
+                                                    child.label,
+                                                    {
+                                                        current_locale:
+                                                            currentLocale,
+                                                    },
+                                                )}
+                                            />
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        )}
                     </ListItem>
                 ))}
+                <Divider sx={{ my: 1 }} />
+                {/* Language Selector in Drawer */}
+                {availableLocales && availableLocales.length > 1 && (
+                    <ListItem disablePadding>
+                        <FormControl
+                            variant="standard"
+                            fullWidth
+                            sx={{ m: 1, minWidth: 120 }}
+                        >
+                            <InputLabel
+                                shrink={false}
+                                id="drawer-language-select-label"
+                                sx={{
+                                    position: "static",
+                                    transform: "none",
+                                    mb: 0.5,
+                                }}
+                            >
+                                Language
+                            </InputLabel>
+                            <Select
+                                labelId="drawer-language-select-label"
+                                id="drawer-language-select"
+                                value={currentLocale}
+                                onChange={handleLanguageChange}
+                                disableUnderline
+                            >
+                                {availableLocales.map((lang) => (
+                                    <MenuItem key={lang.code} value={lang.code}>
+                                        {lang.native_name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </ListItem>
+                )}
                 <Divider sx={{ my: 1 }} />
                 {auth.user ? (
                     <ListItem disablePadding>
@@ -429,17 +546,7 @@ export default function PublicLayout({ children }) {
                                 </ListItemButton>
                             </ListItem>
                         )}
-                        {route().has("register") && (
-                            <ListItem disablePadding>
-                                <ListItemButton
-                                    component={InertiaLink}
-                                    href={route("register")}
-                                    sx={{ textAlign: "left" }}
-                                >
-                                    <ListItemText primary="Register" />
-                                </ListItemButton>
-                            </ListItem>
-                        )}
+                        {/* {route().has("register") && (...)} // Register link if needed */}
                     </>
                 )}
             </List>
@@ -479,28 +586,51 @@ export default function PublicLayout({ children }) {
                                 textDecoration: "none",
                                 color: "inherit",
                                 mr: 2,
+                                display: { xs: "none", md: "flex" },
+                                alignItems: "center",
+                            }}
+                        >
+                            {/* Optional: Logo here */} {siteName}
+                        </Typography>
+                        {/* Mobile Site Name (takes space if logo is also there on mobile) */}
+                        <Typography
+                            variant="h6"
+                            component={InertiaLink}
+                            href={route("home")}
+                            sx={{
+                                textDecoration: "none",
+                                color: "inherit",
                                 flexGrow: { xs: 1, md: 0 },
+                                display: { xs: "flex", md: "none" },
+                                alignItems: "center",
                             }}
                         >
                             {siteName}
                         </Typography>
+
                         <Box
                             sx={{
                                 flexGrow: 1,
                                 display: { xs: "none", md: "flex" },
-                                gap: 1,
+                                gap: 0.5,
+                                justifyContent: "center",
                             }}
                         >
                             {headerNavItems.map((item) => (
-                                <HeaderNavLink key={item.id} item={item} />
+                                <HeaderNavLink
+                                    key={item.id}
+                                    item={item}
+                                    currentLocale={currentLocale}
+                                />
                             ))}
                         </Box>
+
                         <Box
                             component="form"
                             onSubmit={handleSearchSubmit}
                             sx={{
-                                mr: { xs: 0, md: 2 },
-                                ml: { xs: 1 },
+                                mr: { xs: 0, md: 1 },
+                                ml: { xs: 1, md: 0 },
                                 display: { xs: "none", md: "flex" },
                             }}
                         >
@@ -519,7 +649,62 @@ export default function PublicLayout({ children }) {
                                 }}
                             />
                         </Box>
-                        <Box sx={{ display: { xs: "none", md: "block" } }}>
+
+                        {/* Language Selector in AppBar */}
+                        {availableLocales && availableLocales.length > 1 && (
+                            <FormControl
+                                variant="standard"
+                                size="small"
+                                sx={{
+                                    minWidth: 80,
+                                    display: { xs: "none", md: "inline-flex" },
+                                    ml: 1,
+                                }}
+                            >
+                                <Select
+                                    id="language-select-header"
+                                    value={currentLocale}
+                                    onChange={handleLanguageChange}
+                                    disableUnderline
+                                    IconComponent={(props) => (
+                                        <LanguageIcon
+                                            {...props}
+                                            sx={{
+                                                mr: -0.5,
+                                                color: "action.active",
+                                            }}
+                                        />
+                                    )} // Use LanguageIcon as Select icon
+                                    renderValue={(value) =>
+                                        availableLocales
+                                            .find((l) => l.code === value)
+                                            ?.code.toUpperCase() || ""
+                                    } // Display only code
+                                    sx={{
+                                        "& .MuiSelect-select": {
+                                            pr: 1,
+                                            py: 0.5,
+                                            display: "flex",
+                                            alignItems: "center",
+                                        },
+                                    }}
+                                >
+                                    {availableLocales.map((lang) => (
+                                        <MenuItem
+                                            key={lang.code}
+                                            value={lang.code}
+                                        >
+                                            {lang.native_name} (
+                                            {lang.code.toUpperCase()})
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        )}
+
+                        <Box
+                            sx={{ display: { xs: "none", md: "block" }, ml: 1 }}
+                        >
                             {auth.user ? (
                                 <Button
                                     component={InertiaLink}
@@ -531,13 +716,25 @@ export default function PublicLayout({ children }) {
                                     Dashboard
                                 </Button>
                             ) : (
-                                <> </>
+                                route().has("login") && (
+                                    <Button
+                                        component={InertiaLink}
+                                        href={route("login")}
+                                        color="primary"
+                                        variant="text"
+                                        size="small"
+                                    >
+                                        Login
+                                    </Button>
+                                )
                             )}
                         </Box>
                     </Toolbar>
                 </Container>
             </AppBar>
             <Box component="nav">
+                {" "}
+                {/* Drawer for mobile */}
                 <Drawer
                     variant="temporary"
                     open={mobileOpen}
@@ -558,10 +755,12 @@ export default function PublicLayout({ children }) {
             <Container
                 component="main"
                 maxWidth="lg"
-                sx={{ mt: 4, mb: 4, flexGrow: 1 }}
+                sx={{ mt: { xs: 2, sm: 3, md: 4 }, mb: 4, flexGrow: 1 }}
             >
                 {children}
             </Container>
+
+            {/* Footer remains largely the same */}
             <Box
                 component="footer"
                 sx={{
@@ -573,36 +772,47 @@ export default function PublicLayout({ children }) {
             >
                 <Container maxWidth="lg">
                     <Grid container spacing={4} justifyContent="space-between">
-                        <Grid size={{ xs: 12, md: 4 }}>
+                        <Grid item xs={12} md={4}>
                             <Typography variant="h6" gutterBottom>
                                 {siteName}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {" "}
-                                Sharing knowledge and insights.{" "}
+                                {getTranslatedField(
+                                    settings?.site_description?.value,
+                                    { current_locale: currentLocale },
+                                    "Sharing knowledge and insights.",
+                                )}
                             </Typography>
                         </Grid>
                         {footerCol1Items.length > 0 && (
-                            <Grid size={{ xs: 6, sm: 3, md: 2 }}>
+                            <Grid item xs={6} sm={3} md={2}>
                                 <Typography variant="subtitle1" gutterBottom>
                                     Links
                                 </Typography>
                                 {footerCol1Items.map((item) => (
-                                    <NavLink key={item.id} item={item} />
+                                    <NavLink
+                                        key={`footer1-${item.id}`}
+                                        item={item}
+                                        currentLocale={currentLocale}
+                                    />
                                 ))}
                             </Grid>
                         )}
                         {footerCol2Items.length > 0 && (
-                            <Grid size={{ xs: 6, sm: 3, md: 2 }}>
+                            <Grid item xs={6} sm={3} md={2}>
                                 <Typography variant="subtitle1" gutterBottom>
                                     Resources
                                 </Typography>
                                 {footerCol2Items.map((item) => (
-                                    <NavLink key={item.id} item={item} />
+                                    <NavLink
+                                        key={`footer2-${item.id}`}
+                                        item={item}
+                                        currentLocale={currentLocale}
+                                    />
                                 ))}
                             </Grid>
                         )}
-                        <Grid size={{ xs: 12, md: 4 }}>
+                        <Grid item xs={12} md={4}>
                             {socialAccounts && socialAccounts.length > 0 && (
                                 <>
                                     <Typography
@@ -617,7 +827,10 @@ export default function PublicLayout({ children }) {
                                                 title={
                                                     getTranslatedField(
                                                         acc.account_name,
-                                                        currentLocale,
+                                                        {
+                                                            current_locale:
+                                                                currentLocale,
+                                                        },
                                                     ) || acc.platform
                                                 }
                                                 key={acc.id}
@@ -632,7 +845,10 @@ export default function PublicLayout({ children }) {
                                                         aria-label={
                                                             getTranslatedField(
                                                                 acc.account_name,
-                                                                currentLocale,
+                                                                {
+                                                                    current_locale:
+                                                                        currentLocale,
+                                                                },
                                                             ) || acc.platform
                                                         }
                                                         disabled={!acc.url}
@@ -679,10 +895,9 @@ export default function PublicLayout({ children }) {
                                     size="medium"
                                     disabled={subProcessing}
                                 >
-                                    {" "}
                                     {subProcessing
                                         ? "Subscribing..."
-                                        : "Subscribe"}{" "}
+                                        : "Subscribe"}
                                 </Button>
                             </Box>
                         </Grid>
@@ -693,9 +908,11 @@ export default function PublicLayout({ children }) {
                         color="text.secondary"
                         align="center"
                     >
-                        {" "}
-                        {"© "} {new Date().getFullYear()} {siteName}. All
-                        rights reserved.{" "}
+                        {getTranslatedField(
+                            settings?.footer_copyright_text?.value,
+                            { current_locale: currentLocale },
+                            `© {year} ${siteName}. All rights reserved.`,
+                        ).replace("{year}", new Date().getFullYear())}
                     </Typography>
                 </Container>
             </Box>
