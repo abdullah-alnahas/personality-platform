@@ -33,6 +33,7 @@ class RolesAndPermissionsSeeder extends Seeder
             "manage users",
             "manage roles",
             "manage quotes",
+            "manage languages",
         ];
 
         foreach ($permissions as $permission) {
@@ -59,5 +60,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create a basic Member role (example, might not be needed now)
         // Role::findOrCreate('Member', 'web');
+        $editorRole = Role::findOrCreate("Editor", "web");
+        $editorRole->givePermissionTo("manage languages");
     }
 }

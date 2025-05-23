@@ -13,8 +13,6 @@ import {
     ListItemText,
     Toolbar,
     Typography,
-    useTheme,
-    useMediaQuery,
     Snackbar,
     Alert,
     Divider,
@@ -25,20 +23,17 @@ import CategoryIcon from "@mui/icons-material/Category";
 import ArticleIcon from "@mui/icons-material/Article";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import LinkIcon from "@mui/icons-material/Link";
-import GroupIcon from "@mui/icons-material/Group";
+import LinkIcon from "@mui/icons-material/Link"; // For NavigationItems
+import GroupIcon from "@mui/icons-material/Group"; // For SocialAccounts
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
-import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary"; // <-- Import Media Icon
-
-// ... (AdminLayout code remains the same until drawerContent) ...
+import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
+import LanguageIcon from "@mui/icons-material/Language"; // <-- New Icon for Languages
 
 const drawerWidth = 240;
 
 export default function AdminLayout({ children, title = "Admin Panel" }) {
-    // ... (state and handlers remain the same) ...
     const [mobileOpen, setMobileOpen] = useState(false);
-    const theme = useTheme();
-    const { flash, auth } = usePage().props;
+    const { flash, auth } = usePage().props; // Use general auth, specific perms checked by `can` prop or Gate
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -72,7 +67,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
     };
 
     const drawerContent = (
-        <div>
+        <Box>
             <Toolbar /> {/* Spacer for AppBar */}
             <List>
                 <ListItem disablePadding>
@@ -95,7 +90,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                 >
                     Content
                 </Typography>
-
+                {/* ... other content links (Categories, Items, Quotes, Media) ... */}
                 <ListItem disablePadding>
                     <ListItemButton
                         component={InertiaLink}
@@ -132,7 +127,6 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         <ListItemText primary="Quotes" />
                     </ListItemButton>
                 </ListItem>
-                {/* --- Add Media Library Link --- */}
                 <ListItem disablePadding>
                     <ListItemButton
                         component={InertiaLink}
@@ -145,7 +139,6 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         <ListItemText primary="Media Library" />
                     </ListItemButton>
                 </ListItem>
-                {/* --- End Media Library Link --- */}
 
                 <Divider sx={{ my: 1 }} />
                 <Typography
@@ -154,7 +147,6 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                 >
                     Site Structure
                 </Typography>
-                {/* ... other links ... */}
                 <ListItem disablePadding>
                     <ListItemButton
                         component={InertiaLink}
@@ -188,6 +180,20 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                     Administration
                 </Typography>
                 <ListItem disablePadding>
+                    {" "}
+                    {/* Add Languages Link */}
+                    <ListItemButton
+                        component={InertiaLink}
+                        href={route("admin.languages.index")}
+                        selected={route().current("admin.languages.*")}
+                    >
+                        <ListItemIcon>
+                            <LanguageIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Languages" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
                     <ListItemButton
                         component={InertiaLink}
                         href={route("admin.settings.edit")}
@@ -199,11 +205,22 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         <ListItemText primary="Settings" />
                     </ListItemButton>
                 </ListItem>
+                {/* Consider adding Users & Roles management links here if permissions allow */}
             </List>
-        </div>
+            <Divider sx={{ my: 1 }} />
+            <List>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={handleLogout}>
+                        <ListItemIcon>
+                            <LogoutIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Logout" />
+                    </ListItemButton>
+                </ListItem>
+            </List>
+        </Box>
     );
 
-    // ... (Rest of AdminLayout.jsx: AppBar, Drawers, Main Content, Snackbar) remains the same ...
     return (
         <Box sx={{ display: "flex" }}>
             <CssBaseline />
@@ -227,12 +244,10 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         component="div"
                         sx={{ flexGrow: 1 }}
                     >
-                        {" "}
-                        {title}{" "}
+                        {title}
                     </Typography>
                     <Typography variant="body2" sx={{ mr: 2 }}>
-                        {" "}
-                        {auth.user.name}{" "}
+                        {auth.user.name}
                     </Typography>
                     <IconButton
                         color="inherit"
@@ -240,8 +255,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         edge="end"
                         onClick={handleLogout}
                     >
-                        {" "}
-                        <LogoutIcon />{" "}
+                        <LogoutIcon />
                     </IconButton>
                 </Toolbar>
             </AppBar>
@@ -263,8 +277,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         },
                     }}
                 >
-                    {" "}
-                    {drawerContent}{" "}
+                    {drawerContent}
                 </Drawer>
                 <Drawer
                     variant="permanent"
@@ -277,8 +290,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                     }}
                     open
                 >
-                    {" "}
-                    {drawerContent}{" "}
+                    {drawerContent}
                 </Drawer>
             </Box>
             <Box
@@ -299,14 +311,13 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             >
                 <Alert
-                    key={snackbarMessage}
+                    key={snackbarMessage} // Ensure Alert re-renders if message changes rapidly
                     onClose={handleSnackbarClose}
                     severity={snackbarSeverity}
                     sx={{ width: "100%" }}
                     variant="filled"
                 >
-                    {" "}
-                    {snackbarMessage}{" "}
+                    {snackbarMessage}
                 </Alert>
             </Snackbar>
         </Box>
