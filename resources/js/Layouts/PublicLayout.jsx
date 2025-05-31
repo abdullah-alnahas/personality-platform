@@ -45,6 +45,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import CookieConsentBanner from "@/Components/CookieConsentBanner";
 
 const SocialIcon = ({ platform }) => {
     /* ... (same as before) ... */
@@ -922,6 +923,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+            <CookieConsentBanner />
         </Box>
     );
 }
