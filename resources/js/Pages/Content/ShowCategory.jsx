@@ -1,50 +1,46 @@
 import React from "react";
-import { Head, Link as InertiaLink, usePage } from "@inertiajs/react"; // usePage is fine inside the component itself
+import { Head, Link as InertiaLink, usePage } from "@inertiajs/react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import {
     Box,
     Typography,
-    Container,
     Grid,
-    Paper,
     Breadcrumbs,
-    Link,
+    Link as MuiLink,
     Button,
     Pagination,
-} from "@mui/material";
+} from "@mui/material"; // Removed Container, Paper as layout handles it
 import ContentCard from "@/Components/ContentCard";
 import HomeIcon from "@mui/icons-material/Home";
 
-// getTranslatedField is still used within the ShowCategory component body correctly
-const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
-    const { props } = usePage();
-    const currentLocale = props.locale || locale;
-    if (fieldObject == null) {
-        return fallback;
-    }
-    if (typeof fieldObject !== "object") {
-        return String(fieldObject) || fallback;
-    }
+const getTranslatedField = (fieldObject, pageProps, fallback = "") => {
+    /* ... (same as before) ... */
+    const currentLocale = pageProps.current_locale || "en";
+    if (fieldObject == null) return fallback;
+    if (typeof fieldObject !== "object") return String(fieldObject) || fallback;
     return (
         fieldObject[currentLocale] ||
-        fieldObject[locale] ||
-        Object.values(fieldObject)[0] ||
+        fieldObject[Object.keys(fieldObject)[0]] ||
         fallback
     );
 };
 
 export default function ShowCategory({ category, items }) {
-    const { data, links, current_page, last_page } = items;
-    const categoryName = getTranslatedField(category.name); // Fine here
+    const { props: pageProps } = usePage();
+    const { data: results, links, current_page, last_page } = items; // Renamed data to results for clarity
+    const categoryName = getTranslatedField(category.name, pageProps);
 
     return (
         <>
             <Head
                 title={categoryName}
-                description={getTranslatedField(category.description)}
+                description={getTranslatedField(
+                    category.description,
+                    pageProps,
+                )}
             />
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-                <Link
+                <MuiLink
                     component={InertiaLink}
                     underline="hover"
                     sx={{ display: "flex", alignItems: "center" }}
@@ -52,7 +48,7 @@ export default function ShowCategory({ category, items }) {
                     href={route("home")}
                 >
                     <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" /> Home
-                </Link>
+                </MuiLink>
                 <Typography color="text.primary">{categoryName}</Typography>
             </Breadcrumbs>
             <Typography variant="h4" component="h1" gutterBottom>
@@ -64,21 +60,23 @@ export default function ShowCategory({ category, items }) {
                     color="text.secondary"
                     sx={{ mb: 3 }}
                 >
-                    {getTranslatedField(category.description)}
+                    {getTranslatedField(category.description, pageProps)}
                 </Typography>
             )}
+
             <Grid container spacing={3}>
-                {data.length > 0 ? (
-                    data.map((item) => (
-                        <Grid
-                            size={{ xs: 12, sm: 6, md: 4 }}
-                            key={`cat-item-${item.id}`}
-                        >
+                {results && results.length > 0 ? (
+                    results.map((item) => (
+                        <Grid xs={12} sm={6} md={4} key={`cat-item-${item.id}`}>
+                            {" "}
+                            {/* Grid v2 */}
                             <ContentCard item={item} />
                         </Grid>
                     ))
                 ) : (
-                    <Grid size={{ xs: 12 }}>
+                    <Grid xs={12}>
+                        {" "}
+                        {/* Grid v2 */}
                         <Typography>
                             No items found in this category.
                         </Typography>
@@ -86,36 +84,47 @@ export default function ShowCategory({ category, items }) {
                 )}
             </Grid>
 
-            {links.length > 3 && (
-                <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                    <Box sx={{ display: "flex", gap: 1 }}>
-                        {links.map((link, index) => (
-                            <Button
-                                key={index}
-                                component={link.url ? InertiaLink : "button"}
-                                href={link.url}
-                                disabled={!link.url || link.active}
-                                size="small"
-                                variant={link.active ? "contained" : "outlined"}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                preserveScroll
-                                preserveState
-                            />
-                        ))}
+            {links &&
+                links.length > 3 && ( // Standard Inertia pagination links
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            py: 4,
+                        }}
+                    >
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                            {links.map((link, index) => (
+                                <Button
+                                    key={index}
+                                    component={
+                                        link.url ? InertiaLink : "button"
+                                    }
+                                    href={link.url}
+                                    disabled={!link.url || link.active}
+                                    size="small"
+                                    variant={
+                                        link.active ? "contained" : "outlined"
+                                    }
+                                    dangerouslySetInnerHTML={{
+                                        __html: link.label,
+                                    }}
+                                    preserveScroll
+                                    preserveState
+                                />
+                            ))}
+                        </Box>
                     </Box>
-                </Box>
-            )}
+                )}
         </>
     );
 }
-
-// Corrected Layout Assignment:
 ShowCategory.layout = (page) => {
-    // Safely derive title from page.props for the layout
+    /* ... (same as before) ... */
     const categoryNameObject = page.props.category?.name;
-    let titleForLayout = "Category"; // Default title
+    let titleForLayout = "Category";
     if (categoryNameObject && typeof categoryNameObject === "object") {
-        const currentLocale = page.props.locale || "en"; // Get locale from page.props
+        const currentLocale = page.props.locale || "en";
         titleForLayout =
             categoryNameObject[currentLocale] ||
             Object.values(categoryNameObject)[0] ||
@@ -123,5 +132,5 @@ ShowCategory.layout = (page) => {
     } else if (categoryNameObject) {
         titleForLayout = String(categoryNameObject);
     }
-    return <PublicLayout children={page} title={titleForLayout} />;
+    return <PublicLayout title={titleForLayout}>{page}</PublicLayout>; // Pass title to PublicLayout
 };

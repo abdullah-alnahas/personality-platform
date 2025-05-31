@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Head, Link as InertiaLink, router, usePage } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react"; // Removed InertiaLink as not directly used for navigation here
 import AdminLayout from "@/Layouts/AdminLayout";
 import {
     Box,
@@ -13,19 +13,18 @@ import {
     CardActions,
     IconButton,
     Tooltip,
-    Chip,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Pagination, // For MUI pagination
+    Pagination,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
-import BrokenImageIcon from "@mui/icons-material/BrokenImage";
+import BrokenImageIcon from "@mui/icons-material/BrokenImage"; // For placeholder
 
 const formatFileSize = (bytes) => {
+    /* ... (same as before) ... */
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
@@ -42,7 +41,6 @@ export default function Index({ mediaItems, can }) {
         setSelectedMediaId(id);
         setDialogOpen(true);
     };
-
     const handleConfirmDelete = () => {
         if (selectedMediaId) {
             router.delete(route("admin.media.destroy", selectedMediaId), {
@@ -52,12 +50,10 @@ export default function Index({ mediaItems, can }) {
             });
         }
     };
-
     const handleCloseDialog = () => {
         setDialogOpen(false);
         setSelectedMediaId(null);
     };
-
     const handleMuiPageChange = (event, value) => {
         if (current_page !== value) {
             router.get(
@@ -80,18 +76,14 @@ export default function Index({ mediaItems, can }) {
                 }}
             >
                 <Typography variant="h4">Media Library</Typography>
-                {/* Placeholder for future upload functionality */}
             </Box>
-
             <Paper sx={{ p: 2 }}>
                 {data.length > 0 ? (
                     <Grid container spacing={2}>
                         {data.map((media) => (
-                            // Use the 'size' prop for Grid items
-                            <Grid
-                                size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
-                                key={media.id}
-                            >
+                            <Grid xs={12} sm={6} md={4} lg={3} key={media.id}>
+                                {" "}
+                                {/* Grid v2 */}
                                 <Card
                                     sx={{
                                         display: "flex",
@@ -107,11 +99,10 @@ export default function Index({ mediaItems, can }) {
                                                 height: 160,
                                                 objectFit: "cover",
                                             }}
-                                            image={media.thumb_url} // Use thumb_url which should be a valid URL
+                                            image={media.thumb_url}
                                             alt={media.name}
                                         />
                                     ) : (
-                                        // Fallback for non-images or if thumbnail is missing
                                         <Box
                                             sx={{
                                                 height: 160,
@@ -194,7 +185,6 @@ export default function Index({ mediaItems, can }) {
                         No media items found.
                     </Typography>
                 )}
-
                 {total > 0 && links.length > 3 && (
                     <Box
                         sx={{
@@ -214,24 +204,18 @@ export default function Index({ mediaItems, can }) {
                     </Box>
                 )}
             </Paper>
-
-            <Dialog
-                open={dialogOpen}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"Confirm Deletion"}
-                </DialogTitle>
+            <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+                <DialogTitle>Confirm Deletion</DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
+                    <DialogContentText>
                         Are you sure you want to delete this media item? This
                         action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>Cancel</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">
+                        Cancel
+                    </Button>
                     <Button
                         onClick={handleConfirmDelete}
                         color="error"
@@ -244,5 +228,4 @@ export default function Index({ mediaItems, can }) {
         </>
     );
 }
-
 Index.layout = (page) => <AdminLayout children={page} title="Media Library" />;

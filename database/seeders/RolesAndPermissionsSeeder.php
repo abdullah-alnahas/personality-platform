@@ -21,46 +21,40 @@ class RolesAndPermissionsSeeder extends Seeder
         $permissions = [
             "view admin",
             "manage settings",
-            "manage languages",
+            "manage languages", // Was added in a previous step
             "manage navigation",
             "manage categories",
             "manage content items",
-            "manage quotes",
             "manage social accounts",
             "manage subscribers",
             "manage contact submissions",
             "manage media",
             "manage users",
             "manage roles",
-            "manage quotes",
-            "manage languages",
+            "manage quotes", // Ensure this appears only once
+            // "manage quotes", // This was the duplicate, now removed
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::findOrCreate($permission, "web"); // Specify guard 'web'
+        foreach ($permissions as $permissionName) {
+            // Changed variable name for clarity
+            Permission::findOrCreate($permissionName, "web"); // Specify guard 'web'
         }
 
         // Define Roles and Assign Permissions
+        // Ensure 'manage quotes' is correctly assigned to Editor if intended
         $editorPermissions = [
             "view admin",
             "manage categories",
             "manage content items",
-            "manage quotes",
             "manage media",
-            "manage quotes",
+            "manage quotes", // Ensure it's here if editors should manage quotes
         ];
 
         $editorRole = Role::findOrCreate("Editor", "web");
         $editorRole->syncPermissions($editorPermissions);
 
         $superAdminRole = Role::findOrCreate("Super Admin", "web");
-        // Super Admin gets all permissions (using a Gate check later is more flexible)
-        // For explicit assignment: $superAdminRole->syncPermissions(Permission::all());
-        // We will rely on the Gate::before check for Super Admin for simplicity now.
-
-        // Create a basic Member role (example, might not be needed now)
-        // Role::findOrCreate('Member', 'web');
-        $editorRole = Role::findOrCreate("Editor", "web");
-        $editorRole->givePermissionTo("manage languages");
+        // Super Admin gets all permissions via Gate::before check in AuthServiceProvider,
+        // so no explicit permission assignment needed here for $superAdminRole.
     }
 }

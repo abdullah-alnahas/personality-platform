@@ -28,48 +28,44 @@ import {
     Input,
     LinearProgress,
 } from "@mui/material";
-import {
-    DateTimePicker, // No need for LocalizationProvider here, it's in app.jsx
-} from "@mui/x-date-pickers/DateTimePicker";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 
 const getTranslatedFieldLocal = (
     fieldObject,
-    pageProps, // Pass the entire page props
-    localeKeyToUse = "en", // Default locale to try
+    pageProps,
+    localeKeyToUse = "en",
     fallback = "",
 ) => {
-    const currentLocale = pageProps.locale || localeKeyToUse; // Get current locale from shared props
+    /* ... (same) ... */
+    const currentLocale = pageProps.locale || localeKeyToUse;
     if (!fieldObject) return fallback;
     if (typeof fieldObject !== "object" || fieldObject === null)
         return String(fieldObject) || fallback;
     return (
         fieldObject[currentLocale] ||
-        fieldObject[localeKeyToUse] || // Fallback to specified localeKeyToUse
-        Object.values(fieldObject)[0] || // Fallback to first available translation
+        fieldObject[localeKeyToUse] ||
+        Object.values(fieldObject)[0] ||
         fallback
     );
 };
 
 export default function Form({
-    item, // The content item being edited, or null if creating
-    categories, // Array of available categories
-    featured_image_url, // URL of the existing featured image (if any)
-    activeLanguages: controllerActiveLanguages, // Array of active language codes ['en', 'ar', 'tr']
+    item,
+    categories,
+    featured_image_url,
+    activeLanguages: controllerActiveLanguages,
 }) {
     const isEditing = !!item;
     const [imagePreview, setImagePreview] = useState(
         featured_image_url || null,
     );
-    const { props: pageProps } = usePage(); // Get all page props, including 'locale'
-
-    // Ensure activeLanguages is an array of strings, fallback if not provided correctly
+    const { props: pageProps } = usePage();
     const activeLanguages =
         Array.isArray(controllerActiveLanguages) &&
         controllerActiveLanguages.every((lang) => typeof lang === "string")
             ? controllerActiveLanguages
-            : ["en", "ar", "tr"]; // Default fallback
-
+            : ["en", "ar", "tr"];
     const { data, setData, post, processing, errors, reset, progress } =
         useForm({
             title: activeLanguages.reduce(
@@ -91,7 +87,6 @@ export default function Form({
                 {},
             ),
             featured_image_alt_text: activeLanguages.reduce(
-                // Initialize alt text field
                 (acc, lang) => ({
                     ...acc,
                     [lang]: item?.featured_image_alt_text?.[lang] ?? "",
@@ -100,94 +95,77 @@ export default function Form({
             ),
             content_category_id: item?.content_category_id ?? "",
             status: item?.status ?? "draft",
-            publish_date: item?.publish_date ? dayjs(item.publish_date) : null, // Ensure dayjs object for DateTimePicker
+            publish_date: item?.publish_date ? dayjs(item.publish_date) : null,
             is_featured_home: item?.is_featured_home ?? false,
-            featured_image: null, // For new image uploads
-            remove_featured_image: false, // Flag to indicate if existing image should be removed
-            _method: isEditing ? "PUT" : "POST", // For Laravel method spoofing
+            featured_image: null,
+            remove_featured_image: false,
+            _method: isEditing ? "PUT" : "POST",
         });
-
-    // Effect to update image preview when a new file is selected or existing image is loaded
     useEffect(() => {
+        /* ... (image preview logic same) ... */
         if (data.featured_image instanceof File) {
             const reader = new FileReader();
             reader.onload = (e) => setImagePreview(e.target.result);
             reader.readAsDataURL(data.featured_image);
         } else if (!featured_image_url && !data.featured_image) {
-            // No existing and no new file
             setImagePreview(null);
         } else if (
             featured_image_url &&
             !data.featured_image &&
             !data.remove_featured_image
         ) {
-            // Existing image, no new file, not marked for removal
             setImagePreview(featured_image_url);
         }
-        // If data.remove_featured_image is true, preview is handled by handleRemoveImage
     }, [data.featured_image, featured_image_url, data.remove_featured_image]);
-
-    // Form submission handler
     const handleSubmit = (e) => {
+        /* ... (same) ... */
         e.preventDefault();
         const options = {
             preserveScroll: true,
-            onSuccess: () => {
-                reset("featured_image"); // Only reset the file input on success
-                // Snackbar for success will be handled by AdminLayout
-            },
-            onError: (formErrors) => {
-                console.error("Form submission errors:", formErrors);
-                // Snackbar for error will be handled by AdminLayout or specific error display here
-            },
-            forceFormData: true, // Ensures data is sent as FormData when files are present
+            onSuccess: () => reset("featured_image"),
+            onError: (err) => console.error(err),
+            forceFormData: true,
         };
-
         const routeName = isEditing
             ? "admin.content-items.update"
             : "admin.content-items.store";
         const routeParams = isEditing ? item.id : [];
-
-        // Prepare data for submission, especially date format
         const dataToSend = {
             ...data,
             publish_date: data.publish_date
-                ? data.publish_date.toISOString() // Convert Dayjs object to ISO string
+                ? data.publish_date.toISOString()
                 : null,
         };
-
-        // Use router.post for both create and update when dealing with files and _method spoofing
         router.post(route(routeName, routeParams), dataToSend, options);
     };
-
-    // Handler for translatable fields (TextField, RichTextEditor)
     const handleTranslatableChange = (fieldName, langCode, valueOrEvent) => {
+        /* ... (same) ... */
         let newValue;
         if (
             valueOrEvent &&
             typeof valueOrEvent === "object" &&
-            valueOrEvent.target // Check if it's a standard input event
+            valueOrEvent.target
         ) {
             newValue = valueOrEvent.target.value;
         } else {
-            newValue = valueOrEvent; // Direct value from RichTextEditor or other custom components
+            newValue = valueOrEvent;
         }
         setData(fieldName, { ...data[fieldName], [langCode]: newValue });
     };
-
-    // Handler for file input change
     const handleFileChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
+        /* ... (same) ... */ if (e.target.files && e.target.files[0]) {
             setData("featured_image", e.target.files[0]);
-            setData("remove_featured_image", false); // If a new file is selected, ensure not to remove
+            setData("remove_featured_image", false);
         }
     };
-
-    // Handler to remove the current featured image
     const handleRemoveImage = () => {
-        setData({ ...data, featured_image: null, remove_featured_image: true });
+        /* ... (same) ... */ setData({
+            ...data,
+            featured_image: null,
+            remove_featured_image: true,
+        });
         setImagePreview(null);
-        const fileInput = document.getElementById("featured_image_input"); // Reset the actual file input
+        const fileInput = document.getElementById("featured_image_input");
         if (fileInput) {
             fileInput.value = "";
         }
@@ -203,20 +181,16 @@ export default function Form({
                     ? `Edit Item: ${getTranslatedFieldLocal(item.title, pageProps)}`
                     : "Create New Content Item"}
             </Typography>
-
             <Paper sx={{ p: 3 }}>
                 <Box
                     component="form"
                     onSubmit={handleSubmit}
                     noValidate
                     sx={{ mt: 1 }}
-                    // encType="multipart/form-data" // Inertia handles this with router.post and FormData
                 >
                     <Grid container spacing={3}>
-                        {/* Translatable Title Fields */}
                         {activeLanguages.map((lang) => (
                             <Grid
-                                item
                                 xs={12}
                                 md={activeLanguages.length > 1 ? 4 : 12}
                                 key={`title-${lang}`}
@@ -224,7 +198,7 @@ export default function Form({
                                 <TextField
                                     required={
                                         lang === (pageProps.locale || "en")
-                                    } // Require for current/default locale
+                                    }
                                     fullWidth
                                     id={`title-${lang}`}
                                     label={`Title (${lang.toUpperCase()})`}
@@ -237,20 +211,16 @@ export default function Form({
                                             e,
                                         )
                                     }
-                                    error={!!errors[`title.${lang}`]} // Specific error for each language field
+                                    error={!!errors[`title.${lang}`]}
                                     helperText={errors[`title.${lang}`]}
                                 />
                             </Grid>
                         ))}
-
-                        <Grid item xs={12}>
+                        <Grid xs={12}>
                             <Divider>Content & Details</Divider>
                         </Grid>
-
-                        {/* Translatable Excerpt Fields */}
                         {activeLanguages.map((lang) => (
                             <Grid
-                                item
                                 xs={12}
                                 md={activeLanguages.length > 1 ? 4 : 12}
                                 key={`excerpt-${lang}`}
@@ -275,9 +245,7 @@ export default function Form({
                                 />
                             </Grid>
                         ))}
-
-                        {/* Translatable Content Fields (RichTextEditor) */}
-                        <Grid item xs={12}>
+                        <Grid xs={12}>
                             <Typography
                                 variant="subtitle1"
                                 gutterBottom
@@ -288,7 +256,6 @@ export default function Form({
                         </Grid>
                         {activeLanguages.map((lang) => (
                             <Grid
-                                item
                                 xs={12}
                                 md={activeLanguages.length > 1 ? 4 : 12}
                                 key={`content-${lang}`}
@@ -308,19 +275,16 @@ export default function Form({
                                         )
                                     }
                                     placeholder={`Enter content for ${lang.toUpperCase()}...`}
-                                    direction={lang === "ar" ? "rtl" : "ltr"} // Handle RTL for Arabic
+                                    direction={lang === "ar" ? "rtl" : "ltr"}
                                     error={!!errors[`content.${lang}`]}
                                     helperText={errors[`content.${lang}`]}
                                 />
                             </Grid>
                         ))}
-
-                        <Grid item xs={12}>
+                        <Grid xs={12}>
                             <Divider>Configuration</Divider>
                         </Grid>
-
-                        {/* Category Select */}
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid xs={12} sm={6} md={4}>
                             <FormControl
                                 fullWidth
                                 error={!!errors.content_category_id}
@@ -361,9 +325,7 @@ export default function Form({
                                 )}
                             </FormControl>
                         </Grid>
-
-                        {/* Status Select */}
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid xs={12} sm={6} md={4}>
                             <FormControl fullWidth error={!!errors.status}>
                                 <InputLabel id="status-label">
                                     Status
@@ -392,12 +354,10 @@ export default function Form({
                                 )}
                             </FormControl>
                         </Grid>
-
-                        {/* Publish Date Picker */}
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid xs={12} sm={6} md={4}>
                             <DateTimePicker
                                 label="Publish Date/Time"
-                                value={data.publish_date} // Expects Dayjs object or null
+                                value={data.publish_date}
                                 onChange={(newValue) =>
                                     setData("publish_date", newValue)
                                 }
@@ -412,9 +372,7 @@ export default function Form({
                                 }}
                             />
                         </Grid>
-
-                        {/* Featured on Homepage Switch */}
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid xs={12} sm={6} md={4}>
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -436,13 +394,10 @@ export default function Form({
                                 </FormHelperText>
                             )}
                         </Grid>
-
-                        <Grid item xs={12}>
+                        <Grid xs={12}>
                             <Divider>Featured Image</Divider>
                         </Grid>
-
-                        {/* Featured Image Upload */}
-                        <Grid item xs={12} md={6}>
+                        <Grid xs={12} md={6}>
                             <FormControl
                                 fullWidth
                                 error={!!errors.featured_image}
@@ -461,7 +416,7 @@ export default function Form({
                                 </InputLabel>
                                 <Input
                                     accept="image/*"
-                                    id="featured_image_input" // Ensure this ID is unique if form is part of a larger page
+                                    id="featured_image_input"
                                     type="file"
                                     onChange={handleFileChange}
                                     sx={{ display: "block" }}
@@ -469,7 +424,7 @@ export default function Form({
                                         data.featured_image
                                             ? "file-selected"
                                             : "no-file"
-                                    } // Force re-render to clear
+                                    }
                                 />
                                 {progress && (
                                     <Box sx={{ width: "100%", mt: 1 }}>
@@ -489,7 +444,7 @@ export default function Form({
                                 )}
                             </FormControl>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid xs={12} md={6}>
                             {imagePreview && (
                                 <Card
                                     sx={{ maxWidth: 300, position: "relative" }}
@@ -516,7 +471,6 @@ export default function Form({
                                     </Button>
                                 </Card>
                             )}
-                            {/* Hidden input for remove_featured_image flag, useful if not using FormData explicitly for simple cases */}
                             {isEditing && featured_image_url && (
                                 <input
                                     type="hidden"
@@ -527,10 +481,7 @@ export default function Form({
                                 />
                             )}
                         </Grid>
-
-                        {/* Translatable Featured Image Alt Text */}
                         <Grid
-                            item
                             xs={12}
                             sx={{ mt: activeLanguages.length > 1 ? 0 : 2 }}
                         >
@@ -541,7 +492,6 @@ export default function Form({
                         </Grid>
                         {activeLanguages.map((lang) => (
                             <Grid
-                                item
                                 xs={12}
                                 md={activeLanguages.length > 1 ? 4 : 12}
                                 key={`alt-text-${lang}`}
@@ -575,10 +525,7 @@ export default function Form({
                                 />
                             </Grid>
                         ))}
-
-                        {/* Action Buttons */}
                         <Grid
-                            item
                             xs={12}
                             sx={{
                                 display: "flex",
@@ -614,7 +561,6 @@ export default function Form({
         </>
     );
 }
-
 Form.layout = (page) => (
     <AdminLayout
         children={page}

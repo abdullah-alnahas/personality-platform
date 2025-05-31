@@ -1,7 +1,7 @@
 import React from "react";
 import { Head, usePage, useForm } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
-import RichTextEditor from "@/Components/RichTextEditor"; // <-- Import RichTextEditor
+import RichTextEditor from "@/Components/RichTextEditor";
 import {
     Box,
     Typography,
@@ -24,19 +24,16 @@ export default function Edit({
     groupedSettings,
     activeLanguages: propActiveLanguages,
 }) {
-    const { props } = usePage();
-    const defaultLocale = props.locale || "en";
+    const { props: pageProps } = usePage(); // Use pageProps for consistency
+    const defaultLocale = pageProps.locale || "en";
     const activeLanguages = Array.isArray(propActiveLanguages)
         ? propActiveLanguages
-        : props.activeLanguages || ["en", "ar", "tr"];
-
+        : pageProps.activeLanguages || ["en", "ar", "tr"];
     const initialFormData = {};
-    // Ensure settings is an object before calling Object.values
     Object.values(settings || {}).forEach((setting) => {
         const key = setting.key;
         const type = setting.type;
         const value = setting.value;
-
         if (type === "boolean") {
             let boolValue = false;
             if (
@@ -68,40 +65,31 @@ export default function Edit({
         }
     });
     initialFormData._method = "PUT";
-
     const { data, setData, put, processing, errors } = useForm(initialFormData);
-
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Prepare data for submission, especially for boolean values
         const dataToSubmit = { ...data };
         Object.values(settings || {}).forEach((setting) => {
             if (setting.type === "boolean") {
-                // Store booleans as '1' or '0' string in the default locale, as per seeder
                 dataToSubmit[setting.key] = {
                     [defaultLocale]: data[setting.key] ? "1" : "0",
                 };
             }
         });
-
         put(route("admin.settings.update"), {
-            data: dataToSubmit, // Send prepared data
+            data: dataToSubmit,
             preserveScroll: true,
         });
     };
-
-    // Updated to handle direct value from RTE and Switch, and event from TextField
     const handleFieldChange = (key, langCode, valueOrEvent, type) => {
         if (type === "boolean") {
-            setData(key, valueOrEvent); // valueOrEvent is the boolean from Switch's event.target.checked
+            setData(key, valueOrEvent);
         } else if (
             type === "richtext" ||
             (valueOrEvent && typeof valueOrEvent !== "object")
         ) {
-            // Direct value from RTE or simple input
             setData(key, { ...data[key], [langCode]: valueOrEvent });
         } else if (valueOrEvent && valueOrEvent.target) {
-            // Event from TextField
             setData(key, {
                 ...data[key],
                 [langCode]: valueOrEvent.target.value,
@@ -115,11 +103,10 @@ export default function Edit({
         const labelBase = setting.key
             .replace(/_/g, " ")
             .replace(/\b\w/g, (l) => l.toUpperCase());
-
         switch (type) {
             case "boolean":
                 return (
-                    <Grid item xs={12} key={key} sx={{ mb: 2 }}>
+                    <Grid xs={12} key={key} sx={{ mb: 2 }}>
                         <FormControlLabel
                             control={
                                 <Switch
@@ -151,10 +138,9 @@ export default function Edit({
             case "number":
                 return activeLanguages.map((lang) => (
                     <Grid
-                        item
                         xs={12}
                         md={activeLanguages.length > 1 ? 4 : 12}
-                        key={`<span class="math-inline">\{key\}\-</span>{lang}`}
+                        key={`${key}-${lang}`}
                     >
                         <TextField
                             fullWidth
@@ -165,22 +151,14 @@ export default function Edit({
                                       ? "number"
                                       : "text"
                             }
-                            id={`<span class="math-inline">\{key\}\-</span>{lang}`}
-                            label={`<span class="math-inline">\{labelBase\} \(</span>{lang.toUpperCase()})`}
+                            id={`${key}-${lang}`}
+                            label={`${labelBase} (${lang.toUpperCase()})`}
                             value={data[key]?.[lang] ?? ""}
                             onChange={(e) =>
                                 handleFieldChange(key, lang, e, type)
                             }
-                            error={
-                                !!errors[
-                                    `<span class="math-inline">\{key\}\.</span>{lang}`
-                                ]
-                            }
-                            helperText={
-                                errors[
-                                    `<span class="math-inline">\{key\}\.</span>{lang}`
-                                ]
-                            }
+                            error={!!errors[`${key}.${lang}`]}
+                            helperText={errors[`${key}.${lang}`]}
                             sx={{ mb: 2 }}
                         />
                     </Grid>
@@ -188,71 +166,54 @@ export default function Edit({
             case "textarea":
                 return activeLanguages.map((lang) => (
                     <Grid
-                        item
                         xs={12}
                         md={activeLanguages.length > 1 ? 4 : 12}
-                        key={`<span class="math-inline">\{key\}\-</span>{lang}`}
+                        key={`${key}-${lang}`}
                     >
                         <TextField
                             fullWidth
                             multiline
                             rows={4}
-                            id={`<span class="math-inline">\{key\}\-</span>{lang}`}
-                            label={`<span class="math-inline">\{labelBase\} \(</span>{lang.toUpperCase()})`}
+                            id={`${key}-${lang}`}
+                            label={`${labelBase} (${lang.toUpperCase()})`}
                             value={data[key]?.[lang] ?? ""}
                             onChange={(e) =>
                                 handleFieldChange(key, lang, e, type)
                             }
-                            error={
-                                !!errors[
-                                    `<span class="math-inline">\{key\}\.</span>{lang}`
-                                ]
-                            }
-                            helperText={
-                                errors[
-                                    `<span class="math-inline">\{key\}\.</span>{lang}`
-                                ]
-                            }
+                            error={!!errors[`${key}.${lang}`]}
+                            helperText={errors[`${key}.${lang}`]}
                             sx={{ mb: 2 }}
                         />
                     </Grid>
                 ));
-            case "richtext": // Use RichTextEditor for 'richtext' type
+            case "richtext":
                 return activeLanguages.map((lang) => (
                     <Grid
-                        item
                         xs={12}
                         md={activeLanguages.length > 1 ? 4 : 12}
-                        key={`<span class="math-inline">\{key\}\-</span>{lang}`}
+                        key={`${key}-${lang}`}
                     >
                         <Typography
                             variant="caption"
                             display="block"
                             gutterBottom
-                        >{`<span class="math-inline">\{labelBase\} \(</span>{lang.toUpperCase()})`}</Typography>
+                        >{`${labelBase} (${lang.toUpperCase()})`}</Typography>
                         <RichTextEditor
                             value={data[key]?.[lang] || ""}
                             onChange={(value) =>
                                 handleFieldChange(key, lang, value, type)
                             }
-                            placeholder={`Enter content for <span class="math-inline">\{labelBase\} \(</span>{lang.toUpperCase()})...`}
+                            placeholder={`Enter content for ${labelBase} (${lang.toUpperCase()})...`}
                             direction={lang === "ar" ? "rtl" : "ltr"}
-                            error={
-                                !!errors[
-                                    `<span class="math-inline">\{key\}\.</span>{lang}`
-                                ]
-                            }
-                            helperText={
-                                errors[
-                                    `<span class="math-inline">\{key\}\.</span>{lang}`
-                                ]
-                            }
+                            error={!!errors[`${key}.${lang}`]}
+                            helperText={errors[`${key}.${lang}`]}
                         />
+                        <Box mb={2} />
                     </Grid>
                 ));
             default:
                 return (
-                    <Grid item xs={12} key={key}>
+                    <Grid xs={12} key={key}>
                         <Typography color="error">
                             Unknown setting type: {type} for key: {key}
                         </Typography>
@@ -293,7 +254,15 @@ export default function Edit({
                                 </Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <Paper sx={{ p: 3, width: "100%" }}>
+                                <Paper
+                                    sx={{
+                                        p: 3,
+                                        width: "100%",
+                                        boxShadow: "none",
+                                        border: "1px solid",
+                                        borderColor: "divider",
+                                    }}
+                                >
                                     <Grid container spacing={2}>
                                         {settingsInGroup.map((setting) =>
                                             renderField(setting),
@@ -305,7 +274,6 @@ export default function Edit({
                     ),
                 )}
                 <Grid
-                    item
                     xs={12}
                     sx={{
                         mt: 3,
@@ -326,5 +294,4 @@ export default function Edit({
         </>
     );
 }
-
 Edit.layout = (page) => <AdminLayout children={page} title="Site Settings" />;

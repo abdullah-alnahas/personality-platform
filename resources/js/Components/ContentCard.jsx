@@ -8,20 +8,18 @@ import {
     Chip,
     Box,
 } from "@mui/material";
-import { styled } from "@mui/material/styles"; // Import styled utility
+import { styled } from "@mui/material/styles";
 import { Link as InertiaLink, usePage } from "@inertiajs/react";
 
-// Styled component for the <picture> element
 const StyledPicture = styled("picture")({
     position: "absolute",
     top: 0,
     left: 0,
     width: "100%",
     height: "100%",
-    display: "block", // Ensure picture element behaves as a block
+    display: "block",
 });
 
-// getTranslatedField and buildSrcSet helpers remain the same
 const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
     const { props } = usePage();
     const currentLocale = props.locale || locale;
@@ -34,7 +32,6 @@ const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
         fallback
     );
 };
-
 const buildSrcSet = (sources) => {
     if (!sources || !Array.isArray(sources) || sources.length === 0) return "";
     return sources.map((source) => `${source.url} ${source.width}w`).join(", ");
@@ -50,28 +47,24 @@ export default function ContentCard({ item }) {
         item.category_name,
         pageProps.locale,
     );
-
     const imageDetails = item.image_details;
     let displayImageSrc =
         imageDetails?.thumbnail_jpg || imageDetails?.original_url;
     let displayImageSrcSetWebP = null;
     let displayImageSrcSetJpg = null;
-
     const imageAspectRatioBoxSx = {
         width: "100%",
-        paddingTop: "56.25%", // 16:9
+        paddingTop: "56.25%",
         position: "relative",
         backgroundColor:
             imageDetails && displayImageSrc ? "transparent" : "grey.200",
     };
 
     if (imageDetails) {
-        if (imageDetails.thumbnail_webp) {
+        if (imageDetails.thumbnail_webp)
             displayImageSrc = imageDetails.thumbnail_webp;
-        } else if (imageDetails.thumbnail_jpg) {
+        else if (imageDetails.thumbnail_jpg)
             displayImageSrc = imageDetails.thumbnail_jpg;
-        }
-
         const webpCardSources = [];
         if (imageDetails.thumbnail_webp)
             webpCardSources.push({
@@ -84,7 +77,6 @@ export default function ContentCard({ item }) {
                 if (!webpCardSources.some((existing) => existing.url === s.url))
                     webpCardSources.push(s);
             });
-
         const jpgCardSources = [];
         if (imageDetails.thumbnail_jpg)
             jpgCardSources.push({
@@ -97,23 +89,19 @@ export default function ContentCard({ item }) {
                 if (!jpgCardSources.some((existing) => existing.url === s.url))
                     jpgCardSources.push(s);
             });
-
-        if (webpCardSources.length > 0) {
+        if (webpCardSources.length > 0)
             displayImageSrcSetWebP = buildSrcSet(webpCardSources);
-        }
-        if (jpgCardSources.length > 0) {
+        if (jpgCardSources.length > 0)
             displayImageSrcSetJpg = buildSrcSet(jpgCardSources);
-        }
         if (
             !displayImageSrc ||
             (displayImageSrc === imageDetails.original_url &&
                 (jpgCardSources.length > 0 || webpCardSources.length > 0))
-        ) {
+        )
             displayImageSrc =
                 jpgCardSources[0]?.url ||
                 webpCardSources[0]?.url ||
                 imageDetails.original_url;
-        }
     }
 
     return (
@@ -126,8 +114,6 @@ export default function ContentCard({ item }) {
                 <Box sx={imageAspectRatioBoxSx}>
                     {imageDetails && displayImageSrc ? (
                         <StyledPicture>
-                            {" "}
-                            {/* Use styled component */}
                             {displayImageSrcSetWebP && (
                                 <source
                                     srcSet={displayImageSrcSetWebP}
@@ -142,23 +128,18 @@ export default function ContentCard({ item }) {
                                     sizes="(max-width: 600px) 50vw, 320px"
                                 />
                             )}
-                            <CardMedia // CardMedia already accepts sx prop and renders an <img>
+                            <CardMedia
                                 component="img"
                                 image={displayImageSrc}
                                 alt={imageDetails.alt || title}
                                 sx={{
-                                    position: "absolute", // sx prop is fine for CardMedia
+                                    position: "absolute",
                                     top: 0,
                                     left: 0,
                                     width: "100%",
                                     height: "100%",
                                     objectFit: "cover",
                                 }}
-                                // The sizes attribute on CardMedia's img would be:
-                                // imageProps={{ sizes: "(max-width: 600px) 50vw, 320px" }}
-                                // However, the <source> elements already have 'sizes'.
-                                // For the fallback img, its src is a single image, so sizes might not be strictly needed IF sources handle all cases.
-                                // But it's good for robustness if the browser ignores <source> and uses <img> with srcset (not used here)
                             />
                         </StyledPicture>
                     ) : (
@@ -205,13 +186,19 @@ export default function ContentCard({ item }) {
                                 label={categoryName}
                                 size="small"
                                 variant="outlined"
-                                component={InertiaLink}
+                                component={InertiaLink} // This makes the Chip an anchor via InertiaLink
                                 href={route(
                                     "content.show-category",
                                     item.category_slug,
                                 )}
-                                clickable
-                                sx={{ mb: 1 }}
+                                // clickable prop removed to avoid nested anchors when component is InertiaLink
+                                sx={{
+                                    mb: 1,
+                                    "&:hover": {
+                                        cursor: "pointer",
+                                        backgroundColor: "action.hover",
+                                    },
+                                }}
                             />
                         )}
                     </Box>

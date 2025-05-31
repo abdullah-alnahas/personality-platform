@@ -18,7 +18,7 @@ import {
     Divider,
     Select,
     MenuItem,
-    FormControl, // <-- Added Select, MenuItem, FormControl
+    FormControl,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -26,11 +26,11 @@ import CategoryIcon from "@mui/icons-material/Category";
 import ArticleIcon from "@mui/icons-material/Article";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import LinkIcon from "@mui/icons-material/Link"; // For NavigationItems
-import GroupIcon from "@mui/icons-material/Group"; // For SocialAccounts
+import LinkIcon from "@mui/icons-material/Link";
+import GroupIcon from "@mui/icons-material/Group";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
-import LanguageIcon from "@mui/icons-material/Language"; // For Languages CRUD & Switcher
+import LanguageIcon from "@mui/icons-material/Language";
 
 const drawerWidth = 240;
 
@@ -39,7 +39,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
     const {
         flash,
         auth,
-        ziggy, // For current URL and query params
+        ziggy,
         available_locales: availableLocales,
         current_locale: currentLocale,
     } = usePage().props;
@@ -61,16 +61,10 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
     }, [flash]);
 
     const handleSnackbarClose = (event, reason) => {
-        if (reason === "clickaway") {
-            return;
-        }
+        if (reason === "clickaway") return;
         setSnackbarOpen(false);
     };
-
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
-
+    const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
     const handleLogout = (e) => {
         e.preventDefault();
         router.post(route("admin.logout"));
@@ -78,25 +72,44 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
 
     const handleLanguageChange = (event) => {
         const newLocale = event.target.value;
+        console.log(
+            "Language Switcher (Admin): Attempting to change language.",
+        );
+        console.log("Current Locale from props:", currentLocale);
+        console.log("New Locale selected:", newLocale);
+        console.log(
+            "Is newLocale different?",
+            newLocale && newLocale !== currentLocale,
+        );
+        console.log("Current ziggy.location (URL path):", ziggy?.location);
+        console.log("Current ziggy.query (params):", ziggy?.query);
+
         if (newLocale && newLocale !== currentLocale) {
+            const baseUrl = ziggy.location.split("?")[0];
             const currentQuery = { ...ziggy.query };
             currentQuery.lang = newLocale;
-            Object.keys(currentQuery).forEach(
-                (key) =>
-                    currentQuery[key] === undefined && delete currentQuery[key],
-            );
+            Object.keys(currentQuery).forEach((key) => {
+                if (currentQuery[key] === undefined) delete currentQuery[key];
+            });
 
-            router.get(ziggy.location.split("?")[0], currentQuery, {
+            console.log("Navigating to URL (Admin):", baseUrl);
+            console.log("With query params (Admin):", currentQuery);
+            router.get(baseUrl, currentQuery, {
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
             });
+        } else {
+            console.log(
+                "Language Switcher (Admin): No change needed or newLocale is invalid.",
+            );
         }
     };
 
     const drawerContent = (
+        /* ... (no changes to drawerContent structure, only ensure props are passed if needed) ... */
         <Box>
-            <Toolbar /> {/* Spacer for AppBar */}
+            <Toolbar />
             <List>
                 <ListItem disablePadding>
                     <ListItemButton
@@ -110,7 +123,6 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         <ListItemText primary="Dashboard" />
                     </ListItemButton>
                 </ListItem>
-
                 <Divider sx={{ my: 1 }} />
                 <Typography
                     variant="caption"
@@ -166,7 +178,6 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         <ListItemText primary="Media Library" />
                     </ListItemButton>
                 </ListItem>
-
                 <Divider sx={{ my: 1 }} />
                 <Typography
                     variant="caption"
@@ -198,7 +209,6 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         <ListItemText primary="Social Accounts" />
                     </ListItemButton>
                 </ListItem>
-
                 <Divider sx={{ my: 1 }} />
                 <Typography
                     variant="caption"
@@ -268,11 +278,8 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         component="div"
                         sx={{ flexGrow: 1 }}
                     >
-                        {title}{" "}
-                        {/* This title comes from individual page's layout assignment */}
+                        {title}
                     </Typography>
-
-                    {/* Language Selector for Admin Panel */}
                     {availableLocales && availableLocales.length > 1 && (
                         <FormControl
                             variant="standard"
@@ -281,7 +288,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         >
                             <Select
                                 id="admin-language-select-header"
-                                value={currentLocale}
+                                value={currentLocale || ""} // Ensure value is controlled
                                 onChange={handleLanguageChange}
                                 disableUnderline
                                 IconComponent={(props) => (
@@ -319,7 +326,6 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                             </Select>
                         </FormControl>
                     )}
-
                     <Typography
                         variant="body2"
                         sx={{ mr: 1, display: { xs: "none", sm: "inline" } }}
@@ -378,8 +384,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                     width: { sm: `calc(100% - ${drawerWidth}px)` },
                 }}
             >
-                <Toolbar />{" "}
-                {/* This is important to offset content below AppBar */}
+                <Toolbar />
                 {children}
             </Box>
             <Snackbar

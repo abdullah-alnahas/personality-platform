@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"; // Added React for hooks
+import React, { useEffect } from "react";
 import { Head, Link as InertiaLink, useForm } from "@inertiajs/react";
 import {
     TextField,
@@ -11,7 +11,7 @@ import {
     Alert,
     Link as MuiLink,
 } from "@mui/material";
-import GuestLayout from "@/Layouts/GuestLayout"; // Already uses MUI
+import GuestLayout from "@/Layouts/GuestLayout";
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -19,13 +19,11 @@ export default function Login({ status, canResetPassword }) {
         password: "",
         remember: false,
     });
-
     useEffect(() => {
         return () => {
             reset("password");
         };
     }, []);
-
     const submit = (e) => {
         e.preventDefault();
         post(route("login"));
@@ -34,13 +32,11 @@ export default function Login({ status, canResetPassword }) {
     return (
         <GuestLayout>
             <Head title="Log in" />
-
             {status && (
                 <Alert severity="success" sx={{ mb: 2, width: "100%" }}>
                     {status}
                 </Alert>
             )}
-
             <Typography
                 component="h1"
                 variant="h5"
@@ -48,7 +44,6 @@ export default function Login({ status, canResetPassword }) {
             >
                 Log in
             </Typography>
-
             <Box component="form" onSubmit={submit} noValidate sx={{ mt: 1 }}>
                 <TextField
                     margin="normal"
@@ -105,8 +100,12 @@ export default function Login({ status, canResetPassword }) {
                     {processing ? "Logging in..." : "Log in"}
                 </Button>
                 <Grid container>
+                    {" "}
+                    {/* Grid container for links */}
                     {canResetPassword && (
-                        <Grid item xs>
+                        <Grid xs>
+                            {" "}
+                            {/* Grid item */}
                             <MuiLink
                                 component={InertiaLink}
                                 href={route("password.request")}
@@ -117,7 +116,9 @@ export default function Login({ status, canResetPassword }) {
                         </Grid>
                     )}
                     {route().has("register") && (
-                        <Grid item>
+                        <Grid textAlign="right" xs>
+                            {" "}
+                            {/* Grid item, aligning right */}
                             <MuiLink
                                 component={InertiaLink}
                                 href={route("register")}

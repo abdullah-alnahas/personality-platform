@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; // Added useState, useEffect
+import React, { useState, useEffect } from "react";
 import { Head, Link as InertiaLink, useForm } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import {
@@ -11,20 +11,13 @@ import {
     Switch,
     FormControlLabel,
     FormHelperText,
-    Autocomplete, // <-- Import Autocomplete
+    Autocomplete,
 } from "@mui/material";
 
 export default function Form({ language, knownLanguages }) {
-    // language is null when creating, knownLanguages is new prop
     const isEditing = !!language;
     const [selectedKnownLanguage, setSelectedKnownLanguage] = useState(null);
-    // Determine if the current language code matches one from the knownLanguages list (on edit)
-    // or if a known language has been selected (on create or after selection)
-    const isCodeFromKnownList = isEditing
-        ? knownLanguages.some((kl) => kl.code === language?.code)
-        : !!selectedKnownLanguage;
-
-    const { data, setData, post, put, processing, errors, reset } = useForm({
+    const { data, setData, post, put, processing, errors } = useForm({
         code: language?.code ?? "",
         name: language?.name ?? "",
         native_name: language?.native_name ?? "",
@@ -32,16 +25,13 @@ export default function Form({ language, knownLanguages }) {
         _method: isEditing ? "PUT" : "POST",
     });
 
-    // Effect to populate form if editing an existing language that matches a known one
     useEffect(() => {
         if (isEditing && language) {
             const matchingKnownLanguage = knownLanguages.find(
                 (kl) => kl.code === language.code,
             );
-            if (matchingKnownLanguage) {
+            if (matchingKnownLanguage)
                 setSelectedKnownLanguage(matchingKnownLanguage);
-                // No need to setData here if language prop already populates data correctly
-            }
         }
     }, [isEditing, language, knownLanguages]);
 
@@ -49,21 +39,11 @@ export default function Form({ language, knownLanguages }) {
         setSelectedKnownLanguage(newValue);
         if (newValue) {
             setData({
-                ...data, // Keep other data like is_active
+                ...data,
                 code: newValue.code,
                 name: newValue.name,
                 native_name: newValue.native_name,
             });
-        } else {
-            // If cleared, allow manual input (optionally reset fields or keep them)
-            // For now, we keep them, user can clear manually if they wish to start fresh
-            // Or, to reset:
-            // setData({
-            //     ...data,
-            //     code: '',
-            //     name: '',
-            //     native_name: '',
-            // });
         }
     };
 
@@ -74,9 +54,7 @@ export default function Form({ language, knownLanguages }) {
                 preserveScroll: true,
             });
         } else {
-            post(route("admin.languages.store"), {
-                preserveScroll: true,
-            });
+            post(route("admin.languages.store"), { preserveScroll: true });
         }
     };
 
@@ -94,7 +72,6 @@ export default function Form({ language, knownLanguages }) {
                     ? `Edit Language: ${language.name}`
                     : "Create New Language"}
             </Typography>
-
             <Paper sx={{ p: 3, maxWidth: "lg", mx: "auto" }}>
                 <Box
                     component="form"
@@ -103,8 +80,8 @@ export default function Form({ language, knownLanguages }) {
                     sx={{ mt: 1 }}
                 >
                     <Grid container spacing={3}>
-                        {!isEditing && ( // Show Autocomplete only when creating a new language
-                            <Grid item xs={12}>
+                        {!isEditing && (
+                            <Grid xs={12}>
                                 <Autocomplete
                                     options={knownLanguages}
                                     getOptionLabel={(option) =>
@@ -126,14 +103,10 @@ export default function Form({ language, knownLanguages }) {
                                 />
                             </Grid>
                         )}
-
                         <Grid
-                            item
                             xs={12}
                             sm={isEditing || !selectedKnownLanguage ? 6 : 12}
                         >
-                            {" "}
-                            {/* Adjust grid based on Autocomplete visibility */}
                             <TextField
                                 required
                                 fullWidth
@@ -153,7 +126,7 @@ export default function Form({ language, knownLanguages }) {
                                     isEditing ||
                                     processing ||
                                     (!!selectedKnownLanguage && !isEditing)
-                                } // Disabled if editing, or processing, or a known lang is selected on create
+                                }
                                 InputLabelProps={{
                                     shrink:
                                         isEditing || data.code
@@ -162,7 +135,7 @@ export default function Form({ language, knownLanguages }) {
                                 }}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid xs={12} sm={6}>
                             <TextField
                                 required
                                 fullWidth
@@ -190,7 +163,7 @@ export default function Form({ language, knownLanguages }) {
                                 }}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid xs={12} sm={6}>
                             <TextField
                                 required
                                 fullWidth
@@ -218,7 +191,7 @@ export default function Form({ language, knownLanguages }) {
                                 }}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid xs={12} sm={6}>
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -241,9 +214,7 @@ export default function Form({ language, knownLanguages }) {
                                 </FormHelperText>
                             )}
                         </Grid>
-
                         <Grid
-                            item
                             xs={12}
                             sx={{
                                 display: "flex",
@@ -278,7 +249,6 @@ export default function Form({ language, knownLanguages }) {
         </>
     );
 }
-
 Form.layout = (page) => (
     <AdminLayout
         children={page}

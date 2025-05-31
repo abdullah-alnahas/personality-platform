@@ -1,4 +1,3 @@
-// Edit file: resources/js/Pages/Welcome.jsx
 import React from "react";
 import { Head, Link as InertiaLink, usePage } from "@inertiajs/react";
 import PublicLayout from "@/Layouts/PublicLayout";
@@ -15,8 +14,7 @@ import {
     Avatar,
     Divider,
     Tooltip,
-    IconButton,
-} from "@mui/material";
+} from "@mui/material"; // Removed IconButton as it's not directly used here, it's in SocialIcon
 import ContentCard from "@/Components/ContentCard";
 import ThematicSectionCarousel from "@/Components/ThematicSectionCarousel";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
@@ -26,9 +24,10 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import LinkIcon from "@mui/icons-material/Link";
+import LinkIconOriginal from "@mui/icons-material/Link"; // Renamed to avoid naming conflict
 
 const SocialIcon = ({ platform }) => {
+    /* ... (same as before) ... */
     switch (platform?.toLowerCase()) {
         case "facebook":
             return <FacebookIcon />;
@@ -45,27 +44,21 @@ const SocialIcon = ({ platform }) => {
         case "linkedin":
             return <LinkedInIcon />;
         default:
-            return <LinkIcon />;
+            return <LinkIconOriginal />;
     }
 };
-const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
-    const { props } = usePage();
-    const currentLocale = props.locale || locale;
-    if (fieldObject == null) {
-        return fallback;
-    }
-    if (typeof fieldObject !== "object") {
-        return String(fieldObject) || fallback;
-    }
+const getTranslatedField = (fieldObject, pageProps, fallback = "") => {
+    /* ... (same as before) ... */
+    const currentLocale = pageProps.current_locale || "en";
+    if (fieldObject == null) return fallback;
+    if (typeof fieldObject !== "object") return String(fieldObject) || fallback;
     return (
         fieldObject[currentLocale] ||
-        fieldObject[locale] ||
-        Object.values(fieldObject)[0] ||
+        fieldObject[Object.keys(fieldObject)[0]] ||
         fallback
     );
 };
-
-const VisionSection = ({ section }) => (
+const VisionSection = ({ section, pageProps }) => (
     <Paper
         sx={{
             p: { xs: 2, md: 4 },
@@ -75,10 +68,10 @@ const VisionSection = ({ section }) => (
         }}
     >
         <Typography variant="h3" component="h1" gutterBottom color="primary">
-            {getTranslatedField(section.title)}
+            {getTranslatedField(section.title, pageProps)}
         </Typography>
         <Typography variant="subtitle1" sx={{ mb: 2, fontStyle: "italic" }}>
-            {getTranslatedField(section.subtitle_or_quote)}
+            {getTranslatedField(section.subtitle_or_quote, pageProps)}
         </Typography>
         {section.config?.button_text && section.config?.button_link && (
             <Button
@@ -87,20 +80,19 @@ const VisionSection = ({ section }) => (
                 variant="contained"
                 size="large"
             >
-                {getTranslatedField(section.config.button_text)}
+                {getTranslatedField(section.config.button_text, pageProps)}
             </Button>
         )}
     </Paper>
 );
-
-const LatestNewsSection = ({ section }) => (
+const LatestNewsSection = ({ section, pageProps }) => (
     <Box sx={{ mb: 4 }}>
         <Typography variant="h5" component="h2" gutterBottom>
-            {getTranslatedField(section.title)}
+            {getTranslatedField(section.title, pageProps)}
         </Typography>
         <Grid container spacing={2}>
             {section.items?.map((item) => (
-                <Grid size={{ xs: 12, sm: 6 }} key={`news-${item.id}`}>
+                <Grid xs={12} sm={6} key={`news-${item.id}`}>
                     <Card variant="outlined">
                         <CardContent>
                             {item.category_name && (
@@ -109,7 +101,10 @@ const LatestNewsSection = ({ section }) => (
                                     color="text.secondary"
                                     display="block"
                                 >
-                                    {getTranslatedField(item.category_name)}
+                                    {getTranslatedField(
+                                        item.category_name,
+                                        pageProps,
+                                    )}
                                 </Typography>
                             )}
                             <MuiLink
@@ -119,7 +114,7 @@ const LatestNewsSection = ({ section }) => (
                                 variant="h6"
                                 sx={{ display: "block", mb: 0.5 }}
                             >
-                                {getTranslatedField(item.title)}
+                                {getTranslatedField(item.title, pageProps)}
                             </MuiLink>
                             <Typography variant="body2" color="text.secondary">
                                 {item.publish_date_formatted}
@@ -129,7 +124,7 @@ const LatestNewsSection = ({ section }) => (
                 </Grid>
             ))}
             {section.items?.length === 0 && (
-                <Grid size={{ xs: 12 }}>
+                <Grid xs={12}>
                     <Typography sx={{ p: 2 }}>
                         No news items to display.
                     </Typography>
@@ -138,8 +133,7 @@ const LatestNewsSection = ({ section }) => (
         </Grid>
     </Box>
 );
-
-const FeaturedQuoteSection = ({ section }) =>
+const FeaturedQuoteSection = ({ section, pageProps }) =>
     section.quote_data ? (
         <Paper sx={{ p: 2, mb: 3, position: "relative", bgcolor: "grey.100" }}>
             {section.title && (
@@ -149,7 +143,7 @@ const FeaturedQuoteSection = ({ section }) =>
                     gutterBottom
                     sx={{ textAlign: "center" }}
                 >
-                    {getTranslatedField(section.title)}
+                    {getTranslatedField(section.title, pageProps)}
                 </Typography>
             )}
             <FormatQuoteIcon
@@ -162,7 +156,7 @@ const FeaturedQuoteSection = ({ section }) =>
                 }}
             />
             <Typography variant="body1" sx={{ fontStyle: "italic", mb: 1 }}>
-                "{getTranslatedField(section.quote_data.text)}"
+                "{getTranslatedField(section.quote_data.text, pageProps)}"
             </Typography>
             <Typography
                 variant="caption"
@@ -170,26 +164,23 @@ const FeaturedQuoteSection = ({ section }) =>
                 align="right"
                 display="block"
             >
-                - {getTranslatedField(section.quote_data.source) || "Unknown"}
+                -{" "}
+                {getTranslatedField(section.quote_data.source, pageProps) ||
+                    "Unknown"}
             </Typography>
         </Paper>
     ) : null;
-
-const SocialMediaLinksSection = ({ section }) => {
+const SocialMediaLinksSection = ({ section, pageProps }) => {
     const { socialAccounts } = usePage().props;
     if (!socialAccounts || socialAccounts.length === 0) return null;
-
     return (
         <Box sx={{ mb: 4 }}>
             <Typography variant="h5" component="h2" gutterBottom>
-                {getTranslatedField(section.title)}
+                {getTranslatedField(section.title, pageProps)}
             </Typography>
             <Grid container spacing={1}>
                 {socialAccounts.map((acc) => (
-                    <Grid
-                        size={{ xs: 12, sm: 6 }}
-                        key={`social-link-${acc.id}`}
-                    >
+                    <Grid xs={12} sm={6} key={`social-link-${acc.id}`}>
                         <Card variant="outlined">
                             <CardActionArea
                                 component="a"
@@ -214,6 +205,7 @@ const SocialMediaLinksSection = ({ section }) => {
                                         >
                                             {getTranslatedField(
                                                 acc.account_name,
+                                                pageProps,
                                             ) ||
                                                 acc.platform
                                                     .charAt(0)
@@ -222,6 +214,7 @@ const SocialMediaLinksSection = ({ section }) => {
                                         </Typography>
                                         {getTranslatedField(
                                             acc.account_name,
+                                            pageProps,
                                         ) && (
                                             <Typography
                                                 variant="caption"
@@ -249,13 +242,13 @@ export default function Welcome({
     homepageSections,
     genericFeaturedItems,
 }) {
+    const { props: pageProps } = usePage(); // Pass pageProps to helpers
     const siteName = getTranslatedField(
         settings?.site_name?.value,
-        "en",
+        pageProps,
         "Personality Platform",
     );
     const pageTitle = `Welcome - ${siteName}`;
-
     const renderSection = (section) => {
         switch (section.section_type) {
             case "vision":
@@ -263,16 +256,18 @@ export default function Welcome({
                     <VisionSection
                         key={`section-${section.id}`}
                         section={section}
+                        pageProps={pageProps}
                     />
                 );
             case "thematic_carousel":
                 return (
                     <React.Fragment key={`section-${section.id}`}>
                         <ThematicSectionCarousel
-                            title={getTranslatedField(section.title)}
+                            title={getTranslatedField(section.title, pageProps)}
                             items={section.items || []}
                             sectionQuote={getTranslatedField(
                                 section.subtitle_or_quote,
+                                pageProps,
                             )}
                         />
                         <Divider sx={{ my: 3 }} />
@@ -283,6 +278,7 @@ export default function Welcome({
                     <LatestNewsSection
                         key={`section-${section.id}`}
                         section={section}
+                        pageProps={pageProps}
                     />
                 );
             case "featured_quote":
@@ -290,6 +286,7 @@ export default function Welcome({
                     <FeaturedQuoteSection
                         key={`section-${section.id}`}
                         section={section}
+                        pageProps={pageProps}
                     />
                 );
             case "social_media_links":
@@ -297,6 +294,7 @@ export default function Welcome({
                     <SocialMediaLinksSection
                         key={`section-${section.id}`}
                         section={section}
+                        pageProps={pageProps}
                     />
                 );
             default:
@@ -307,10 +305,8 @@ export default function Welcome({
                 );
         }
     };
-
     return (
         <>
-            <Head title={pageTitle} />
             {homepageSections &&
                 homepageSections.map((section) => renderSection(section))}
             {genericFeaturedItems &&
@@ -327,7 +323,9 @@ export default function Welcome({
                         <Grid container spacing={3}>
                             {genericFeaturedItems.map((item) => (
                                 <Grid
-                                    size={{ xs: 12, sm: 6, md: 4 }}
+                                    xs={12}
+                                    sm={6}
+                                    md={4}
                                     key={`generic-featured-${item.id}`}
                                 >
                                     <ContentCard item={item} />
@@ -339,4 +337,4 @@ export default function Welcome({
         </>
     );
 }
-Welcome.layout = (page) => <PublicLayout children={page} />;
+Welcome.layout = (page) => <PublicLayout>{page}</PublicLayout>; // Simpler layout assignment

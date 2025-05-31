@@ -1,4 +1,3 @@
-// Edit file: resources/js/Pages/Admin/Quotes/Form.jsx
 import React from "react";
 import { Head, Link as InertiaLink, useForm, usePage } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
@@ -34,19 +33,14 @@ const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
 };
 
 export default function Form({ quote, activeLanguages }) {
-    // activeLanguages is passed from controller
     const isEditing = !!quote;
-    const { props } = usePage();
-    const defaultLocale = props.locale || "en";
-
-    // --- Add Safeguard for activeLanguages ---
+    const { props: pageProps } = usePage();
+    const defaultLocale = pageProps.locale || "en";
     const languagesToIterate = Array.isArray(activeLanguages)
         ? activeLanguages
         : [];
-    // --- End Safeguard ---
 
-    const { data, setData, post, put, processing, errors, reset } = useForm({
-        // --- Use languagesToIterate ---
+    const { data, setData, post, put, processing, errors } = useForm({
         text: languagesToIterate.reduce(
             (acc, lang) => ({ ...acc, [lang]: quote?.text?.[lang] ?? "" }),
             {},
@@ -55,7 +49,6 @@ export default function Form({ quote, activeLanguages }) {
             (acc, lang) => ({ ...acc, [lang]: quote?.source?.[lang] ?? "" }),
             {},
         ),
-        // --- End Use languagesToIterate ---
         status: quote?.status ?? "draft",
         is_featured: quote?.is_featured ?? false,
         _method: isEditing ? "PUT" : "POST",
@@ -67,7 +60,6 @@ export default function Form({ quote, activeLanguages }) {
             ? "admin.quotes.update"
             : "admin.quotes.store";
         const routeParams = isEditing ? quote.id : [];
-
         if (isEditing) {
             put(route(routeName, routeParams), { preserveScroll: true });
         } else {
@@ -87,7 +79,6 @@ export default function Form({ quote, activeLanguages }) {
                     ? `Edit Quote: "${getTranslatedField(quote.text, defaultLocale).substring(0, 30)}..."`
                     : "Create New Quote"}
             </Typography>
-
             <Paper sx={{ p: 3 }}>
                 <Box
                     component="form"
@@ -96,16 +87,11 @@ export default function Form({ quote, activeLanguages }) {
                     sx={{ mt: 1 }}
                 >
                     <Grid container spacing={3}>
-                        <Grid item xs={12}>
-                            {" "}
-                            <Typography variant="h6">
-                                Quote Text
-                            </Typography>{" "}
+                        <Grid xs={12}>
+                            <Typography variant="h6">Quote Text</Typography>
                         </Grid>
-                        {/* --- Use languagesToIterate for mapping --- */}
                         {languagesToIterate.map((lang) => (
                             <Grid
-                                item
                                 xs={12}
                                 md={languagesToIterate.length > 1 ? 4 : 12}
                                 key={`text-${lang}`}
@@ -131,20 +117,14 @@ export default function Form({ quote, activeLanguages }) {
                                 />
                             </Grid>
                         ))}
-                        {/* --- End Use languagesToIterate --- */}
-
-                        <Grid item xs={12}>
+                        <Grid xs={12}>
                             <Divider sx={{ my: 1 }}>Optional Details</Divider>
                         </Grid>
-
-                        <Grid item xs={12}>
-                            {" "}
-                            <Typography variant="h6">Source</Typography>{" "}
+                        <Grid xs={12}>
+                            <Typography variant="h6">Source</Typography>
                         </Grid>
-                        {/* --- Use languagesToIterate for mapping --- */}
                         {languagesToIterate.map((lang) => (
                             <Grid
-                                item
                                 xs={12}
                                 md={languagesToIterate.length > 1 ? 4 : 12}
                                 key={`source-${lang}`}
@@ -167,13 +147,10 @@ export default function Form({ quote, activeLanguages }) {
                                 />
                             </Grid>
                         ))}
-                        {/* --- End Use languagesToIterate --- */}
-
-                        <Grid item xs={12}>
+                        <Grid xs={12}>
                             <Divider sx={{ my: 1 }}>Configuration</Divider>
                         </Grid>
-
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid xs={12} sm={6} md={4}>
                             <FormControl fullWidth error={!!errors.status}>
                                 <InputLabel id="status-label">
                                     Status
@@ -202,8 +179,7 @@ export default function Form({ quote, activeLanguages }) {
                                 )}
                             </FormControl>
                         </Grid>
-
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid xs={12} sm={6} md={4}>
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -225,9 +201,7 @@ export default function Form({ quote, activeLanguages }) {
                                 </FormHelperText>
                             )}
                         </Grid>
-
                         <Grid
-                            item
                             xs={12}
                             sx={{
                                 display: "flex",
@@ -262,7 +236,6 @@ export default function Form({ quote, activeLanguages }) {
         </>
     );
 }
-
 Form.layout = (page) => (
     <AdminLayout
         children={page}
