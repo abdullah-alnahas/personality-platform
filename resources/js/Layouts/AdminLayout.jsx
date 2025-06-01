@@ -31,18 +31,14 @@ import GroupIcon from "@mui/icons-material/Group";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import LanguageIcon from "@mui/icons-material/Language";
+import { useLocale } from "@/Hooks/useLocale"; // Import the hook
 
 const drawerWidth = 240;
 
 export default function AdminLayout({ children, title = "Admin Panel" }) {
     const [mobileOpen, setMobileOpen] = useState(false);
-    const {
-        flash,
-        auth,
-        ziggy,
-        available_locales: availableLocales,
-        current_locale: currentLocale,
-    } = usePage().props;
+    const { flash, auth, ziggy } = usePage().props;
+    const { currentLocale, availableLocales, isRTL } = useLocale(); // Use the hook
 
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -64,7 +60,9 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
         if (reason === "clickaway") return;
         setSnackbarOpen(false);
     };
+
     const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+
     const handleLogout = (e) => {
         e.preventDefault();
         router.post(route("admin.logout"));
@@ -72,42 +70,29 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
 
     const handleLanguageChange = (event) => {
         const newLocale = event.target.value;
-        console.log(
-            "Language Switcher (Admin): Attempting to change language.",
-        );
-        console.log("Current Locale from props:", currentLocale);
-        console.log("New Locale selected:", newLocale);
-        console.log(
-            "Is newLocale different?",
-            newLocale && newLocale !== currentLocale,
-        );
-        console.log("Current ziggy.location (URL path):", ziggy?.location);
-        console.log("Current ziggy.query (params):", ziggy?.query);
-
         if (newLocale && newLocale !== currentLocale) {
             const baseUrl = ziggy.location.split("?")[0];
             const currentQuery = { ...ziggy.query };
             currentQuery.lang = newLocale;
             Object.keys(currentQuery).forEach((key) => {
-                if (currentQuery[key] === undefined) delete currentQuery[key];
+                if (
+                    currentQuery[key] === undefined ||
+                    currentQuery[key] === null ||
+                    currentQuery[key] === ""
+                ) {
+                    delete currentQuery[key];
+                }
             });
 
-            console.log("Navigating to URL (Admin):", baseUrl);
-            console.log("With query params (Admin):", currentQuery);
             router.get(baseUrl, currentQuery, {
-                preserveState: true,
+                preserveState: true, // Or false, depending on desired behavior on language change
                 preserveScroll: true,
-                replace: true,
+                replace: true, // Replace history state
             });
-        } else {
-            console.log(
-                "Language Switcher (Admin): No change needed or newLocale is invalid.",
-            );
         }
     };
 
     const drawerContent = (
-        /* ... (no changes to drawerContent structure, only ensure props are passed if needed) ... */
         <Box>
             <Toolbar />
             <List>
@@ -256,7 +241,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
     );
 
     return (
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: "flex", direction: isRTL ? "rtl" : "ltr" }}>
             <CssBaseline />
             <AppBar
                 position="fixed"
@@ -280,6 +265,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                     >
                         {title}
                     </Typography>
+
                     {availableLocales && availableLocales.length > 1 && (
                         <FormControl
                             variant="standard"
@@ -288,7 +274,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                         >
                             <Select
                                 id="admin-language-select-header"
-                                value={currentLocale || ""} // Ensure value is controlled
+                                value={currentLocale || ""}
                                 onChange={handleLanguageChange}
                                 disableUnderline
                                 IconComponent={(props) => (
@@ -342,6 +328,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                     </IconButton>
                 </Toolbar>
             </AppBar>
+
             <Box
                 component="nav"
                 sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
@@ -376,6 +363,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                     {drawerContent}
                 </Drawer>
             </Box>
+
             <Box
                 component="main"
                 sx={{
@@ -387,6 +375,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                 <Toolbar />
                 {children}
             </Box>
+
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={6000}

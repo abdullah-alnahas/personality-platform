@@ -1,5 +1,5 @@
 import React from "react";
-import { Head, Link as InertiaLink, usePage } from "@inertiajs/react";
+import { Head, Link as InertiaLink } from "@inertiajs/react"; // Removed usePage
 import PublicLayout from "@/Layouts/PublicLayout";
 import {
     Box,
@@ -9,36 +9,23 @@ import {
     Link as MuiLink,
     Button,
     Pagination,
-} from "@mui/material"; // Removed Container, Paper as layout handles it
+} from "@mui/material";
 import ContentCard from "@/Components/ContentCard";
 import HomeIcon from "@mui/icons-material/Home";
-
-const getTranslatedField = (fieldObject, pageProps, fallback = "") => {
-    /* ... (same as before) ... */
-    const currentLocale = pageProps.current_locale || "en";
-    if (fieldObject == null) return fallback;
-    if (typeof fieldObject !== "object") return String(fieldObject) || fallback;
-    return (
-        fieldObject[currentLocale] ||
-        fieldObject[Object.keys(fieldObject)[0]] ||
-        fallback
-    );
-};
+import { useLocale } from "@/Hooks/useLocale"; // Import the hook
 
 export default function ShowCategory({ category, items }) {
-    const { props: pageProps } = usePage();
-    const { data: results, links, current_page, last_page } = items; // Renamed data to results for clarity
-    const categoryName = getTranslatedField(category.name, pageProps);
+    const { getTranslatedField, currentLocale } = useLocale(); // Use the hook
+    const { data: results, links, current_page, last_page, total } = items;
+    const categoryName = getTranslatedField(category.name, currentLocale);
+    const categoryDescription = getTranslatedField(
+        category.description,
+        currentLocale,
+    );
 
     return (
         <>
-            <Head
-                title={categoryName}
-                description={getTranslatedField(
-                    category.description,
-                    pageProps,
-                )}
-            />
+            <Head title={categoryName} description={categoryDescription} />
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
                 <MuiLink
                     component={InertiaLink}
@@ -54,83 +41,67 @@ export default function ShowCategory({ category, items }) {
             <Typography variant="h4" component="h1" gutterBottom>
                 {categoryName}
             </Typography>
-            {category.description && (
+            {categoryDescription && (
                 <Typography
                     variant="body1"
                     color="text.secondary"
                     sx={{ mb: 3 }}
                 >
-                    {getTranslatedField(category.description, pageProps)}
+                    {categoryDescription}
                 </Typography>
             )}
-
             <Grid container spacing={3}>
                 {results && results.length > 0 ? (
                     results.map((item) => (
-                        <Grid xs={12} sm={6} md={4} key={`cat-item-${item.id}`}>
-                            {" "}
-                            {/* Grid v2 */}
+                        <Grid
+                            item
+                            xs={12}
+                            sm={6}
+                            md={4}
+                            key={`cat-item-${item.id}`}
+                        >
                             <ContentCard item={item} />
                         </Grid>
                     ))
                 ) : (
-                    <Grid xs={12}>
-                        {" "}
-                        {/* Grid v2 */}
+                    <Grid item xs={12}>
                         <Typography>
                             No items found in this category.
                         </Typography>
                     </Grid>
                 )}
             </Grid>
-
-            {links &&
-                links.length > 3 && ( // Standard Inertia pagination links
-                    <Box
-                        sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            py: 4,
+            {total > 0 && last_page > 1 && (
+                <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                    <Pagination
+                        count={last_page}
+                        page={current_page}
+                        onChange={(event, page) => {
+                            router.get(
+                                route("content.show-category", category.slug, {
+                                    page,
+                                    lang: currentLocale,
+                                }),
+                                {},
+                                { preserveState: true, preserveScroll: true },
+                            );
                         }}
-                    >
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                            {links.map((link, index) => (
-                                <Button
-                                    key={index}
-                                    component={
-                                        link.url ? InertiaLink : "button"
-                                    }
-                                    href={link.url}
-                                    disabled={!link.url || link.active}
-                                    size="small"
-                                    variant={
-                                        link.active ? "contained" : "outlined"
-                                    }
-                                    dangerouslySetInnerHTML={{
-                                        __html: link.label,
-                                    }}
-                                    preserveScroll
-                                    preserveState
-                                />
-                            ))}
-                        </Box>
-                    </Box>
-                )}
+                        color="primary"
+                        showFirstButton
+                        showLastButton
+                    />
+                </Box>
+            )}
         </>
     );
 }
 ShowCategory.layout = (page) => {
-    /* ... (same as before) ... */
+    const { getTranslatedField, currentLocale } = useLocale(); // Use hook inside layout determination
     const categoryNameObject = page.props.category?.name;
-    let titleForLayout = "Category";
-    if (categoryNameObject && typeof categoryNameObject === "object") {
-        const currentLocale = page.props.locale || "en";
-        titleForLayout =
-            categoryNameObject[currentLocale] ||
-            Object.values(categoryNameObject)[0] ||
-            "Category";
-    } else if (categoryNameObject) {
-        titleForLayout = String(categoryNameObject);
-    }
-    return <PublicLayout title={titleForLayout}>{page}</PublicLayout>; // Pass title to PublicLayout
+    const titleForLayout = getTranslatedField(
+        categoryNameObject,
+        currentLocale,
+        "Category",
+    );
+    return <PublicLayout title={titleForLayout}>{page}</PublicLayout>;
 };

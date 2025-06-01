@@ -1,5 +1,5 @@
 import React from "react";
-import { Head, Link as InertiaLink, usePage } from "@inertiajs/react";
+import { Head, Link as InertiaLink } from "@inertiajs/react"; // Removed usePage
 import PublicLayout from "@/Layouts/PublicLayout";
 import {
     Box,
@@ -9,39 +9,23 @@ import {
     Breadcrumbs,
     Link as MuiLink,
 } from "@mui/material";
-import { styled } from "@mui/material/styles"; // Import styled utility
+import { styled } from "@mui/material/styles";
 import HomeIcon from "@mui/icons-material/Home";
+import { useLocale } from "@/Hooks/useLocale"; // Import the hook
 
-// Styled components for <picture> and <img>
 const StyledPictureElement = styled("picture")({
     width: "100%",
-    display: "block", // Ensure picture element behaves as a block for sizing
+    display: "block",
 });
-
 const StyledImgElement = styled("img")({
     width: "100%",
-    height: "100%", // Make height 100% to fill the aspect ratio box
+    height: "100%",
     display: "block",
-    objectFit: "cover", // Ensures image covers the area, maintains aspect ratio
-    position: "absolute", // Positioned within the relative parent Box
+    objectFit: "cover",
+    position: "absolute",
     top: 0,
     left: 0,
 });
-
-// getTranslatedField and buildSrcSet helpers remain the same
-const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
-    const { props } = usePage();
-    const currentLocale = props.locale || locale;
-    if (fieldObject == null) return fallback;
-    if (typeof fieldObject !== "object" || fieldObject === null)
-        return String(fieldObject) || fallback;
-    return (
-        fieldObject[currentLocale] ||
-        fieldObject[locale] ||
-        Object.values(fieldObject)[0] ||
-        fallback
-    );
-};
 
 const buildSrcSet = (sources) => {
     if (!sources || !Array.isArray(sources) || sources.length === 0) return "";
@@ -49,18 +33,35 @@ const buildSrcSet = (sources) => {
 };
 
 export default function ShowItem({ item }) {
-    const { props: pageProps } = usePage();
+    const { getTranslatedField, currentLocale } = useLocale(); // Use the hook
+
     if (!item) return null;
 
-    const title = getTranslatedField(item.title, pageProps.locale);
-    const content = getTranslatedField(item.content, pageProps.locale);
-    const categoryName = getTranslatedField(
-        item.category_name,
-        pageProps.locale,
-    );
-    const metaDescription =
-        getTranslatedField(item.meta_fields, pageProps.locale, "")
-            .description || getTranslatedField(item.excerpt, pageProps.locale);
+    const title = getTranslatedField(item.title, currentLocale);
+    const content = getTranslatedField(item.content, currentLocale);
+    const categoryName = getTranslatedField(item.category_name, currentLocale);
+
+    // Enhanced meta description logic
+    let metaDescription = "";
+    const itemMetaFields = item.meta_fields; // This is an object with locale keys
+    if (
+        itemMetaFields &&
+        typeof itemMetaFields === "object" &&
+        itemMetaFields[currentLocale]?.description
+    ) {
+        metaDescription = itemMetaFields[currentLocale].description;
+    } else if (
+        itemMetaFields &&
+        typeof itemMetaFields === "object" &&
+        Object.values(itemMetaFields)[0]?.description
+    ) {
+        // Fallback to first available meta description
+        metaDescription = Object.values(itemMetaFields)[0].description;
+    }
+    if (!metaDescription) {
+        // If no meta description, use excerpt
+        metaDescription = getTranslatedField(item.excerpt, currentLocale);
+    }
 
     const imageDetails = item.image_details;
     let webpSrcSet = null;
@@ -83,13 +84,11 @@ export default function ShowItem({ item }) {
                     ?.url || imageDetails.original_url;
         }
     }
-
-    const aspectRatioPaddingTop = "75%"; // For 4:3 ratio
+    const aspectRatioPaddingTop = "75%"; // 4:3
 
     return (
         <>
             <Head title={title} description={metaDescription} />
-            {/* Breadcrumbs remain the same */}
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
                 <MuiLink
                     component={InertiaLink}
@@ -115,7 +114,6 @@ export default function ShowItem({ item }) {
                 )}
                 <Typography color="text.primary">{title}</Typography>
             </Breadcrumbs>
-
             <Paper sx={{ p: { xs: 2, md: 4 } }}>
                 {imageDetails && fallbackImageSrc && (
                     <Box
@@ -129,8 +127,6 @@ export default function ShowItem({ item }) {
                         }}
                     >
                         <StyledPictureElement>
-                            {" "}
-                            {/* Use styled component */}
                             {webpSrcSet && (
                                 <source
                                     srcSet={webpSrcSet}
@@ -145,16 +141,19 @@ export default function ShowItem({ item }) {
                                     sizes="(max-width: 600px) 90vw, (max-width: 960px) 80vw, 1200px"
                                 />
                             )}
-                            <StyledImgElement // Use styled component for img
+                            <StyledImgElement
                                 src={fallbackImageSrc}
-                                alt={imageDetails.alt || title}
+                                alt={
+                                    getTranslatedField(
+                                        imageDetails.alt,
+                                        currentLocale,
+                                    ) || title
+                                }
                                 sizes="(max-width: 600px) 90vw, (max-width: 960px) 80vw, 1200px"
                             />
                         </StyledPictureElement>
                     </Box>
                 )}
-
-                {/* Rest of the component (Typography for title, metadata, content Box) remains the same */}
                 <Typography
                     variant="h3"
                     component="h1"
@@ -241,19 +240,13 @@ export default function ShowItem({ item }) {
         </>
     );
 }
-
 ShowItem.layout = (page) => {
-    // page.props will contain pageProps needed by getTranslatedField
+    const { getTranslatedField, currentLocale } = useLocale(); // Use hook
     const itemTitleObject = page.props.item?.title;
-    let titleForLayout = "Content";
-    if (itemTitleObject && typeof itemTitleObject === "object") {
-        const currentLocale = page.props.locale || "en";
-        titleForLayout =
-            itemTitleObject[currentLocale] ||
-            Object.values(itemTitleObject)[0] ||
-            "Content";
-    } else if (itemTitleObject) {
-        titleForLayout = String(itemTitleObject);
-    }
-    return <PublicLayout children={page} title={titleForLayout} />;
+    const titleForLayout = getTranslatedField(
+        itemTitleObject,
+        currentLocale,
+        "Content",
+    );
+    return <PublicLayout title={titleForLayout}>{page}</PublicLayout>;
 };

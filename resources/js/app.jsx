@@ -1,5 +1,5 @@
 import "./bootstrap";
-import "../css/app.css"; // Keep this if it contains any non-Tailwind global styles or font imports for MUI
+import "../css/app.css";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -12,6 +12,7 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+// No need to import useLocale here, it will be used by components
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -25,37 +26,34 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        // Function to create theme dynamically based on current locale's RTL status
         const createAppTheme = (pageProps) => {
-            const currentLocaleCode = pageProps.current_locale || "en";
-            const availableLocales = pageProps.available_locales || [];
+            // Access locale info from pageProps, which should be updated by Inertia
+            const currentLocaleCode = pageProps?.current_locale || "en";
+            const availableLocales = pageProps?.available_locales || [];
             const currentSelectedLocale = availableLocales.find(
                 (lang) => lang.code === currentLocaleCode,
             );
             const direction = currentSelectedLocale?.is_rtl ? "rtl" : "ltr";
 
-            // Ensure HTML dir attribute is set
             document.documentElement.dir = direction;
             document.documentElement.lang = currentLocaleCode;
 
             return createTheme({
-                direction: direction, // Set direction dynamically
+                direction: direction,
                 palette: {
-                    primary: { main: "#008080", contrastText: "#ffffff" }, // Teal-ish
-                    secondary: { main: "#D8BFD8", contrastText: "#333333" }, // Thistle, a light purple/pink
-                    background: { default: "#FAF0E6", paper: "#FFFFFF" }, // Linen background, white paper
-                    text: { primary: "#4A4A4A", secondary: "#707070" }, // Darker grays for text
-                    error: { main: "#D32F2F" }, // Standard MUI error red
-                    // You can add more custom colors or MUI's color utilities here
+                    primary: { main: "#008080", contrastText: "#ffffff" },
+                    secondary: { main: "#D8BFD8", contrastText: "#333333" },
+                    background: { default: "#FAF0E6", paper: "#FFFFFF" },
+                    text: { primary: "#4A4A4A", secondary: "#707070" },
+                    error: { main: "#D32F2F" },
                 },
                 typography: {
                     fontFamily: [
-                        // Prioritize fonts based on direction or specific language needs if necessary
                         ...(direction === "rtl"
                             ? ["Tajawal", "Noto Sans Arabic"]
-                            : []), // Arabic fonts first for RTL
-                        "Cairo", // Good general Arabic/Latin font
-                        "Roboto", // Common Latin fallback
+                            : []),
+                        "Cairo",
+                        "Roboto",
                         '"Helvetica Neue"',
                         "Arial",
                         "sans-serif",
@@ -75,10 +73,6 @@ createInertiaApp({
                                 textTransform: "none",
                                 fontWeight: 500,
                             },
-                            containedPrimary: {
-                                // backgroundColor: "#008080", // Set by palette
-                                // "&:hover": { backgroundColor: "#006666" },
-                            },
                         },
                     },
                     MuiAppBar: {
@@ -86,58 +80,36 @@ createInertiaApp({
                             root: {
                                 backgroundColor: "#FFFFFF",
                                 color: "#4A4A4A",
-                            }, // Use paper color for AppBar
+                            },
                         },
                     },
                     MuiCard: {
                         styleOverrides: {
                             root: {
                                 borderRadius: 12,
-                                boxShadow: "0 4px 12px rgba(0,0,0,0.08)", // Softer shadow
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                             },
                         },
                     },
-                    MuiTextField: {
-                        defaultProps: {
-                            variant: "outlined", // Default variant for all TextFields
-                        },
-                    },
-                    MuiSelect: {
-                        defaultProps: {
-                            variant: "outlined",
-                        },
-                    },
-                    // Add other component customizations here
+                    MuiTextField: { defaultProps: { variant: "outlined" } },
+                    MuiSelect: { defaultProps: { variant: "outlined" } },
                 },
             });
         };
 
-        // Note: The 'props' in setup({ el, App, props }) are the initial page props.
-        // The App component itself will receive updated props on subsequent navigations.
-        // We need the ThemeProvider to be reactive to prop changes if the App component re-renders.
-        // This is typically handled by Inertia's <App {...props} /> structure.
-        // The theme creation can happen inside a small wrapper component if needed,
-        // or directly within the App component if it's structured to re-create the theme on prop changes.
-
-        // For simplicity and directness, let's ensure the App re-renders with a new theme if props change.
-        // A common pattern is to define the theme based on props *inside* the render method of a component
-        // that wraps <App /> or by having <App /> itself manage this.
-        // The `createInertiaApp`'s `App` component automatically re-renders with new page props.
-        // So, we can pass the theme creation function or the theme itself based on initial props,
-        // and subsequent renders of `App` will use updated props.
-
-        // Let's refine this: The `App` component provided by `createInertiaApp` will receive updated `props`.
-        // We should ideally re-create the theme when `props.page.props.current_locale` changes.
-        // A simple way is to make a small wrapper component that does this.
-
+        // DynamicThemeProvider re-creates theme when relevant props change.
         const DynamicThemeProvider = ({ children, pageProps }) => {
+            // Use React.useMemo to recreate the theme only when locale-related props change.
+            // The key for re-rendering is now explicitly tied to current_locale and available_locales from pageProps.
             const theme = React.useMemo(
                 () => createAppTheme(pageProps),
-                [pageProps.current_locale, pageProps.available_locales],
+                [pageProps?.current_locale, pageProps?.available_locales], // Ensure these are stable references or correctly updated
             );
             return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
         };
 
+        // props.initialPage.props contains the props for the first page.
+        // The App component will receive updated props for subsequent pages.
         root.render(
             <DynamicThemeProvider pageProps={props.initialPage.props}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -148,6 +120,6 @@ createInertiaApp({
         );
     },
     progress: {
-        color: "#008080", // Primary color for progress bar
+        color: "#008080",
     },
 });

@@ -7,9 +7,10 @@ use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 use App\Models\SocialAccount;
 use App\Models\NavigationItem;
-use App\Models\Language; // <-- Import Language model
+use App\Models\Language;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\App; // <-- Import App facade
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\App;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -22,66 +23,31 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
-        $socialAccounts = Cache::remember(
-            "active_social_accounts",
-            3600,
-            function () {
-                return SocialAccount::where("status", "active")
-                    ->orderBy("display_order")
-                    ->get(["id", "platform", "url", "account_name"]);
-            }
-        );
+        $currentLocaleCode = App::getLocale();
 
-        $structuredNavigationItems = Cache::remember(
-            "published_navigation_items_structured",
-            3600,
-            function () {
-                $locations = NavigationItem::published()
-                    ->distinct()
-                    ->pluck("menu_location");
-                $structuredNav = [];
-                foreach ($locations as $location) {
-                    $structuredNav[$location] = NavigationItem::published()
-                        ->where("menu_location", $location)
-                        ->whereNull("parent_id")
-                        ->with([
-                            "children" => fn($query) => $query
-                                ->published()
-                                ->orderBy("order"),
-                        ])
-                        ->orderBy("order")
-                        ->get([
-                            "id",
-                            "menu_location",
-                            "label",
-                            "url",
-                            "target",
-                            "parent_id",
-                        ])
-                        ->toArray();
-                }
-                return $structuredNav;
-            }
-        );
-
-        // Fetch active languages for the language switcher
         $availableLocales = Cache::remember(
-            "available_locales",
+            "available_locales_shared",
             3600,
             function () {
                 return Language::where("is_active", true)
-                    ->orderBy("name") // Or 'code' or a specific order column if you add one
-                    ->get(["code", "name", "native_name", "is_rtl"])
+                    ->orderBy("name")
+                    ->get(["code", "name", "native_name", "is_rtl"]) // Ensure is_rtl is selected
                     ->toArray();
             }
         );
 
-        // Prepare a simple list of language codes for config('translatable.locales') if needed dynamically
-        // This is more for backend. For frontend switcher, $availableLocales is better.
-        // Cache this separately if other backend services need just the codes.
-        Cache::rememberForever("translatable_locales_config", function () {
-            return Language::where("is_active", true)->pluck("code")->toArray();
-        });
+        // Ensure current_locale_is_rtl is derived correctly
+        $currentSelectedLocale = collect($availableLocales)->firstWhere(
+            "code",
+            $currentLocaleCode
+        );
+        $currentLocaleIsRTL = $currentSelectedLocale["is_rtl"] ?? false;
+
+        // Example: Fetching site_name from settings for dynamic app name
+        // $siteNameSetting = Cache::remember('setting_site_name_shared', 3600, function () {
+        //     return \App\Models\Setting::where('key', 'site_name')->first();
+        // });
+        // $dynamicSiteName = $siteNameSetting ? $siteNameSetting->getTranslation('value', $currentLocaleCode) : config('app.name', 'Laravel');
 
         return array_merge(parent::share($request), [
             "auth" => [
@@ -90,7 +56,6 @@ class HandleInertiaRequests extends Middleware
                         "id" => $request->user()->id,
                         "name" => $request->user()->name,
                         "email" => $request->user()->email,
-                        // Add roles/permissions if needed directly on user object for frontend checks
                         // 'roles' => $request->user()->getRoleNames(),
                         // 'permissions' => $request->user()->getAllPermissions()->pluck('name'),
                     ]
@@ -99,17 +64,81 @@ class HandleInertiaRequests extends Middleware
             "ziggy" => fn() => [
                 ...(new Ziggy())->toArray(),
                 "location" => $request->url(),
-                "query" => $request->query(), // Share query parameters
+                "query" => $request->query(),
             ],
             "flash" => [
                 "success" => fn() => $request->session()->get("success"),
                 "error" => fn() => $request->session()->get("error"),
             ],
-            "socialAccounts" => $socialAccounts,
-            "navigationItems" => $structuredNavigationItems,
-            "available_locales" => $availableLocales, // <-- Share dynamic active languages
-            "current_locale" => App::getLocale(), // <-- Share current application locale
-            // 'current_rtl_status' => $availableLocales[App::getLocale()]['is_rtl'] ?? false, // Example if needed
+            // Renaming to match what app.jsx expects, or update app.jsx
+            "current_locale" => $currentLocaleCode,
+            "available_locales" => $availableLocales,
+            // This is now derived in app.jsx from current_locale and available_locales
+            // "current_locale_is_rtl" => $currentLocaleIsRTL, // Can be removed if app.jsx handles it
+
+            // Other shared data...
+            "socialAccounts" => Cache::remember(
+                "active_social_accounts_shared",
+                3600,
+                function () {
+                    return SocialAccount::where("status", "active")
+                        ->orderBy("display_order")
+                        ->get(["id", "platform", "url", "account_name"]);
+                }
+            ),
+            "navigationItems" => Cache::remember(
+                "published_navigation_items_structured_shared",
+                3600,
+                function () {
+                    // ... (same logic as before)
+                    $locations = NavigationItem::published()
+                        ->distinct()
+                        ->pluck("menu_location");
+                    $structuredNav = [];
+                    foreach ($locations as $location) {
+                        $structuredNav[$location] = NavigationItem::published()
+                            ->where("menu_location", $location)
+                            ->whereNull("parent_id")
+                            ->with([
+                                "children" => fn($query) => $query
+                                    ->published()
+                                    ->orderBy("order"),
+                            ])
+                            ->orderBy("order")
+                            ->get([
+                                "id",
+                                "menu_location",
+                                "label",
+                                "url",
+                                "target",
+                                "parent_id",
+                            ])
+                            ->toArray();
+                    }
+                    return $structuredNav;
+                }
+            ),
+            "settings" => Cache::remember(
+                "site_settings_all_shared",
+                3600,
+                function () {
+                    // Share essential, non-sensitive settings if needed globally
+                    // Be cautious about sharing too much data on every request
+                    return \App\Models\Setting::whereIn("key", [
+                        "site_name",
+                        "site_description",
+                        "footer_copyright_text",
+                    ])
+                        ->get()
+                        ->keyBy("key")
+                        ->map(function ($setting) {
+                            return [
+                                "value" => $setting->value,
+                                "type" => $setting->type,
+                            ]; // Only value and type
+                        });
+                }
+            ),
         ]);
     }
 }

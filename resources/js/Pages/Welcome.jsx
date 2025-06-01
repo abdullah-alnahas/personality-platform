@@ -1,5 +1,5 @@
 import React from "react";
-import { Head, Link as InertiaLink, usePage } from "@inertiajs/react";
+import { Head, Link as InertiaLink } from "@inertiajs/react"; // Removed usePage
 import PublicLayout from "@/Layouts/PublicLayout";
 import {
     Box,
@@ -14,7 +14,7 @@ import {
     Avatar,
     Divider,
     Tooltip,
-} from "@mui/material"; // Removed IconButton as it's not directly used here, it's in SocialIcon
+} from "@mui/material";
 import ContentCard from "@/Components/ContentCard";
 import ThematicSectionCarousel from "@/Components/ThematicSectionCarousel";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
@@ -24,10 +24,10 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import LinkIconOriginal from "@mui/icons-material/Link"; // Renamed to avoid naming conflict
+import LinkIconOriginal from "@mui/icons-material/Link";
+import { useLocale } from "@/Hooks/useLocale"; // Import the hook
 
 const SocialIcon = ({ platform }) => {
-    /* ... (same as before) ... */
     switch (platform?.toLowerCase()) {
         case "facebook":
             return <FacebookIcon />;
@@ -47,94 +47,107 @@ const SocialIcon = ({ platform }) => {
             return <LinkIconOriginal />;
     }
 };
-const getTranslatedField = (fieldObject, pageProps, fallback = "") => {
-    /* ... (same as before) ... */
-    const currentLocale = pageProps.current_locale || "en";
-    if (fieldObject == null) return fallback;
-    if (typeof fieldObject !== "object") return String(fieldObject) || fallback;
+
+const VisionSection = ({ section }) => {
+    const { getTranslatedField, currentLocale } = useLocale();
     return (
-        fieldObject[currentLocale] ||
-        fieldObject[Object.keys(fieldObject)[0]] ||
-        fallback
+        <Paper
+            sx={{
+                p: { xs: 2, md: 4 },
+                textAlign: "center",
+                mb: 4,
+                bgcolor: "secondary.main",
+            }}
+        >
+            <Typography
+                variant="h3"
+                component="h1"
+                gutterBottom
+                color="primary"
+            >
+                {getTranslatedField(section.title, currentLocale)}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontStyle: "italic" }}>
+                {getTranslatedField(section.subtitle_or_quote, currentLocale)}
+            </Typography>
+            {section.config?.button_text && section.config?.button_link && (
+                <Button
+                    component={InertiaLink}
+                    href={section.config.button_link}
+                    variant="contained"
+                    size="large"
+                >
+                    {getTranslatedField(
+                        section.config.button_text,
+                        currentLocale,
+                    )}
+                </Button>
+            )}
+        </Paper>
     );
 };
-const VisionSection = ({ section, pageProps }) => (
-    <Paper
-        sx={{
-            p: { xs: 2, md: 4 },
-            textAlign: "center",
-            mb: 4,
-            bgcolor: "secondary.main",
-        }}
-    >
-        <Typography variant="h3" component="h1" gutterBottom color="primary">
-            {getTranslatedField(section.title, pageProps)}
-        </Typography>
-        <Typography variant="subtitle1" sx={{ mb: 2, fontStyle: "italic" }}>
-            {getTranslatedField(section.subtitle_or_quote, pageProps)}
-        </Typography>
-        {section.config?.button_text && section.config?.button_link && (
-            <Button
-                component={InertiaLink}
-                href={section.config.button_link}
-                variant="contained"
-                size="large"
-            >
-                {getTranslatedField(section.config.button_text, pageProps)}
-            </Button>
-        )}
-    </Paper>
-);
-const LatestNewsSection = ({ section, pageProps }) => (
-    <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" component="h2" gutterBottom>
-            {getTranslatedField(section.title, pageProps)}
-        </Typography>
-        <Grid container spacing={2}>
-            {section.items?.map((item) => (
-                <Grid xs={12} sm={6} key={`news-${item.id}`}>
-                    <Card variant="outlined">
-                        <CardContent>
-                            {item.category_name && (
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                    display="block"
+
+const LatestNewsSection = ({ section }) => {
+    const { getTranslatedField, currentLocale } = useLocale();
+    return (
+        <Box sx={{ mb: 4 }}>
+            <Typography variant="h5" component="h2" gutterBottom>
+                {getTranslatedField(section.title, currentLocale)}
+            </Typography>
+            <Grid container spacing={2}>
+                {section.items?.map((item) => (
+                    <Grid item xs={12} sm={6} key={`news-${item.id}`}>
+                        <Card variant="outlined">
+                            <CardContent>
+                                {item.category_name && (
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                        display="block"
+                                    >
+                                        {getTranslatedField(
+                                            item.category_name,
+                                            currentLocale,
+                                        )}
+                                    </Typography>
+                                )}
+                                <MuiLink
+                                    component={InertiaLink}
+                                    href={route("content.show-item", item.slug)}
+                                    underline="hover"
+                                    variant="h6"
+                                    sx={{ display: "block", mb: 0.5 }}
                                 >
                                     {getTranslatedField(
-                                        item.category_name,
-                                        pageProps,
+                                        item.title,
+                                        currentLocale,
                                     )}
+                                </MuiLink>
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                >
+                                    {item.publish_date_formatted}
                                 </Typography>
-                            )}
-                            <MuiLink
-                                component={InertiaLink}
-                                href={route("content.show-item", item.slug)}
-                                underline="hover"
-                                variant="h6"
-                                sx={{ display: "block", mb: 0.5 }}
-                            >
-                                {getTranslatedField(item.title, pageProps)}
-                            </MuiLink>
-                            <Typography variant="body2" color="text.secondary">
-                                {item.publish_date_formatted}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            ))}
-            {section.items?.length === 0 && (
-                <Grid xs={12}>
-                    <Typography sx={{ p: 2 }}>
-                        No news items to display.
-                    </Typography>
-                </Grid>
-            )}
-        </Grid>
-    </Box>
-);
-const FeaturedQuoteSection = ({ section, pageProps }) =>
-    section.quote_data ? (
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+                {section.items?.length === 0 && (
+                    <Grid item xs={12}>
+                        <Typography sx={{ p: 2 }}>
+                            No news items to display.
+                        </Typography>
+                    </Grid>
+                )}
+            </Grid>
+        </Box>
+    );
+};
+
+const FeaturedQuoteSection = ({ section }) => {
+    const { getTranslatedField, currentLocale } = useLocale();
+    return section.quote_data ? (
         <Paper sx={{ p: 2, mb: 3, position: "relative", bgcolor: "grey.100" }}>
             {section.title && (
                 <Typography
@@ -143,7 +156,7 @@ const FeaturedQuoteSection = ({ section, pageProps }) =>
                     gutterBottom
                     sx={{ textAlign: "center" }}
                 >
-                    {getTranslatedField(section.title, pageProps)}
+                    {getTranslatedField(section.title, currentLocale)}
                 </Typography>
             )}
             <FormatQuoteIcon
@@ -156,7 +169,7 @@ const FeaturedQuoteSection = ({ section, pageProps }) =>
                 }}
             />
             <Typography variant="body1" sx={{ fontStyle: "italic", mb: 1 }}>
-                "{getTranslatedField(section.quote_data.text, pageProps)}"
+                "{getTranslatedField(section.quote_data.text, currentLocale)}"
             </Typography>
             <Typography
                 variant="caption"
@@ -165,22 +178,25 @@ const FeaturedQuoteSection = ({ section, pageProps }) =>
                 display="block"
             >
                 -{" "}
-                {getTranslatedField(section.quote_data.source, pageProps) ||
+                {getTranslatedField(section.quote_data.source, currentLocale) ||
                     "Unknown"}
             </Typography>
         </Paper>
     ) : null;
-const SocialMediaLinksSection = ({ section, pageProps }) => {
-    const { socialAccounts } = usePage().props;
+};
+
+const SocialMediaLinksSection = ({ section, socialAccounts }) => {
+    const { getTranslatedField, currentLocale } = useLocale();
     if (!socialAccounts || socialAccounts.length === 0) return null;
+
     return (
         <Box sx={{ mb: 4 }}>
             <Typography variant="h5" component="h2" gutterBottom>
-                {getTranslatedField(section.title, pageProps)}
+                {getTranslatedField(section.title, currentLocale)}
             </Typography>
             <Grid container spacing={1}>
                 {socialAccounts.map((acc) => (
-                    <Grid xs={12} sm={6} key={`social-link-${acc.id}`}>
+                    <Grid item xs={12} sm={6} key={`social-link-${acc.id}`}>
                         <Card variant="outlined">
                             <CardActionArea
                                 component="a"
@@ -205,7 +221,7 @@ const SocialMediaLinksSection = ({ section, pageProps }) => {
                                         >
                                             {getTranslatedField(
                                                 acc.account_name,
-                                                pageProps,
+                                                currentLocale,
                                             ) ||
                                                 acc.platform
                                                     .charAt(0)
@@ -214,7 +230,7 @@ const SocialMediaLinksSection = ({ section, pageProps }) => {
                                         </Typography>
                                         {getTranslatedField(
                                             acc.account_name,
-                                            pageProps,
+                                            currentLocale,
                                         ) && (
                                             <Typography
                                                 variant="caption"
@@ -241,14 +257,15 @@ export default function Welcome({
     settings,
     homepageSections,
     genericFeaturedItems,
+    socialAccounts: pageSocialAccounts,
 }) {
-    const { props: pageProps } = usePage(); // Pass pageProps to helpers
+    const { getTranslatedField, currentLocale } = useLocale();
     const siteName = getTranslatedField(
         settings?.site_name?.value,
-        pageProps,
+        currentLocale,
         "Personality Platform",
     );
-    const pageTitle = `Welcome - ${siteName}`;
+
     const renderSection = (section) => {
         switch (section.section_type) {
             case "vision":
@@ -256,18 +273,20 @@ export default function Welcome({
                     <VisionSection
                         key={`section-${section.id}`}
                         section={section}
-                        pageProps={pageProps}
                     />
                 );
             case "thematic_carousel":
                 return (
                     <React.Fragment key={`section-${section.id}`}>
                         <ThematicSectionCarousel
-                            title={getTranslatedField(section.title, pageProps)}
+                            title={getTranslatedField(
+                                section.title,
+                                currentLocale,
+                            )}
                             items={section.items || []}
                             sectionQuote={getTranslatedField(
                                 section.subtitle_or_quote,
-                                pageProps,
+                                currentLocale,
                             )}
                         />
                         <Divider sx={{ my: 3 }} />
@@ -278,7 +297,6 @@ export default function Welcome({
                     <LatestNewsSection
                         key={`section-${section.id}`}
                         section={section}
-                        pageProps={pageProps}
                     />
                 );
             case "featured_quote":
@@ -286,15 +304,14 @@ export default function Welcome({
                     <FeaturedQuoteSection
                         key={`section-${section.id}`}
                         section={section}
-                        pageProps={pageProps}
                     />
                 );
-            case "social_media_links":
+            case "social_media_links": // Use the socialAccounts from page props
                 return (
                     <SocialMediaLinksSection
                         key={`section-${section.id}`}
                         section={section}
-                        pageProps={pageProps}
+                        socialAccounts={pageSocialAccounts}
                     />
                 );
             default:
@@ -305,8 +322,10 @@ export default function Welcome({
                 );
         }
     };
+
     return (
         <>
+            <Head title={`Welcome - ${siteName}`} />
             {homepageSections &&
                 homepageSections.map((section) => renderSection(section))}
             {genericFeaturedItems &&
@@ -323,6 +342,7 @@ export default function Welcome({
                         <Grid container spacing={3}>
                             {genericFeaturedItems.map((item) => (
                                 <Grid
+                                    item
                                     xs={12}
                                     sm={6}
                                     md={4}
@@ -337,4 +357,4 @@ export default function Welcome({
         </>
     );
 }
-Welcome.layout = (page) => <PublicLayout>{page}</PublicLayout>; // Simpler layout assignment
+Welcome.layout = (page) => <PublicLayout>{page}</PublicLayout>;

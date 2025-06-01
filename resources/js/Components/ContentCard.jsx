@@ -9,7 +9,8 @@ import {
     Box,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Link as InertiaLink, usePage } from "@inertiajs/react";
+import { Link as InertiaLink } from "@inertiajs/react";
+import { useLocale } from "@/Hooks/useLocale"; // Import the hook
 
 const StyledPicture = styled("picture")({
     position: "absolute",
@@ -20,44 +21,32 @@ const StyledPicture = styled("picture")({
     display: "block",
 });
 
-const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
-    const { props } = usePage();
-    const currentLocale = props.locale || locale;
-    if (fieldObject == null) return fallback;
-    if (typeof fieldObject !== "object") return String(fieldObject) || fallback;
-    return (
-        fieldObject[currentLocale] ||
-        fieldObject[locale] ||
-        Object.values(fieldObject)[0] ||
-        fallback
-    );
-};
 const buildSrcSet = (sources) => {
     if (!sources || !Array.isArray(sources) || sources.length === 0) return "";
     return sources.map((source) => `${source.url} ${source.width}w`).join(", ");
 };
 
 export default function ContentCard({ item }) {
-    const { props: pageProps } = usePage();
+    const { getTranslatedField, currentLocale } = useLocale(); // Use the hook
+
     if (!item) return null;
 
-    const title = getTranslatedField(item.title, pageProps.locale);
-    const excerpt = getTranslatedField(item.excerpt, pageProps.locale);
-    const categoryName = getTranslatedField(
-        item.category_name,
-        pageProps.locale,
-    );
+    const title = getTranslatedField(item.title, currentLocale);
+    const excerpt = getTranslatedField(item.excerpt, currentLocale);
+    const categoryName = getTranslatedField(item.category_name, currentLocale);
     const imageDetails = item.image_details;
+
     let displayImageSrc =
         imageDetails?.thumbnail_jpg || imageDetails?.original_url;
     let displayImageSrcSetWebP = null;
     let displayImageSrcSetJpg = null;
+
     const imageAspectRatioBoxSx = {
         width: "100%",
-        paddingTop: "56.25%",
+        paddingTop: "56.25%", // 16:9 aspect ratio
         position: "relative",
         backgroundColor:
-            imageDetails && displayImageSrc ? "transparent" : "grey.200",
+            imageDetails && displayImageSrc ? "transparent" : "grey.200", // Placeholder bg
     };
 
     if (imageDetails) {
@@ -65,6 +54,7 @@ export default function ContentCard({ item }) {
             displayImageSrc = imageDetails.thumbnail_webp;
         else if (imageDetails.thumbnail_jpg)
             displayImageSrc = imageDetails.thumbnail_jpg;
+
         const webpCardSources = [];
         if (imageDetails.thumbnail_webp)
             webpCardSources.push({
@@ -77,6 +67,7 @@ export default function ContentCard({ item }) {
                 if (!webpCardSources.some((existing) => existing.url === s.url))
                     webpCardSources.push(s);
             });
+
         const jpgCardSources = [];
         if (imageDetails.thumbnail_jpg)
             jpgCardSources.push({
@@ -89,19 +80,23 @@ export default function ContentCard({ item }) {
                 if (!jpgCardSources.some((existing) => existing.url === s.url))
                     jpgCardSources.push(s);
             });
+
         if (webpCardSources.length > 0)
             displayImageSrcSetWebP = buildSrcSet(webpCardSources);
         if (jpgCardSources.length > 0)
             displayImageSrcSetJpg = buildSrcSet(jpgCardSources);
+
+        // Fallback displayImageSrc if only original_url or specific conversions are available
         if (
             !displayImageSrc ||
             (displayImageSrc === imageDetails.original_url &&
                 (jpgCardSources.length > 0 || webpCardSources.length > 0))
-        )
+        ) {
             displayImageSrc =
                 jpgCardSources[0]?.url ||
                 webpCardSources[0]?.url ||
                 imageDetails.original_url;
+        }
     }
 
     return (
@@ -131,7 +126,12 @@ export default function ContentCard({ item }) {
                             <CardMedia
                                 component="img"
                                 image={displayImageSrc}
-                                alt={imageDetails.alt || title}
+                                alt={
+                                    getTranslatedField(
+                                        imageDetails.alt,
+                                        currentLocale,
+                                    ) || title
+                                } // Use translated alt
                                 sx={{
                                     position: "absolute",
                                     top: 0,
@@ -186,12 +186,11 @@ export default function ContentCard({ item }) {
                                 label={categoryName}
                                 size="small"
                                 variant="outlined"
-                                component={InertiaLink} // This makes the Chip an anchor via InertiaLink
+                                component={InertiaLink}
                                 href={route(
                                     "content.show-category",
                                     item.category_slug,
                                 )}
-                                // clickable prop removed to avoid nested anchors when component is InertiaLink
                                 sx={{
                                     mb: 1,
                                     "&:hover": {
