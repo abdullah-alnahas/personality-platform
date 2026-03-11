@@ -1,6 +1,16 @@
 /* Google Fonts: Amiri (Naskh calligraphic), Tajawal (modern Arabic), Cairo (bilingual) */
 @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Tajawal:wght@300;400;500;700&family=Cairo:wght@300;400;500;600;700&display=swap');
 
+/* KFGQPC Hafs Uthmanic Script v18 — Official Quran font from King Fahd Complex */
+@font-face {
+    font-family: 'KFGQPC Hafs Uthmanic Script';
+    src: url('/fonts/hafs.18.woff2') format('woff2'),
+         url('/fonts/hafs.18.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* Islamic Design System — CSS Custom Properties */
 :root {
     --islamic-dark-green: #2B3D2F;
@@ -25,7 +35,7 @@ body {
 
 /* Uthmani Quran text styling */
 .quran-text {
-    font-family: 'Amiri', 'Traditional Arabic', 'Scheherazade New', serif;
+    font-family: 'KFGQPC Hafs Uthmanic Script', 'Amiri', 'Traditional Arabic', serif;
     direction: rtl;
     text-align: center;
     line-height: 2.2;

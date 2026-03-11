@@ -4,7 +4,8 @@ import { Link as InertiaLink } from '@inertiajs/react';
 import { useLocale } from '@/Hooks/useLocale';
 import OrnamentalDivider from '@/Components/Decorative/OrnamentalDivider';
 
-const VERSE_FONT_FAMILY = "'Amiri', 'Traditional Arabic', serif";
+const QURAN_FONT_FAMILY = "'KFGQPC Hafs Uthmanic Script', 'Amiri', 'Traditional Arabic', serif";
+const SECONDARY_FONT_FAMILY = "'Amiri', 'Traditional Arabic', serif";
 const BISMILLAH = '\uFDFD';
 
 function SectionHeading({ text, color }) {
@@ -14,7 +15,7 @@ function SectionHeading({ text, color }) {
             variant="h3"
             sx={{
                 color,
-                fontFamily: VERSE_FONT_FAMILY,
+                fontFamily: SECONDARY_FONT_FAMILY,
                 fontWeight: 700,
                 textAlign: 'center',
                 mb: 4,
@@ -32,7 +33,7 @@ function BismillahText({ color }) {
         <Typography
             sx={{
                 color,
-                fontFamily: VERSE_FONT_FAMILY,
+                fontFamily: QURAN_FONT_FAMILY,
                 fontSize: { xs: '2rem', md: '2.8rem' },
                 textAlign: 'center',
                 direction: 'rtl',
@@ -50,7 +51,7 @@ function VerseText({ text, color }) {
         <Typography
             sx={{
                 color,
-                fontFamily: VERSE_FONT_FAMILY,
+                fontFamily: QURAN_FONT_FAMILY,
                 fontSize: { xs: '1.8rem', md: '2.2rem' },
                 lineHeight: 2.2,
                 textAlign: 'center',
@@ -69,7 +70,7 @@ function VerseReference({ surahName, verseReference, color }) {
         <Typography
             sx={{
                 color,
-                fontFamily: VERSE_FONT_FAMILY,
+                fontFamily: QURAN_FONT_FAMILY,
                 fontSize: '1.1rem',
                 textAlign: 'center',
                 direction: 'rtl',
@@ -90,7 +91,7 @@ function SecondaryContent({ text, source, color }) {
             <Typography
                 sx={{
                     color,
-                    fontFamily: VERSE_FONT_FAMILY,
+                    fontFamily: SECONDARY_FONT_FAMILY,
                     fontSize: { xs: '1.1rem', md: '1.3rem' },
                     lineHeight: 2,
                     direction: 'rtl',
@@ -182,7 +183,7 @@ function BottomItems({ items, getTranslatedField, currentLocale, accentColor }) 
                         sx={{
                             backgroundColor: 'rgba(255,255,255,0.15)',
                             color: '#fff',
-                            fontFamily: VERSE_FONT_FAMILY,
+                            fontFamily: SECONDARY_FONT_FAMILY,
                             fontSize: '0.9rem',
                             borderRadius: 20,
                             px: 1,
