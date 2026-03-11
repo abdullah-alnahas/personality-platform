@@ -9,16 +9,22 @@ class QuoteObserver
 {
     public function saved(Quote $quote): void
     {
-        // The 'featured_quote' section fetches a random quote.
-        // While not strictly necessary to clear 'homepage_sections_data' for every quote save
-        // (as the random quote is fetched live within the cache closure if it's not the quote_data itself),
-        // if the *logic* of which quotes are candidates changes (e.g. new quote becomes 'published'),
-        // it's safer to clear. A more targeted approach might be too complex for now.
-        Cache::forget("homepage_sections_data");
+        $this->clearCaches($quote);
     }
 
     public function deleted(Quote $quote): void
     {
+        $this->clearCaches($quote);
+    }
+
+    protected function clearCaches(Quote $quote): void
+    {
         Cache::forget("homepage_sections_data");
+        Cache::forget("homepage_sections_data_v2");
+
+        // Clear block-specific featured_quote caches
+        Cache::forget("block_featured_quote_{$quote->id}");
+        // Also clear the random quote cache
+        Cache::forget("block_featured_quote_random");
     }
 }

@@ -1,0 +1,202 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\ContentCategory;
+use App\Models\ContentItem;
+use App\Models\Quote;
+use App\Models\SocialAccount;
+use Illuminate\Support\Facades\Cache;
+
+class BlockDataResolver
+{
+    public function resolve(array $block): array
+    {
+        $type = $block['block_type'];
+        $content = $block['content'] ?? [];
+
+        return match ($type) {
+            'category_grid' => $this->resolveCategoryGrid($block, $content),
+            'latest_news' => $this->resolveLatestNews($block, $content),
+            'featured_quote' => $this->resolveFeaturedQuote($block, $content),
+            'social_media_feed' => $this->resolveSocialMediaFeed($block, $content),
+            default => $block,
+        };
+    }
+
+    protected function resolveCategoryGrid(array $block, array $content): array
+    {
+        $categoryId = $content['category_id'] ?? null;
+        $maxItems = $content['max_items'] ?? 6;
+
+        if (!$categoryId) {
+            $block['resolved_data'] = ['category' => null, 'items' => []];
+            return $block;
+        }
+
+        $cacheKey = "block_category_grid_{$categoryId}_{$maxItems}";
+        $block['resolved_data'] = Cache::remember($cacheKey, 3600, function () use ($categoryId, $maxItems) {
+            $category = ContentCategory::where('id', $categoryId)
+                ->where('status', 'published')
+                ->first();
+
+            if (!$category) {
+                return ['category' => null, 'items' => []];
+            }
+
+            $items = ContentItem::published()
+                ->where('content_category_id', $categoryId)
+                ->with(['media', 'category:id,name,slug'])
+                ->latest('publish_date')
+                ->take($maxItems)
+                ->get()
+                ->map(fn(ContentItem $item) => $this->transformContentItem($item))
+                ->all();
+
+            return [
+                'category' => [
+                    'id' => $category->id,
+                    'name' => $category->getTranslations('name'),
+                    'slug' => $category->slug,
+                    'description' => $category->getTranslations('description'),
+                    'icon' => $category->icon,
+                    'image' => $category->image,
+                ],
+                'items' => $items,
+            ];
+        });
+
+        return $block;
+    }
+
+    protected function resolveLatestNews(array $block, array $content): array
+    {
+        $categoryId = $content['category_id'] ?? null;
+        $maxItems = $content['max_items'] ?? 6;
+
+        $cacheKey = "block_latest_news_{$categoryId}_{$maxItems}";
+        $block['resolved_data'] = Cache::remember($cacheKey, 3600, function () use ($categoryId, $maxItems) {
+            $query = ContentItem::published()
+                ->with(['media', 'category:id,name,slug']);
+
+            if ($categoryId) {
+                $query->where('content_category_id', $categoryId);
+            }
+
+            return $query->latest('publish_date')
+                ->take($maxItems)
+                ->get()
+                ->map(fn(ContentItem $item) => $this->transformContentItem($item))
+                ->all();
+        });
+
+        return $block;
+    }
+
+    protected function resolveFeaturedQuote(array $block, array $content): array
+    {
+        $quoteId = $content['quote_id'] ?? null;
+
+        if ($quoteId) {
+            $cacheKey = "block_featured_quote_{$quoteId}";
+            $block['resolved_data'] = Cache::remember($cacheKey, 3600, function () use ($quoteId) {
+                $quote = Quote::where('id', $quoteId)->where('status', 'published')->first();
+                if ($quote) {
+                    return [
+                        'text' => $quote->getTranslations('text'),
+                        'source' => $quote->getTranslations('source'),
+                    ];
+                }
+                return null;
+            });
+        } else {
+            // Random quote: short TTL so it rotates
+            $block['resolved_data'] = Cache::remember('block_featured_quote_random', 300, function () {
+                $quote = Quote::published()->inRandomOrder()->first();
+                if ($quote) {
+                    return [
+                        'text' => $quote->getTranslations('text'),
+                        'source' => $quote->getTranslations('source'),
+                    ];
+                }
+                return null;
+            });
+        }
+
+        return $block;
+    }
+
+    protected function resolveSocialMediaFeed(array $block, array $content): array
+    {
+        $maxItems = $content['max_items'] ?? 6;
+
+        $block['resolved_data'] = Cache::remember("block_social_media_feed_{$maxItems}", 3600, function () use ($maxItems) {
+            return SocialAccount::where('status', 'active')
+                ->orderBy('display_order')
+                ->take($maxItems)
+                ->get(['id', 'platform', 'url', 'account_name'])
+                ->toArray();
+        });
+
+        return $block;
+    }
+
+    protected function transformContentItem(ContentItem $item): array
+    {
+        return [
+            'id' => $item->id,
+            'title' => $item->getTranslations('title'),
+            'excerpt' => $item->getTranslations('excerpt'),
+            'slug' => $item->slug,
+            'category_slug' => $item->category?->slug,
+            'category_name' => $item->category?->getTranslations('name'),
+            'publish_date_formatted' => $item->publish_date?->isoFormat('LL'),
+            'publish_date' => $item->publish_date?->toDateString(),
+            'image_details' => $this->getResponsiveImageData($item),
+        ];
+    }
+
+    protected function getResponsiveImageData(ContentItem $item): ?array
+    {
+        $media = $item->getFirstMedia('featured_image');
+        if (!$media) {
+            return null;
+        }
+
+        $imageData = [
+            'alt' => $item->getTranslation('title', app()->getLocale()),
+            'original_url' => $media->getUrl(),
+            'webp_sources' => [],
+            'jpg_sources' => [],
+            'thumbnail_webp' => $media->hasGeneratedConversion('thumbnail')
+                ? $media->getUrl('thumbnail')
+                : null,
+            'thumbnail_jpg' => $media->hasGeneratedConversion('thumbnail_jpg')
+                ? $media->getUrl('thumbnail_jpg')
+                : null,
+        ];
+
+        $responsiveSizes = [
+            'sm' => ['width' => 320, 'conversion_webp' => 'responsive_sm', 'conversion_jpg' => 'responsive_sm_jpg'],
+            'md' => ['width' => 768, 'conversion_webp' => 'responsive_md', 'conversion_jpg' => 'responsive_md_jpg'],
+            'lg' => ['width' => 1200, 'conversion_webp' => 'responsive_lg', 'conversion_jpg' => 'responsive_lg_jpg'],
+        ];
+
+        foreach ($responsiveSizes as $sizeInfo) {
+            if ($media->hasGeneratedConversion($sizeInfo['conversion_webp'])) {
+                $imageData['webp_sources'][] = [
+                    'url' => $media->getUrl($sizeInfo['conversion_webp']),
+                    'width' => $sizeInfo['width'],
+                ];
+            }
+            if ($media->hasGeneratedConversion($sizeInfo['conversion_jpg'])) {
+                $imageData['jpg_sources'][] = [
+                    'url' => $media->getUrl($sizeInfo['conversion_jpg']),
+                    'width' => $sizeInfo['width'],
+                ];
+            }
+        }
+
+        return $imageData;
+    }
+}

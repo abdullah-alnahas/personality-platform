@@ -169,6 +169,12 @@ export default function Form({
                                     <MenuItem value="footer_col2">
                                         Footer Column 2
                                     </MenuItem>
+                                    <MenuItem value="footer_col3">
+                                        Footer Column 3
+                                    </MenuItem>
+                                    <MenuItem value="footer_col4">
+                                        Footer Column 4
+                                    </MenuItem>
                                 </Select>
                                 {errors.menu_location && (
                                     <FormHelperText>

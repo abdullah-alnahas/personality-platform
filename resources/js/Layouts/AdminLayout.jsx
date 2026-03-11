@@ -31,6 +31,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import LanguageIcon from "@mui/icons-material/Language";
+import WebIcon from "@mui/icons-material/Web";
 import { useLocale } from "@/Hooks/useLocale"; // Import the hook
 
 const drawerWidth = 240;
@@ -161,6 +162,19 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                             <PhotoLibraryIcon />
                         </ListItemIcon>
                         <ListItemText primary="Media Library" />
+                    </ListItemButton>
+                </ListItem>
+                <Divider sx={{ my: 1 }} />
+                <ListItem disablePadding>
+                    <ListItemButton
+                        component={InertiaLink}
+                        href={route("admin.pages.index")}
+                        selected={route().current("admin.pages.*")}
+                    >
+                        <ListItemIcon>
+                            <WebIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Pages" />
                     </ListItemButton>
                 </ListItem>
                 <Divider sx={{ my: 1 }} />

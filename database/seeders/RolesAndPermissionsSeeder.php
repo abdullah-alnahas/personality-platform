@@ -31,8 +31,8 @@ class RolesAndPermissionsSeeder extends Seeder
             "manage media",
             "manage users",
             "manage roles",
-            "manage quotes", // Ensure this appears only once
-            // "manage quotes", // This was the duplicate, now removed
+            "manage quotes",
+            "manage pages",
         ];
 
         foreach ($permissions as $permissionName) {
@@ -47,7 +47,8 @@ class RolesAndPermissionsSeeder extends Seeder
             "manage categories",
             "manage content items",
             "manage media",
-            "manage quotes", // Ensure it's here if editors should manage quotes
+            "manage quotes",
+            "manage pages",
         ];
 
         $editorRole = Role::findOrCreate("Editor", "web");

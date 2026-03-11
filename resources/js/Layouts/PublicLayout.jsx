@@ -263,6 +263,10 @@ export default function PublicLayout({ children, title: pageTitle }) {
         navigationItems?.footer_col1?.filter((item) => !item.parent_id) ?? [];
     const footerCol2Items =
         navigationItems?.footer_col2?.filter((item) => !item.parent_id) ?? [];
+    const footerCol3Items =
+        navigationItems?.footer_col3?.filter((item) => !item.parent_id) ?? [];
+    const footerCol4Items =
+        navigationItems?.footer_col4?.filter((item) => !item.parent_id) ?? [];
     const [searchQuery, setSearchQuery] = useState(ziggy?.query?.q || "");
     const [mobileOpen, setMobileOpen] = useState(false);
     const handleDrawerToggle = () => setMobileOpen((prevState) => !prevState);
@@ -314,17 +318,6 @@ export default function PublicLayout({ children, title: pageTitle }) {
     const handleLanguageChange = (event) => {
         /* ... (same as before, with console logs) ... */
         const newLocale = event.target.value;
-        console.log(
-            "Language Switcher (Public): Attempting to change language.",
-        );
-        console.log("Current Locale from props:", currentLocale);
-        console.log("New Locale selected:", newLocale);
-        console.log(
-            "Is newLocale different?",
-            newLocale && newLocale !== currentLocale,
-        );
-        console.log("Current ziggy.location (URL path):", ziggy?.location);
-        console.log("Current ziggy.query (params):", ziggy?.query);
         if (newLocale && newLocale !== currentLocale) {
             const baseUrl = ziggy.location.split("?")[0];
             const currentQuery = { ...ziggy.query };
@@ -332,17 +325,11 @@ export default function PublicLayout({ children, title: pageTitle }) {
             Object.keys(currentQuery).forEach((key) => {
                 if (currentQuery[key] === undefined) delete currentQuery[key];
             });
-            console.log("Navigating to URL (Public):", baseUrl);
-            console.log("With query params (Public):", currentQuery);
             router.get(baseUrl, currentQuery, {
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
             });
-        } else {
-            console.log(
-                "Language Switcher (Public): No change needed or newLocale is invalid.",
-            );
         }
     };
     const getDrawerLinkHref = (url) => {
@@ -753,110 +740,153 @@ export default function PublicLayout({ children, title: pageTitle }) {
             <Box
                 component="footer"
                 sx={{
-                    bgcolor: "background.paper",
-                    py: 6,
-                    borderTop: "1px solid",
-                    borderColor: "divider",
+                    bgcolor: '#1E2A22',
+                    color: '#ffffff',
+                    pt: 6,
+                    pb: 3,
                 }}
             >
                 <Container maxWidth="lg">
+                    {/* Footer navigation columns */}
                     <Grid container spacing={4} justifyContent="space-between">
-                        <Grid xs={12} md={4}>
-                            {" "}
-                            {/* Grid v2 */}
-                            <Typography variant="h6" gutterBottom>
+                        {/* About / description column */}
+                        <Grid item xs={12} md={3}>
+                            <Typography
+                                variant="h6"
+                                gutterBottom
+                                sx={{ color: '#C9A94E', fontWeight: 700 }}
+                            >
                                 {siteName}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography
+                                variant="body2"
+                                sx={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, mb: 2 }}
+                            >
                                 {getTranslatedField(
                                     settings?.site_description?.value,
                                     pageProps,
                                     "Sharing knowledge and insights.",
                                 )}
                             </Typography>
-                        </Grid>
-                        {footerCol1Items.length > 0 && (
-                            <Grid xs={6} sm={3} md={2}>
-                                {" "}
-                                {/* Grid v2 */}{" "}
-                                <Typography variant="subtitle1" gutterBottom>
-                                    Links
-                                </Typography>
-                                {footerCol1Items.map((item) => (
-                                    <NavLink
-                                        key={`footer1-${item.id}`}
-                                        item={item}
-                                        currentLocale={currentLocale}
-                                    />
-                                ))}
-                            </Grid>
-                        )}
-                        {footerCol2Items.length > 0 && (
-                            <Grid xs={6} sm={3} md={2}>
-                                {" "}
-                                {/* Grid v2 */}{" "}
-                                <Typography variant="subtitle1" gutterBottom>
-                                    Resources
-                                </Typography>
-                                {footerCol2Items.map((item) => (
-                                    <NavLink
-                                        key={`footer2-${item.id}`}
-                                        item={item}
-                                        currentLocale={currentLocale}
-                                    />
-                                ))}
-                            </Grid>
-                        )}
-                        <Grid xs={12} md={4}>
-                            {" "}
-                            {/* Grid v2 */}
                             {socialAccounts && socialAccounts.length > 0 && (
-                                <>
-                                    <Typography
-                                        variant="subtitle1"
-                                        gutterBottom
-                                    >
-                                        Connect
-                                    </Typography>
-                                    <Box sx={{ mb: 2 }}>
-                                        {socialAccounts.map((acc) => (
-                                            <Tooltip
-                                                title={
-                                                    getTranslatedField(
-                                                        acc.account_name,
-                                                        pageProps,
-                                                    ) || acc.platform
-                                                }
-                                                key={acc.id}
-                                            >
-                                                <span>
-                                                    <IconButton
-                                                        component="a"
-                                                        href={acc.url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        color="inherit"
-                                                        aria-label={
-                                                            getTranslatedField(
-                                                                acc.account_name,
-                                                                pageProps,
-                                                            ) || acc.platform
-                                                        }
-                                                        disabled={!acc.url}
-                                                    >
-                                                        <SocialIcon
-                                                            platform={
-                                                                acc.platform
-                                                            }
-                                                        />
-                                                    </IconButton>
-                                                </span>
-                                            </Tooltip>
-                                        ))}
-                                    </Box>
-                                </>
+                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                                    {socialAccounts.map((acc) => (
+                                        <Tooltip
+                                            title={
+                                                getTranslatedField(
+                                                    acc.account_name,
+                                                    pageProps,
+                                                ) || acc.platform
+                                            }
+                                            key={acc.id}
+                                        >
+                                            <span>
+                                                <IconButton
+                                                    component="a"
+                                                    href={acc.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    aria-label={
+                                                        getTranslatedField(
+                                                            acc.account_name,
+                                                            pageProps,
+                                                        ) || acc.platform
+                                                    }
+                                                    disabled={!acc.url}
+                                                    size="small"
+                                                    sx={{
+                                                        color: 'rgba(255,255,255,0.6)',
+                                                        '&:hover': { color: '#C9A94E' },
+                                                    }}
+                                                >
+                                                    <SocialIcon
+                                                        platform={acc.platform}
+                                                    />
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
+                                    ))}
+                                </Box>
                             )}
-                            <Typography variant="subtitle1" gutterBottom>
+                        </Grid>
+
+                        {/* Nav columns - render whichever have items */}
+                        {[
+                            { items: footerCol1Items, key: 'footer1' },
+                            { items: footerCol2Items, key: 'footer2' },
+                            { items: footerCol3Items, key: 'footer3' },
+                            { items: footerCol4Items, key: 'footer4' },
+                        ]
+                            .filter((col) => col.items.length > 0)
+                            .map((col) => (
+                                <Grid item xs={6} sm={3} md={2} key={col.key}>
+                                    {col.items[0]?.label && (
+                                        <Typography
+                                            variant="subtitle2"
+                                            gutterBottom
+                                            sx={{
+                                                color: '#C9A94E',
+                                                fontWeight: 600,
+                                                textTransform: 'uppercase',
+                                                fontSize: '0.75rem',
+                                                letterSpacing: 1,
+                                                mb: 1.5,
+                                            }}
+                                        >
+                                            {getTranslatedField(
+                                                col.items[0]?.label,
+                                                pageProps,
+                                                '',
+                                            ) ? '' : ''}
+                                        </Typography>
+                                    )}
+                                    {col.items.map((item) => (
+                                        <MuiLink
+                                            key={`${col.key}-${item.id}`}
+                                            component={
+                                                item.url.startsWith('http')
+                                                    ? 'a'
+                                                    : InertiaLink
+                                            }
+                                            href={item.url}
+                                            target={item.target}
+                                            rel={
+                                                item.target === '_blank'
+                                                    ? 'noopener noreferrer'
+                                                    : undefined
+                                            }
+                                            underline="hover"
+                                            display="block"
+                                            sx={{
+                                                color: 'rgba(255,255,255,0.7)',
+                                                fontSize: '0.875rem',
+                                                py: 0.4,
+                                                '&:hover': { color: '#C9A94E' },
+                                            }}
+                                        >
+                                            {getTranslatedField(
+                                                item.label,
+                                                { current_locale: currentLocale },
+                                            )}
+                                        </MuiLink>
+                                    ))}
+                                </Grid>
+                            ))}
+
+                        {/* Subscribe column */}
+                        <Grid item xs={12} sm={6} md={3}>
+                            <Typography
+                                variant="subtitle2"
+                                gutterBottom
+                                sx={{
+                                    color: '#C9A94E',
+                                    fontWeight: 600,
+                                    textTransform: 'uppercase',
+                                    fontSize: '0.75rem',
+                                    letterSpacing: 1,
+                                    mb: 1.5,
+                                }}
+                            >
                                 Subscribe
                             </Typography>
                             <Box
@@ -867,7 +897,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                 <TextField
                                     fullWidth
                                     size="small"
-                                    label="Email Address"
+                                    placeholder="Email Address"
                                     variant="outlined"
                                     type="email"
                                     value={subData.email}
@@ -875,7 +905,25 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                         setSubData("email", e.target.value)
                                     }
                                     required
-                                    sx={{ mb: 1 }}
+                                    sx={{
+                                        mb: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            color: '#fff',
+                                            '& fieldset': {
+                                                borderColor: 'rgba(255,255,255,0.3)',
+                                            },
+                                            '&:hover fieldset': {
+                                                borderColor: 'rgba(255,255,255,0.5)',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: '#C9A94E',
+                                            },
+                                        },
+                                        '& .MuiInputBase-input::placeholder': {
+                                            color: 'rgba(255,255,255,0.5)',
+                                            opacity: 1,
+                                        },
+                                    }}
                                     error={!!subErrors.email}
                                     helperText={subErrors.email}
                                     disabled={subProcessing}
@@ -883,8 +931,16 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                 <Button
                                     type="submit"
                                     variant="contained"
-                                    size="medium"
+                                    size="small"
                                     disabled={subProcessing}
+                                    sx={{
+                                        backgroundColor: '#C9A94E',
+                                        color: '#1E2A22',
+                                        fontWeight: 600,
+                                        '&:hover': {
+                                            backgroundColor: '#D4B96A',
+                                        },
+                                    }}
                                 >
                                     {subProcessing
                                         ? "Subscribing..."
@@ -893,11 +949,12 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             </Box>
                         </Grid>
                     </Grid>
-                    <Divider sx={{ my: 4 }} />
+
+                    <Divider sx={{ my: 3, borderColor: 'rgba(255,255,255,0.1)' }} />
                     <Typography
                         variant="body2"
-                        color="text.secondary"
                         align="center"
+                        sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem' }}
                     >
                         {getTranslatedField(
                             settings?.footer_copyright_text?.value,

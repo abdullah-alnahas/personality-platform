@@ -8,6 +8,7 @@ use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url as SitemapUrl;
 use App\Models\ContentItem;
 use App\Models\ContentCategory;
+use App\Models\Page;
 
 class GenerateSitemap extends Command
 {
@@ -20,23 +21,28 @@ class GenerateSitemap extends Command
 
         $sitemap = Sitemap::create();
 
-        // Add static pages
-        $sitemap->add(
-            SitemapUrl::create(route("home"))
-                ->setPriority(1.0)
-                ->setChangeFrequency(SitemapUrl::CHANGE_FREQUENCY_WEEKLY)
-        );
-        $sitemap->add(
-            SitemapUrl::create(route("about"))
-                ->setPriority(0.8)
-                ->setChangeFrequency(SitemapUrl::CHANGE_FREQUENCY_MONTHLY)
-        );
-        $sitemap->add(
-            SitemapUrl::create(route("contact.show"))
-                ->setPriority(0.5)
-                ->setChangeFrequency(SitemapUrl::CHANGE_FREQUENCY_YEARLY)
-        );
-        // Add other static public routes as needed
+        // Add static pages (guarded with Route::has)
+        if (Route::has('home')) {
+            $sitemap->add(
+                SitemapUrl::create(route("home"))
+                    ->setPriority(1.0)
+                    ->setChangeFrequency(SitemapUrl::CHANGE_FREQUENCY_WEEKLY)
+            );
+        }
+        if (Route::has('about')) {
+            $sitemap->add(
+                SitemapUrl::create(route("about"))
+                    ->setPriority(0.8)
+                    ->setChangeFrequency(SitemapUrl::CHANGE_FREQUENCY_MONTHLY)
+            );
+        }
+        if (Route::has('contact.show')) {
+            $sitemap->add(
+                SitemapUrl::create(route("contact.show"))
+                    ->setPriority(0.5)
+                    ->setChangeFrequency(SitemapUrl::CHANGE_FREQUENCY_YEARLY)
+            );
+        }
 
         // Add Content Categories
         ContentCategory::published()
@@ -102,6 +108,37 @@ class GenerateSitemap extends Command
                     } else {
                         $this->warn(
                             "Route 'content.show-item' not found. Skipping item ID {$item->id}."
+                        );
+                    }
+                }
+            });
+
+        // Add Published Pages
+        Page::published()
+            ->where('is_homepage', false)
+            ->get()
+            ->each(function (Page $page) use ($sitemap) {
+                if ($page->slug) {
+                    if (Route::has('page.show')) {
+                        try {
+                            $url = route('page.show', $page->slug);
+                            $sitemap->add(
+                                SitemapUrl::create($url)
+                                    ->setLastModificationDate($page->updated_at)
+                                    ->setChangeFrequency(
+                                        SitemapUrl::CHANGE_FREQUENCY_WEEKLY
+                                    )
+                                    ->setPriority(0.7)
+                            );
+                        } catch (\Exception $e) {
+                            $this->warn(
+                                "Could not generate URL for page ID {$page->id}: {$page->slug} - " .
+                                    $e->getMessage()
+                            );
+                        }
+                    } else {
+                        $this->warn(
+                            "Route 'page.show' not found. Skipping page ID {$page->id}."
                         );
                     }
                 }

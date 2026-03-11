@@ -9,11 +9,25 @@ class SocialAccountObserver
 {
     public function saved(SocialAccount $socialAccount): void
     {
-        Cache::forget("active_social_accounts");
+        $this->clearCaches();
     }
 
     public function deleted(SocialAccount $socialAccount): void
     {
+        $this->clearCaches();
+    }
+
+    protected function clearCaches(): void
+    {
         Cache::forget("active_social_accounts");
+
+        foreach ($this->getMaxItemsVariants() as $maxItems) {
+            Cache::forget("block_social_media_feed_{$maxItems}");
+        }
+    }
+
+    private function getMaxItemsVariants(): array
+    {
+        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20, 24, 25, 30, 50];
     }
 }

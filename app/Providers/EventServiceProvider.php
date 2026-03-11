@@ -22,6 +22,10 @@ use App\Models\ContentCategory;
 use App\Observers\ContentCategoryObserver;
 use App\Models\Quote;
 use App\Observers\QuoteObserver;
+use App\Models\Page;
+use App\Observers\PageObserver;
+use App\Models\PageBlock;
+use App\Observers\PageBlockObserver;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -39,8 +43,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // It's good practice to call parent::boot() if it exists, though not strictly necessary for the default ServiceProvider
-        // parent::boot();
+        parent::boot();
 
         Setting::observe(SettingObserver::class);
         HomepageSection::observe(HomepageSectionObserver::class);
@@ -49,6 +52,8 @@ class EventServiceProvider extends ServiceProvider
         ContentItem::observe(ContentItemObserver::class);
         ContentCategory::observe(ContentCategoryObserver::class);
         Quote::observe(QuoteObserver::class);
+        Page::observe(PageObserver::class);
+        PageBlock::observe(PageBlockObserver::class);
     }
 
     /**

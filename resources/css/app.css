@@ -1,0 +1,45 @@
+/* Google Fonts: Amiri (Naskh calligraphic), Tajawal (modern Arabic), Cairo (bilingual) */
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Tajawal:wght@300;400;500;700&family=Cairo:wght@300;400;500;600;700&display=swap');
+
+/* Islamic Design System — CSS Custom Properties */
+:root {
+    --islamic-dark-green: #2B3D2F;
+    --islamic-deep-green: #1E2A22;
+    --islamic-olive: #6B7B4C;
+    --islamic-olive-light: #8B9A6B;
+    --islamic-cream: #F5F0E8;
+    --islamic-cream-light: #FAF7F2;
+    --islamic-gold: #C9A94E;
+    --islamic-gold-light: #D4B96A;
+    --islamic-warm-white: #FEFCF8;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Uthmani Quran text styling */
+.quran-text {
+    font-family: 'Amiri', 'Traditional Arabic', 'Scheherazade New', serif;
+    direction: rtl;
+    text-align: center;
+    line-height: 2.2;
+    font-size: 1.8rem;
+}
+
+/* Decorative geometric pattern background utility */
+.islamic-pattern-bg {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A94E' fill-opacity='0.06'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* RTL adjustments */
+[dir="rtl"] .MuiListItemIcon-root {
+    min-width: auto;
+    margin-left: 12px;
+    margin-right: 0;
+}

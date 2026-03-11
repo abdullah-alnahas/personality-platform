@@ -18,30 +18,44 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\LanguageController;
+use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\PageBlockController;
+use App\Http\Controllers\PageDisplayController;
 
 // --- Public Routes ---
-Route::get("/", HomepageController::class)->name("home");
+// Cacheable public GET routes (full-page cache for guests + CSP headers)
+Route::middleware(['page.cache', 'csp'])->group(function () {
+    Route::get("/", [PageDisplayController::class, "homepage"])->name("home");
 
-Route::get("/item/{slug}", [ContentController::class, "showItem"])
-    ->where("slug", "[a-zA-Z0-9-]+")
-    ->name("content.show-item");
+    Route::get("/item/{slug}", [ContentController::class, "showItem"])
+        ->where("slug", "[a-zA-Z0-9-]+")
+        ->name("content.show-item");
 
-Route::get("/category/{slug}", [ContentController::class, "showCategory"])
-    ->where("slug", "[a-zA-Z0-9-]+")
-    ->name("content.show-category");
+    Route::get("/category/{slug}", [ContentController::class, "showCategory"])
+        ->where("slug", "[a-zA-Z0-9-]+")
+        ->name("content.show-category");
 
-Route::get("/about", AboutPageController::class)->name("about");
+    Route::get("/about", AboutPageController::class)->name("about");
 
-Route::get("/contact", [ContactPageController::class, "show"])->name(
-    "contact.show"
-);
-Route::post("/contact", [ContactPageController::class, "store"])->name(
-    "contact.store"
-);
+    Route::get("/contact", [ContactPageController::class, "show"])->name(
+        "contact.show"
+    );
 
-Route::post("/subscribe", SubscriptionController::class)->name("subscribe");
+    Route::get("/search", SearchController::class)->name("search");
 
-Route::get("/search", SearchController::class)->name("search");
+    // Dynamic pages (catch-all for page slugs - must be after all specific routes)
+    Route::get("/page/{slug}", [PageDisplayController::class, "show"])
+        ->where("slug", "[a-zA-Z0-9-]+")
+        ->name("page.show");
+});
+
+// Non-cacheable POST routes (still get CSP)
+Route::middleware(['csp'])->group(function () {
+    Route::post("/contact", [ContactPageController::class, "store"])->name(
+        "contact.store"
+    );
+    Route::post("/subscribe", SubscriptionController::class)->name("subscribe");
+});
 
 // Admin Routes
 Route::prefix("admin")
@@ -119,8 +133,26 @@ Route::prefix("admin")
                 ->middleware("can:manage media");
             // Languages CRUD (Requires 'manage languages' permission)
             Route::resource("languages", LanguageController::class)
-                ->except(["show"]) // 'show' action is often not needed for admin CRUD
+                ->except(["show"])
                 ->middleware("can:manage languages");
+
+            // Pages CRUD (Requires 'manage pages' permission)
+            Route::resource("pages", PageController::class)
+                ->except(["show"])
+                ->middleware("can:manage pages");
+
+            // Page Blocks (nested under pages)
+            Route::prefix("pages/{page}/blocks")
+                ->name("pages.blocks.")
+                ->middleware("can:manage pages")
+                ->group(function () {
+                    Route::get("create", [PageBlockController::class, "create"])->name("create");
+                    Route::post("/", [PageBlockController::class, "store"])->name("store");
+                    Route::get("{block}/edit", [PageBlockController::class, "edit"])->name("edit");
+                    Route::put("{block}", [PageBlockController::class, "update"])->name("update");
+                    Route::delete("{block}", [PageBlockController::class, "destroy"])->name("destroy");
+                    Route::post("reorder", [PageBlockController::class, "reorder"])->name("reorder");
+                });
         });
     });
 

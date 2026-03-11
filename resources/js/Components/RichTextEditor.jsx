@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import ReactQuill, { Quill } from "react-quill";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 // Optional: Add support for text direction to the default Quill formats
 // This allows the toolbar to have a direction button if needed,

@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             HomepageSectionSeeder::class,
             SettingsSeeder::class,
+            PrototypePageSeeder::class,
+            PrototypeAboutPageSeeder::class,
         ]);
     }
 }
