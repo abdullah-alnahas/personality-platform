@@ -23,12 +23,16 @@ class ContentSecurityPolicy
         /** @var Response $response */
         $response = $next($request);
 
+        $vite = app()->environment('local') ? 'http://127.0.0.1:5173 ws://127.0.0.1:5173' : '';
+        $fonts = 'https://fonts.googleapis.com https://fonts.gstatic.com https://fonts.bunny.net';
+
         $directives = [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline'",
-            "style-src 'self' 'unsafe-inline'",
+            "script-src 'self' 'unsafe-inline' {$vite}",
+            "style-src 'self' 'unsafe-inline' {$fonts}",
             "img-src 'self' data: https:",
-            "font-src 'self' https:",
+            "font-src 'self' {$fonts} https:",
+            "connect-src 'self' {$vite}",
         ];
 
         $response->headers->set(

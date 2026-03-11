@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             HomepageSectionSeeder::class,
             SettingsSeeder::class,
-            PrototypePageSeeder::class,
+            PrototypeHomepageSeeder::class,
             PrototypeAboutPageSeeder::class,
         ]);
     }
