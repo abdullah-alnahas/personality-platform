@@ -97,11 +97,14 @@ This creates all tables and seeds:
 - Roles and permissions
 - Site settings
 - Two prototype pages (Home + About) with sample blocks
+- Four content categories (الإسلام, الإيمان, الإحسان, علامات الساعة) with sample items
+- Quotes for the featured quote block
+- Social media accounts
 
 To seed only the prototype pages separately:
 
 ```bash
-php artisan db:seed --class=PrototypePageSeeder
+php artisan db:seed --class=PrototypeHomepageSeeder
 php artisan db:seed --class=PrototypeAboutPageSeeder
 ```
 
@@ -263,8 +266,8 @@ resources/js/
 
 database/
     seeders/
-        PrototypePageSeeder.php       # Homepage with 5 blocks
-        PrototypeAboutPageSeeder.php  # About page with 4 blocks
+        PrototypeHomepageSeeder.php    # Homepage with 13 blocks + categories, items, quotes, social accounts
+        PrototypeAboutPageSeeder.php   # About page with 4 blocks
 ```
 
 ---
