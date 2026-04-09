@@ -258,6 +258,8 @@ export default function PublicLayout({ children, title: pageTitle }) {
         pageProps,
         "Personality Platform",
     );
+    const logoUrl = getTranslatedField(settings?.logo_url?.value, pageProps, "");
+    const logoWidth = parseInt(getTranslatedField(settings?.logo_width?.value, pageProps, "120"), 10) || 120;
     const headerNavItems = navigationItems?.header ?? [];
     const footerCol1Items =
         navigationItems?.footer_col1?.filter((item) => !item.parent_id) ?? [];
@@ -370,9 +372,11 @@ export default function PublicLayout({ children, title: pageTitle }) {
                     mb: 2,
                 }}
             >
-                <Typography variant="h6" sx={{ my: 0 }}>
-                    {siteName}
-                </Typography>
+                {logoUrl ? (
+                    <Box component="img" src={logoUrl} alt={siteName} sx={{ height: 36, maxWidth: logoWidth, objectFit: "contain" }} />
+                ) : (
+                    <Typography variant="h6" sx={{ my: 0 }}>{siteName}</Typography>
+                )}
                 <IconButton onClick={handleDrawerToggle}>
                     <CloseIcon />
                 </IconButton>
@@ -559,8 +563,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography
-                            variant="h6"
+                        <Box
                             component={InertiaLink}
                             href={route("home")}
                             sx={{
@@ -571,10 +574,13 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                 alignItems: "center",
                             }}
                         >
-                            {siteName}
-                        </Typography>
-                        <Typography
-                            variant="h6"
+                            {logoUrl ? (
+                                <Box component="img" src={logoUrl} alt={siteName} sx={{ height: 40, width: logoWidth, objectFit: "contain" }} />
+                            ) : (
+                                <Typography variant="h6">{siteName}</Typography>
+                            )}
+                        </Box>
+                        <Box
                             component={InertiaLink}
                             href={route("home")}
                             sx={{
@@ -585,8 +591,12 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                 alignItems: "center",
                             }}
                         >
-                            {siteName}
-                        </Typography>
+                            {logoUrl ? (
+                                <Box component="img" src={logoUrl} alt={siteName} sx={{ height: 40, width: logoWidth, objectFit: "contain" }} />
+                            ) : (
+                                <Typography variant="h6">{siteName}</Typography>
+                            )}
+                        </Box>
                         <Box
                             sx={{
                                 flexGrow: 1,

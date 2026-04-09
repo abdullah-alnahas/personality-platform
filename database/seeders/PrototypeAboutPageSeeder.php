@@ -138,6 +138,66 @@ class PrototypeAboutPageSeeder extends Seeder
             ],
         ]);
 
+        // ─── Scholar Cards ("شيوخه وسنده") ───
+        PageBlock::create([
+            'page_id' => $page->id,
+            'block_type' => 'scholar_cards',
+            'display_order' => $order++,
+            'status' => 'published',
+            'content' => [
+                'heading' => [
+                    'en' => 'His Scholars and Chain of Transmission',
+                    'ar' => 'شيوخه وسنده',
+                    'tr' => 'Hocaları ve İlim Silsilesi',
+                ],
+                'description' => [
+                    'en' => '<p>Sheikh Awn received his knowledge from the most eminent scholars of his time, establishing an unbroken chain of transmission reaching back to the Prophet ﷺ.</p>',
+                    'ar' => '<p>تلقى الشيخ عون علمه على يد كبار علماء عصره، مما أسس سلسلة إسناد متواصلة تمتد حتى النبي صلى الله عليه وسلم.</p>',
+                    'tr' => '<p>Şeyh Avn, ilmini zamanının en büyük alimlerinden aldı ve Hz. Peygamber\'e kadar uzanan kesintisiz bir ilim silsilesi kurdu.</p>',
+                ],
+            ],
+            'config' => [
+                'background_color' => '#F5F0E8',
+                'text_color' => '#2B3D2F',
+                'full_width' => true,
+            ],
+        ]);
+
+        // ─── Logo Grid ("أعماله ونشاطاته") ───
+        PageBlock::create([
+            'page_id' => $page->id,
+            'block_type' => 'logo_grid',
+            'display_order' => $order++,
+            'status' => 'published',
+            'content' => [
+                'heading' => [
+                    'en' => 'His Works and Activities',
+                    'ar' => 'أعماله ونشاطاته',
+                    'tr' => 'Eserleri ve Faaliyetleri',
+                ],
+                'subtitle' => [
+                    'en' => 'Organizations, initiatives, and institutions founded or supported by Sheikh Awn',
+                    'ar' => 'المنظمات والمبادرات والمؤسسات التي أسسها أو دعمها الشيخ عون',
+                    'tr' => 'Şeyh Avn tarafından kurulan veya desteklenen kuruluşlar, girişimler ve kurumlar',
+                ],
+                'logos' => [
+                    ['name' => ['ar' => 'الأكاديمية الإسلامية', 'en' => 'Islamic Academy'], 'image_url' => '', 'link' => ''],
+                    ['name' => ['ar' => 'مركز تعليم القرآن', 'en' => 'Quran Teaching Center'], 'image_url' => '', 'link' => ''],
+                    ['name' => ['ar' => 'مؤسسة الرعاية الخيرية', 'en' => 'Charitable Foundation'], 'image_url' => '', 'link' => ''],
+                    ['name' => ['ar' => 'منصة تلقي', 'en' => 'Talaqqi Platform'], 'image_url' => '', 'link' => ''],
+                ],
+                'cta_text' => ['en' => 'Learn More', 'ar' => 'اعرف أكثر', 'tr' => 'Daha Fazla'],
+                'cta_link' => '',
+            ],
+            'config' => [
+                'background_color' => '#1E2A22',
+                'text_color' => '#ffffff',
+                'grayscale' => false,
+                'columns' => 4,
+                'full_width' => true,
+            ],
+        ]);
+
         // ─── Newsletter CTA ───
         PageBlock::create([
             'page_id' => $page->id,

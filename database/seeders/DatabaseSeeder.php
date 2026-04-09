@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             PrototypeHomepageSeeder::class,
             PrototypeAboutPageSeeder::class,
+            PrototypeIslamCategorySeeder::class,
         ]);
     }
 }

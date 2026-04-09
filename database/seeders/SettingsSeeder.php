@@ -101,6 +101,19 @@ class SettingsSeeder extends Seeder
                 "type" => "textarea", // translatable textarea
                 "group" => "seo",
             ],
+            // Branding Group
+            [
+                "key" => "logo_url",
+                "value" => ["en" => ""],
+                "type" => "text",
+                "group" => "branding",
+            ],
+            [
+                "key" => "logo_width",
+                "value" => ["en" => "120"],
+                "type" => "number",
+                "group" => "branding",
+            ],
             [
                 "key" => "footer_copyright_text",
                 "value" => [
