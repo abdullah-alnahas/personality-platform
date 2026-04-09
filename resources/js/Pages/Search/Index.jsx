@@ -58,7 +58,7 @@ export default function Index({ query, items }) {
                                 disabled={!link.url || link.active}
                                 size="small"
                                 variant={link.active ? "contained" : "outlined"}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
+                                children={link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')}
                                 preserveScroll
                                 preserveState
                             />
