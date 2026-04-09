@@ -39,6 +39,7 @@ export default function Form({ scholar }) {
             (acc, l) => ({ ...acc, [l]: scholar?.bio?.[l] ?? "" }),
             {}
         ),
+        photo_url: scholar?.photo_url ?? "",
         display_order: scholar?.display_order ?? 0,
         status: scholar?.status ?? "published",
         _method: isEditing ? "PUT" : "POST",
@@ -152,6 +153,18 @@ export default function Form({ scholar }) {
                                     </FormHelperText>
                                 )}
                             </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                size="small"
+                                label="Photo URL (optional)"
+                                value={data.photo_url}
+                                onChange={(e) => setData("photo_url", e.target.value)}
+                                helperText="Link to scholar's portrait image"
+                                error={!!errors.photo_url}
+                            />
                         </Grid>
 
                         <Grid item xs={12}>

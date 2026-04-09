@@ -25,4 +25,9 @@ class SocialAccount extends Model
      protected $casts = [
         'account_name' => 'array', // Cast for easier access if needed
     ];
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
 }

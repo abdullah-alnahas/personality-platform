@@ -57,6 +57,7 @@ class ScholarController extends Controller
             'group_key'     => 'required|string|max:100',
             'bio'           => 'nullable|array',
             'bio.*'         => 'nullable|string',
+            'photo_url'     => 'nullable|url|max:2048',
             'display_order' => 'integer|min:0',
             'status'        => 'required|in:published,draft',
         ]);
@@ -78,6 +79,7 @@ class ScholarController extends Controller
                 'group_name'    => $scholar->getTranslations('group_name'),
                 'group_key'     => $scholar->group_key,
                 'bio'           => $scholar->getTranslations('bio'),
+                'photo_url'     => $scholar->photo_url,
                 'display_order' => $scholar->display_order,
                 'status'        => $scholar->status,
             ],
@@ -96,6 +98,7 @@ class ScholarController extends Controller
             'group_key'     => 'required|string|max:100',
             'bio'           => 'nullable|array',
             'bio.*'         => 'nullable|string',
+            'photo_url'     => 'nullable|url|max:2048',
             'display_order' => 'integer|min:0',
             'status'        => 'required|in:published,draft',
         ]);

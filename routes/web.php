@@ -7,7 +7,6 @@ use Inertia\Inertia;
 use App\Http\Controllers\Admin\ContentCategoryController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ContentItemController;
-use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\Admin\NavigationItemController;
 use App\Http\Controllers\Admin\SocialAccountController;
@@ -85,11 +84,9 @@ Route::prefix("admin")
             ])->name("logout");
 
             // Dashboard (Requires 'view admin' permission - apply middleware)
-            Route::get("/dashboard", function () {
-                return Inertia::render("Admin/Dashboard");
-            })
+            Route::get("/dashboard", [DashboardController::class, "index"])
                 ->middleware("can:view admin")
-                ->name("dashboard"); // Added permission
+                ->name("dashboard");
 
             // Settings (Requires 'manage settings' permission)
             Route::get("settings", [SettingController::class, "edit"])

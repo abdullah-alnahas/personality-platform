@@ -157,7 +157,7 @@ const BooksGrid = ({ block }) => {
                                                     },
                                                 }}
                                             >
-                                                قراءة
+                                                {currentLocale === 'ar' ? 'قراءة' : currentLocale === 'tr' ? 'Oku' : 'Read'}
                                             </Button>
                                         </CardActions>
                                     )}

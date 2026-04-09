@@ -135,7 +135,7 @@ class BlockDataResolver
         $maxItems = $content['max_items'] ?? 6;
 
         $block['resolved_data'] = Cache::remember("block_social_media_feed_{$maxItems}", 3600, function () use ($maxItems) {
-            return SocialAccount::where('status', 'active')
+            return SocialAccount::active()
                 ->orderBy('display_order')
                 ->take($maxItems)
                 ->get(['id', 'platform', 'url', 'account_name'])
@@ -185,6 +185,7 @@ class BlockDataResolver
                     'group_name' => $s->getTranslations('group_name'),
                     'group_key'  => $s->group_key,
                     'bio'        => $s->getTranslations('bio'),
+                    'photo_url'  => $s->photo_url,
                 ])
                 ->all();
 

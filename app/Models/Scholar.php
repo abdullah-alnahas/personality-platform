@@ -15,6 +15,7 @@ class Scholar extends Model
         'group_name',
         'group_key',
         'bio',
+        'photo_url',
         'display_order',
         'status',
     ];
