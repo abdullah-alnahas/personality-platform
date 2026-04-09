@@ -25,5 +25,10 @@ class PageObserver
             Cache::forget('homepage_data');
             Cache::forget('homepage_sections_data_v2');
         }
+
+        if ($page->slug === 'about') {
+            Cache::forget('about_page_builder');
+            Cache::forget("about_page_blocks_{$page->id}");
+        }
     }
 }

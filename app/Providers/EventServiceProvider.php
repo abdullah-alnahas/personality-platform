@@ -26,6 +26,8 @@ use App\Models\Book;
 use App\Observers\BookObserver;
 use App\Models\Scholar;
 use App\Observers\ScholarObserver;
+use App\Models\Language;
+use App\Observers\LanguageObserver;
 use App\Models\Page;
 use App\Observers\PageObserver;
 use App\Models\PageBlock;
@@ -58,6 +60,7 @@ class EventServiceProvider extends ServiceProvider
         Quote::observe(QuoteObserver::class);
         Book::observe(BookObserver::class);
         Scholar::observe(ScholarObserver::class);
+        Language::observe(LanguageObserver::class);
         Page::observe(PageObserver::class);
         PageBlock::observe(PageBlockObserver::class);
     }

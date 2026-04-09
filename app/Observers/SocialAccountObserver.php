@@ -20,6 +20,7 @@ class SocialAccountObserver
     protected function clearCaches(): void
     {
         Cache::forget("active_social_accounts");
+        Cache::forget("active_social_accounts_shared");
 
         foreach ($this->getMaxItemsVariants() as $maxItems) {
             Cache::forget("block_social_media_feed_{$maxItems}");

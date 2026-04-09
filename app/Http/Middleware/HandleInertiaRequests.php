@@ -81,7 +81,7 @@ class HandleInertiaRequests extends Middleware
                 "active_social_accounts_shared",
                 3600,
                 function () {
-                    return SocialAccount::where("status", "active")
+                    return SocialAccount::active()
                         ->orderBy("display_order")
                         ->get(["id", "platform", "url", "account_name"]);
                 }

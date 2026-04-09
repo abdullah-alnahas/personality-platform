@@ -12,11 +12,13 @@ class ContentCategoryObserver
         Cache::forget("homepage_sections_data"); // Re-cache homepage sections
         // Also clear navigation if categories are linked in nav, or category listing caches
         Cache::forget("published_navigation_items_structured");
+        Cache::forget("published_navigation_items_structured_shared");
     }
 
     public function deleted(ContentCategory $contentCategory): void
     {
         Cache::forget("homepage_sections_data");
         Cache::forget("published_navigation_items_structured");
+        Cache::forget("published_navigation_items_structured_shared");
     }
 }
