@@ -51,7 +51,8 @@ class StoreContentCategoryRequest extends FormRequest
             'icon' => ['nullable', 'string', 'max:100'],
             // 'image' => ['nullable', 'image', 'max:2048'], // Add later with MediaLibrary handling
             'order' => ['nullable', 'integer', 'min:0'],
-            'status' => ['required', 'string', Rule::in(['published', 'draft'])],
+            'status'  => ['required', 'string', Rule::in(['published', 'draft'])],
+            'page_id' => ['nullable', 'integer', 'exists:pages,id'],
         ];
     }
 

@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Book;
 use App\Models\ContentCategory;
 use App\Models\ContentItem;
 use App\Models\Quote;
+use App\Models\Scholar;
 use App\Models\SocialAccount;
 use Illuminate\Support\Facades\Cache;
 
@@ -16,10 +18,12 @@ class BlockDataResolver
         $content = $block['content'] ?? [];
 
         return match ($type) {
-            'category_grid' => $this->resolveCategoryGrid($block, $content),
-            'latest_news' => $this->resolveLatestNews($block, $content),
-            'featured_quote' => $this->resolveFeaturedQuote($block, $content),
+            'category_grid'    => $this->resolveCategoryGrid($block, $content),
+            'latest_news'      => $this->resolveLatestNews($block, $content),
+            'featured_quote'   => $this->resolveFeaturedQuote($block, $content),
             'social_media_feed' => $this->resolveSocialMediaFeed($block, $content),
+            'books_grid'       => $this->resolveBooksGrid($block, $content),
+            'scholar_cards'    => $this->resolveScholarCards($block, $content),
             default => $block,
         };
     }
@@ -136,6 +140,69 @@ class BlockDataResolver
                 ->take($maxItems)
                 ->get(['id', 'platform', 'url', 'account_name'])
                 ->toArray();
+        });
+
+        return $block;
+    }
+
+    protected function resolveBooksGrid(array $block, array $content): array
+    {
+        $maxItems = $content['max_items'] ?? 8;
+        $cacheKey = "block_books_grid_{$maxItems}";
+
+        $block['resolved_data'] = Cache::remember($cacheKey, 3600, function () use ($maxItems) {
+            return Book::published()
+                ->orderBy('display_order')
+                ->orderBy('id')
+                ->take($maxItems)
+                ->get()
+                ->map(fn(Book $book) => [
+                    'id'              => $book->id,
+                    'title'           => $book->getTranslations('title'),
+                    'subtitle'        => $book->getTranslations('subtitle'),
+                    'description'     => $book->getTranslations('description'),
+                    'cover_image_url' => $book->cover_image_url,
+                    'buy_link'        => $book->buy_link,
+                    'category'        => $book->category,
+                    'is_featured'     => $book->is_featured,
+                ])
+                ->all();
+        });
+
+        return $block;
+    }
+
+    protected function resolveScholarCards(array $block, array $content): array
+    {
+        $block['resolved_data'] = Cache::remember('block_scholar_cards', 3600, function () {
+            $scholars = Scholar::published()
+                ->orderBy('group_key')
+                ->orderBy('display_order')
+                ->get()
+                ->map(fn(Scholar $s) => [
+                    'id'         => $s->id,
+                    'name'       => $s->getTranslations('name'),
+                    'group_name' => $s->getTranslations('group_name'),
+                    'group_key'  => $s->group_key,
+                    'bio'        => $s->getTranslations('bio'),
+                ])
+                ->all();
+
+            // Group by group_key, preserving translatable group_name
+            $groups = [];
+            foreach ($scholars as $scholar) {
+                $key = $scholar['group_key'];
+                if (!isset($groups[$key])) {
+                    $groups[$key] = [
+                        'group_key'  => $key,
+                        'group_name' => $scholar['group_name'],
+                        'scholars'   => [],
+                    ];
+                }
+                $groups[$key]['scholars'][] = $scholar;
+            }
+
+            return array_values($groups);
         });
 
         return $block;

@@ -32,6 +32,8 @@ import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import LanguageIcon from "@mui/icons-material/Language";
 import WebIcon from "@mui/icons-material/Web";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import SchoolIcon from "@mui/icons-material/School";
 import { useLocale } from "@/Hooks/useLocale"; // Import the hook
 
 const drawerWidth = 240;
@@ -150,6 +152,30 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                             <FormatQuoteIcon />
                         </ListItemIcon>
                         <ListItemText primary="Quotes" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        component={InertiaLink}
+                        href={route("admin.books.index")}
+                        selected={route().current("admin.books.*")}
+                    >
+                        <ListItemIcon>
+                            <MenuBookIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Books" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        component={InertiaLink}
+                        href={route("admin.scholars.index")}
+                        selected={route().current("admin.scholars.*")}
+                    >
+                        <ListItemIcon>
+                            <SchoolIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Scholars" />
                     </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>

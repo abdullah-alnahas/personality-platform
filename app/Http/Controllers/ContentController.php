@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\ContentCategory;
 use App\Models\ContentItem;
+use App\Services\BlockDataResolver;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\App; // For app()->getLocale()
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 
 class ContentController extends Controller
 {
@@ -182,7 +184,35 @@ class ContentController extends Controller
         try {
             $category = ContentCategory::published()
                 ->where("slug", $slug)
+                ->with('page.blocks')
                 ->firstOrFail();
+
+            // If the category has a linked page-builder page, render that instead
+            if ($category->page && $category->page->status === 'published') {
+                $resolver = new BlockDataResolver();
+                $blocks = $category->page->blocks()
+                    ->where('status', 'published')
+                    ->orderBy('display_order')
+                    ->get()
+                    ->map(fn($block) => $resolver->resolve([
+                        'id'            => $block->id,
+                        'block_type'    => $block->block_type,
+                        'content'       => $block->content,
+                        'config'        => $block->config,
+                        'display_order' => $block->display_order,
+                        'status'        => $block->status,
+                    ]))
+                    ->all();
+
+                return Inertia::render('PageDisplay', [
+                    'page'   => [
+                        'id'    => $category->page->id,
+                        'title' => $category->page->getTranslations('title'),
+                        'slug'  => $category->page->slug,
+                    ],
+                    'blocks' => $blocks,
+                ]);
+            }
 
             $itemsPaginator = ContentItem::published()
                 ->where("content_category_id", $category->id)

@@ -195,6 +195,52 @@ class BlockRegistry
                 'background_color' => 'transparent',
             ],
         ],
+        'stats_counter' => [
+            'label' => 'Stats Counter',
+            'icon' => 'bar_chart',
+            'fields' => [
+                'heading'  => ['type' => 'translatable_text', 'required' => true],
+                'subtitle' => ['type' => 'translatable_text'],
+                'stats'    => ['type' => 'stat_list', 'required' => true],
+            ],
+            'config_defaults' => [
+                'background_color' => '#2B3D2F',
+                'text_color'       => '#ffffff',
+                'accent_color'     => '#C9A94E',
+                'columns'          => 3,
+                'padding_y'        => 'lg',
+            ],
+        ],
+        'books_grid' => [
+            'label' => 'Books / Publications',
+            'icon' => 'menu_book',
+            'fields' => [
+                'heading'   => ['type' => 'translatable_text', 'required' => true],
+                'subtitle'  => ['type' => 'translatable_text'],
+                'max_items' => ['type' => 'number', 'default' => 8],
+            ],
+            'config_defaults' => [
+                'background_color' => '#1E2A22',
+                'text_color'       => '#ffffff',
+                'columns'          => 4,
+                'show_description' => false,
+                'padding_y'        => 'xl',
+            ],
+        ],
+        'scholar_cards' => [
+            'label' => 'Scholar / Teacher Cards',
+            'icon' => 'school',
+            'fields' => [
+                'heading'     => ['type' => 'translatable_text', 'required' => true],
+                'description' => ['type' => 'translatable_richtext'],
+            ],
+            'config_defaults' => [
+                'background_color' => '#F5F0E8',
+                'text_color'       => '#2B3D2F',
+                'accent_color'     => '#2B3D2F',
+                'padding_y'        => 'xl',
+            ],
+        ],
     ];
 
     public static function all(): array
@@ -234,7 +280,7 @@ class BlockRegistry
                 $defaults[$field] = $meta['default'];
             } elseif ($meta['type'] === 'translatable_text' || $meta['type'] === 'translatable_richtext') {
                 $defaults[$field] = [];
-            } elseif ($meta['type'] === 'translatable_list' || $meta['type'] === 'card_list') {
+            } elseif (in_array($meta['type'], ['translatable_list', 'card_list', 'stat_list'])) {
                 $defaults[$field] = [];
             } elseif ($meta['type'] === 'boolean') {
                 $defaults[$field] = $meta['default'] ?? false;
@@ -290,6 +336,7 @@ class BlockRegistry
                     $rules[$prefix] = 'nullable|array';
                     break;
                 case 'card_list':
+                case 'stat_list':
                     $rules[$prefix] = ($isRequired ? 'required' : 'nullable') . '|array';
                     break;
             }

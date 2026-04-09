@@ -33,6 +33,8 @@ class RolesAndPermissionsSeeder extends Seeder
             "manage roles",
             "manage quotes",
             "manage pages",
+            "manage books",
+            "manage scholars",
         ];
 
         foreach ($permissions as $permissionName) {
@@ -49,6 +51,8 @@ class RolesAndPermissionsSeeder extends Seeder
             "manage media",
             "manage quotes",
             "manage pages",
+            "manage books",
+            "manage scholars",
         ];
 
         $editorRole = Role::findOrCreate("Editor", "web");

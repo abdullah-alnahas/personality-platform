@@ -25,6 +25,7 @@ class ContentCategory extends Model
         "order",
         "status",
         "meta_fields",
+        "page_id",
     ];
 
     public array $translatable = [
@@ -52,6 +53,11 @@ class ContentCategory extends Model
     public function items()
     {
         return $this->hasMany(ContentItem::class);
+    }
+
+    public function page()
+    {
+        return $this->belongsTo(Page::class);
     }
 
     public function scopePublished($query)

@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Book;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class BookController extends Controller
+{
+    public function index(Request $request): Response
+    {
+        $books = Book::orderBy('display_order')->orderBy('id')
+            ->paginate(20)
+            ->withQueryString()
+            ->through(fn(Book $book) => [
+                'id'              => $book->id,
+                'title'           => $book->getTranslations('title'),
+                'subtitle'        => $book->getTranslations('subtitle'),
+                'cover_image_url' => $book->cover_image_url,
+                'category'        => $book->category,
+                'is_featured'     => $book->is_featured,
+                'status'          => $book->status,
+                'display_order'   => $book->display_order,
+            ]);
+
+        return Inertia::render('Admin/Books/Index', [
+            'books' => $books,
+            'can'   => [
+                'create' => $request->user()->can('manage books'),
+                'edit'   => $request->user()->can('manage books'),
+                'delete' => $request->user()->can('manage books'),
+            ],
+        ]);
+    }
+
+    public function create(): Response
+    {
+        return Inertia::render('Admin/Books/Form', [
+            'book' => null,
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title'           => 'required|array',
+            'title.*'         => 'nullable|string|max:500',
+            'subtitle'        => 'nullable|array',
+            'subtitle.*'      => 'nullable|string|max:500',
+            'description'     => 'nullable|array',
+            'description.*'   => 'nullable|string',
+            'cover_image_url' => 'nullable|string|max:2048',
+            'buy_link'        => 'nullable|string|max:2048',
+            'category'        => 'nullable|string|max:255',
+            'display_order'   => 'integer|min:0',
+            'is_featured'     => 'boolean',
+            'status'          => 'required|in:published,draft',
+        ]);
+
+        Book::create($validated);
+
+        return redirect()->route('admin.books.index')
+            ->with('success', 'Book created successfully.');
+    }
+
+    public function edit(Book $book): Response
+    {
+        return Inertia::render('Admin/Books/Form', [
+            'book' => [
+                'id'              => $book->id,
+                'title'           => $book->getTranslations('title'),
+                'subtitle'        => $book->getTranslations('subtitle'),
+                'description'     => $book->getTranslations('description'),
+                'cover_image_url' => $book->cover_image_url,
+                'buy_link'        => $book->buy_link,
+                'category'        => $book->category,
+                'display_order'   => $book->display_order,
+                'is_featured'     => $book->is_featured,
+                'status'          => $book->status,
+            ],
+        ]);
+    }
+
+    public function update(Request $request, Book $book): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title'           => 'required|array',
+            'title.*'         => 'nullable|string|max:500',
+            'subtitle'        => 'nullable|array',
+            'subtitle.*'      => 'nullable|string|max:500',
+            'description'     => 'nullable|array',
+            'description.*'   => 'nullable|string',
+            'cover_image_url' => 'nullable|string|max:2048',
+            'buy_link'        => 'nullable|string|max:2048',
+            'category'        => 'nullable|string|max:255',
+            'display_order'   => 'integer|min:0',
+            'is_featured'     => 'boolean',
+            'status'          => 'required|in:published,draft',
+        ]);
+
+        $book->update($validated);
+
+        return redirect()->route('admin.books.index')
+            ->with('success', 'Book updated successfully.');
+    }
+
+    public function destroy(Book $book): RedirectResponse
+    {
+        $book->delete();
+
+        return redirect()->route('admin.books.index')
+            ->with('success', 'Book deleted.');
+    }
+}

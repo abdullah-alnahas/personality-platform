@@ -12,6 +12,9 @@ import NewsletterCta from "@/Components/Blocks/NewsletterCta";
 import RichTextBlock from "@/Components/Blocks/RichTextBlock";
 import Spacer from "@/Components/Blocks/Spacer";
 import LogoGrid from "@/Components/Blocks/LogoGrid";
+import StatsCounter from "@/Components/Blocks/StatsCounter";
+import BooksGrid from "@/Components/Blocks/BooksGrid";
+import ScholarCards from "@/Components/Blocks/ScholarCards";
 
 const blockComponents = {
     hero_banner: HeroBanner,
@@ -26,6 +29,9 @@ const blockComponents = {
     rich_text: RichTextBlock,
     spacer: Spacer,
     logo_grid: LogoGrid,
+    stats_counter: StatsCounter,
+    books_grid: BooksGrid,
+    scholar_cards: ScholarCards,
 };
 
 export default function BlockRenderer({ block }) {
@@ -54,7 +60,10 @@ export default function BlockRenderer({ block }) {
         block.block_type === "quran_verse" ||
         block.block_type === "newsletter_cta" ||
         block.block_type === "featured_quote" ||
-        block.block_type === "logo_grid";
+        block.block_type === "logo_grid" ||
+        block.block_type === "stats_counter" ||
+        block.block_type === "books_grid" ||
+        block.block_type === "scholar_cards";
 
     return (
         <Box

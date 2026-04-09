@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreContentCategoryRequest;
 use App\Http\Requests\Admin\UpdateContentCategoryRequest;
 use App\Models\ContentCategory;
+use App\Models\Page;
 use Illuminate\Http\RedirectResponse;
-// use Illuminate\Support\Facades\Gate; // Or use Policy authorization
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,13 +38,15 @@ class ContentCategoryController extends Controller
      */
     public function create(): Response
     {
-        // Add authorization check
-        // Gate::authorize('create', ContentCategory::class);
+        $pages = Page::orderBy('title')->get(['id', 'title', 'slug']);
 
-        // Pass any data needed for the form (e.g., active languages)
         return Inertia::render('Admin/ContentCategories/Form', [
-             'category' => null, // Indicate creating new
-             // 'languages' => Language::where('is_active', true)->get(['code', 'native_name']), // Example
+            'category' => null,
+            'pages'    => $pages->map(fn($p) => [
+                'id'    => $p->id,
+                'title' => $p->getTranslations('title'),
+                'slug'  => $p->slug,
+            ]),
         ]);
     }
 
@@ -72,15 +74,17 @@ class ContentCategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ContentCategory $content_category): Response // Use snake_case parameter consistent with resource route
+    public function edit(ContentCategory $content_category): Response
     {
-         // Add authorization check
-        // Gate::authorize('update', $content_category);
+        $pages = Page::orderBy('title')->get(['id', 'title', 'slug']);
 
-        // Pass the category data to the form
         return Inertia::render('Admin/ContentCategories/Form', [
-            'category' => $content_category, // Pass existing category data
-             // 'languages' => Language::where('is_active', true)->get(['code', 'native_name']), // Example
+            'category' => $content_category,
+            'pages'    => $pages->map(fn($p) => [
+                'id'    => $p->id,
+                'title' => $p->getTranslations('title'),
+                'slug'  => $p->slug,
+            ]),
         ]);
     }
 

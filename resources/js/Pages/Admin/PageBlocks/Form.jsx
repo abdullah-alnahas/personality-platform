@@ -70,6 +70,19 @@ const BLOCK_PRESETS = {
         { label: 'Dark Elegance', config: { background_color: '#1a1a2e', text_color: '#ffffff' } },
         { label: 'Islamic Green', config: { background_color: '#1E2A22', text_color: '#ffffff' } },
     ],
+    stats_counter: [
+        { label: 'Islamic Green', config: { background_color: '#2B3D2F', text_color: '#ffffff', accent_color: '#C9A94E', columns: 3 } },
+        { label: 'Deep Dark', config: { background_color: '#1E2A22', text_color: '#ffffff', accent_color: '#C9A94E', columns: 3 } },
+        { label: 'Cream Light', config: { background_color: '#F5F0E8', text_color: '#2B3D2F', accent_color: '#2B3D2F', columns: 3 } },
+    ],
+    books_grid: [
+        { label: 'Dark Islamic', config: { background_color: '#1E2A22', text_color: '#ffffff', columns: 4 } },
+        { label: 'Deep Navy', config: { background_color: '#1a1a2e', text_color: '#ffffff', columns: 4 } },
+    ],
+    scholar_cards: [
+        { label: 'Cream Background', config: { background_color: '#F5F0E8', text_color: '#2B3D2F', accent_color: '#2B3D2F' } },
+        { label: 'Dark Green', config: { background_color: '#2B3D2F', text_color: '#ffffff', accent_color: '#C9A94E' } },
+    ],
 };
 
 /** Logo item default (simpler than full card) */
@@ -771,6 +784,77 @@ export default function Form({
                             {cards.length === 0 && (
                                 <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
                                     No cards added. Click "Add Card" to begin.
+                                </Typography>
+                            )}
+                        </Box>
+                    </Grid>
+                );
+            }
+
+            case 'stat_list': {
+                const stats = data.content[fieldKey] || [];
+                const makeStatDefault = () => ({
+                    value: '',
+                    suffix: activeLanguages.reduce((acc, l) => ({ ...acc, [l]: '' }), {}),
+                    label: activeLanguages.reduce((acc, l) => ({ ...acc, [l]: '' }), {}),
+                });
+                const addStat = () => handleContentChange(fieldKey, [...stats, makeStatDefault()]);
+                const removeStat = (i) => {
+                    const next = [...stats];
+                    next.splice(i, 1);
+                    handleContentChange(fieldKey, next);
+                };
+                const updateStat = (i, field, lang, val) => {
+                    const next = stats.map((s, idx) => {
+                        if (idx !== i) return s;
+                        if (field === 'value') return { ...s, value: lang };
+                        return { ...s, [field]: { ...(s[field] || {}), [lang]: val } };
+                    });
+                    handleContentChange(fieldKey, next);
+                };
+                return (
+                    <Grid item xs={12} key={fieldKey}>
+                        <Box sx={{ mb: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                <Typography variant="subtitle2">{label}</Typography>
+                                <Button size="small" startIcon={<AddIcon />} onClick={addStat}>Add Stat</Button>
+                            </Box>
+                            {stats.map((stat, i) => (
+                                <Paper key={i} variant="outlined" sx={{ p: 2, mb: 1.5 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                        <Typography variant="caption">Stat {i + 1}</Typography>
+                                        <IconButton size="small" color="error" onClick={() => removeStat(i)}>
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} sm={3}>
+                                            <TextField
+                                                fullWidth
+                                                size="small"
+                                                label="Value (number)"
+                                                value={stat.value ?? ''}
+                                                onChange={(e) => updateStat(i, 'value', e.target.value)}
+                                                helperText='e.g. "140" or "70 ألف"'
+                                            />
+                                        </Grid>
+                                        {activeLanguages.map((lang) => (
+                                            <Grid item xs={12} sm={3} key={`stat-${i}-label-${lang}`}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label={`Label (${lang.toUpperCase()})`}
+                                                    value={stat.label?.[lang] ?? ''}
+                                                    onChange={(e) => updateStat(i, 'label', lang, e.target.value)}
+                                                />
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </Paper>
+                            ))}
+                            {stats.length === 0 && (
+                                <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
+                                    No stats added. Click "Add Stat" to begin.
                                 </Typography>
                             )}
                         </Box>

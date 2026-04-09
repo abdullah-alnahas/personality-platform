@@ -24,19 +24,18 @@ const activeLanguages = [
     { code: 'tr', name: 'Turkish' }
 ];
 
-export default function Form({ category /* , languages */ }) { // Destructure category prop
-    const isEditing = !!category; // Check if we are editing (category object exists)
+export default function Form({ category, pages = [] }) {
+    const isEditing = !!category;
 
-    // Initialize form data using useForm hook
     const { data, setData, post, put, processing, errors, reset } = useForm({
         name: activeLanguages.reduce((acc, lang) => ({ ...acc, [lang.code]: category?.name?.[lang.code] ?? '' }), {}),
         description: activeLanguages.reduce((acc, lang) => ({ ...acc, [lang.code]: category?.description?.[lang.code] ?? '' }), {}),
         quote: activeLanguages.reduce((acc, lang) => ({ ...acc, [lang.code]: category?.quote?.[lang.code] ?? '' }), {}),
-        // meta_fields: category?.meta_fields ?? {}, // Add later if needed
         icon: category?.icon ?? '',
         order: category?.order ?? 0,
-        status: category?.status ?? 'published', // Default status
-        _method: isEditing ? 'PUT' : 'POST', // Method spoofing for PUT
+        status: category?.status ?? 'published',
+        page_id: category?.page_id ?? '',
+        _method: isEditing ? 'PUT' : 'POST',
     });
 
     const handleSubmit = (e) => {
@@ -179,6 +178,31 @@ export default function Form({ category /* , languages */ }) { // Destructure ca
                             </FormControl>
                          </Grid>
 
+                        {/* Linked Page (for rich category pages via page builder) */}
+                        <Grid xs={12}>
+                            <Divider>Rich Category Page (optional)</Divider>
+                        </Grid>
+                        <Grid xs={12} sm={8}>
+                            <FormControl fullWidth>
+                                <InputLabel id="page-label">Link to Page Builder Page</InputLabel>
+                                <Select
+                                    labelId="page-label"
+                                    value={data.page_id}
+                                    label="Link to Page Builder Page"
+                                    onChange={(e) => setData('page_id', e.target.value || '')}
+                                >
+                                    <MenuItem value="">— None (use default listing) —</MenuItem>
+                                    {pages.map(p => (
+                                        <MenuItem key={p.id} value={p.id}>
+                                            {p.title?.ar || p.title?.en || p.slug} ({p.slug})
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                                <FormHelperText>
+                                    When set, /category/{'{slug}'} will render this page-builder page instead of the item listing.
+                                </FormHelperText>
+                            </FormControl>
+                        </Grid>
 
                         {/* Action Buttons */}
                         <Grid xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>

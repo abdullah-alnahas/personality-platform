@@ -18,8 +18,10 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\LanguageController;
+use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PageBlockController;
+use App\Http\Controllers\Admin\ScholarController;
 use App\Http\Controllers\PageDisplayController;
 
 // --- Public Routes ---
@@ -135,6 +137,16 @@ Route::prefix("admin")
             Route::resource("languages", LanguageController::class)
                 ->except(["show"])
                 ->middleware("can:manage languages");
+
+            // Books / Publications (Requires 'manage books' permission)
+            Route::resource("books", BookController::class)
+                ->except(["show"])
+                ->middleware("can:manage books");
+
+            // Scholars / Teachers (Requires 'manage scholars' permission)
+            Route::resource("scholars", ScholarController::class)
+                ->except(["show"])
+                ->middleware("can:manage scholars");
 
             // Pages CRUD (Requires 'manage pages' permission)
             Route::resource("pages", PageController::class)

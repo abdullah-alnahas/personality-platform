@@ -51,7 +51,8 @@ class UpdateContentCategoryRequest extends FormRequest
 
             'icon' => ['nullable', 'string', 'max:100'],
             'order' => ['nullable', 'integer', 'min:0'],
-            'status' => ['sometimes','required', 'string', Rule::in(['published', 'draft'])],
+            'status'  => ['sometimes', 'required', 'string', Rule::in(['published', 'draft'])],
+            'page_id' => ['nullable', 'integer', 'exists:pages,id'],
         ];
         // Note: Slug validation is usually handled automatically by spatie/laravel-sluggable
         // based on its configuration (e.g., doNotGenerateSlugsOnUpdate).
