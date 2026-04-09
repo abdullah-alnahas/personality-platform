@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import { Box, Typography } from "@mui/material";
 
@@ -67,15 +67,17 @@ const RichTextEditor = ({
 }) => {
     const quillRef = useRef(null);
 
-    useEffect(() => {
-        if (quillRef.current) {
-            const editor = quillRef.current.getEditor();
-            // You can directly manipulate the editor instance here if needed,
-            // for example, to set focus or programmatically change content.
-            // For direction, Quill often respects the direction of the containing element
-            // or the input method.
-        }
-    }, [direction]);
+    // Only propagate changes triggered by the user, not programmatic value-prop updates.
+    // ReactQuill fires onChange on init/value-prop changes with source='api',
+    // which causes an infinite setState loop when used in controlled forms.
+    const handleChange = useCallback(
+        (content, _delta, source) => {
+            if (source === 'user') {
+                onChange(content);
+            }
+        },
+        [onChange],
+    );
 
     return (
         <Box
@@ -110,7 +112,7 @@ const RichTextEditor = ({
                 ref={quillRef}
                 theme="snow"
                 value={value || ""}
-                onChange={onChange}
+                onChange={handleChange}
                 modules={modules}
                 formats={formats}
                 placeholder={placeholder}

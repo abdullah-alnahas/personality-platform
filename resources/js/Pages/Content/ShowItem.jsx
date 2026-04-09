@@ -240,13 +240,4 @@ export default function ShowItem({ item }) {
         </>
     );
 }
-ShowItem.layout = (page) => {
-    const { getTranslatedField, currentLocale } = useLocale(); // Use hook
-    const itemTitleObject = page.props.item?.title;
-    const titleForLayout = getTranslatedField(
-        itemTitleObject,
-        currentLocale,
-        "Content",
-    );
-    return <PublicLayout title={titleForLayout}>{page}</PublicLayout>;
-};
+ShowItem.layout = (page) => <PublicLayout>{page}</PublicLayout>;

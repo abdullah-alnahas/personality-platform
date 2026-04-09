@@ -1,5 +1,5 @@
 import React from "react";
-import { Head, Link as InertiaLink } from "@inertiajs/react"; // Removed usePage
+import { Head, Link as InertiaLink, router } from "@inertiajs/react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import {
     Box,
@@ -95,13 +95,4 @@ export default function ShowCategory({ category, items }) {
         </>
     );
 }
-ShowCategory.layout = (page) => {
-    const { getTranslatedField, currentLocale } = useLocale(); // Use hook inside layout determination
-    const categoryNameObject = page.props.category?.name;
-    const titleForLayout = getTranslatedField(
-        categoryNameObject,
-        currentLocale,
-        "Category",
-    );
-    return <PublicLayout title={titleForLayout}>{page}</PublicLayout>;
-};
+ShowCategory.layout = (page) => <PublicLayout>{page}</PublicLayout>;
