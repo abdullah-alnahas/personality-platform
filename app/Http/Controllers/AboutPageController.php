@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Page;
 use App\Models\Setting;
+use App\Services\BlockDataResolver;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -12,28 +14,62 @@ class AboutPageController extends Controller
 {
     /**
      * Handle the incoming request.
+     *
+     * Checks for a page-builder page with slug 'about'. If found and published,
+     * renders it through the unified PageDisplay component, making the about page
+     * fully manageable from the admin page builder. Falls back to the legacy
+     * static About view when no such page exists.
      */
     public function __invoke(Request $request): Response
     {
-        // Fetch the about page content setting
-        // Cache it for a reasonable duration (e.g., 1 hour)
-        $aboutContentSetting = Cache::remember('setting_about_page_content', 3600, function () {
-            return Setting::where('key', 'about_page_content')->first();
+        $page = Cache::remember('about_page_builder', 3600, function () {
+            return Page::where('slug', 'about')
+                ->where('status', 'published')
+                ->first();
         });
 
-        // Prepare the content for the view (pass the value array or null)
-        $aboutContent = $aboutContentSetting ? $aboutContentSetting->value : null;
+        if ($page) {
+            $resolver = new BlockDataResolver();
+            $blocks = Cache::remember("about_page_blocks_{$page->id}", 3600, function () use ($page, $resolver) {
+                return $page->blocks()
+                    ->where('status', 'published')
+                    ->orderBy('display_order')
+                    ->get()
+                    ->map(fn($block) => $resolver->resolve([
+                        'id'            => $block->id,
+                        'block_type'    => $block->block_type,
+                        'content'       => $block->content,
+                        'config'        => $block->config,
+                        'display_order' => $block->display_order,
+                        'status'        => $block->status,
+                    ]))
+                    ->all();
+            });
 
-        // Fetch site name for the title (optional, could rely on layout)
-        $siteNameSetting = Cache::remember('setting_site_name', 3600, function () {
-            return Setting::where('key', 'site_name')->first();
+            return Inertia::render('PageDisplay', [
+                'page'   => [
+                    'id'    => $page->id,
+                    'title' => $page->getTranslations('title'),
+                    'slug'  => $page->slug,
+                ],
+                'blocks' => $blocks,
+            ]);
+        }
+
+        // Legacy fallback: render static about content from settings
+        $aboutContent = Cache::remember('setting_about_page_content', 3600, function () {
+            $setting = Setting::where('key', 'about_page_content')->first();
+            return $setting?->value;
         });
-        $siteName = $siteNameSetting?->value ?? null;
 
+        $siteName = Cache::remember('setting_site_name', 3600, function () {
+            $setting = Setting::where('key', 'site_name')->first();
+            return $setting?->value;
+        });
 
         return Inertia::render('About', [
-            'aboutContent' => $aboutContent, // Pass the translatable content array
-            'siteName' => $siteName, // Pass site name for potential use in Head title
+            'aboutContent' => $aboutContent,
+            'siteName'     => $siteName,
         ]);
     }
 }
