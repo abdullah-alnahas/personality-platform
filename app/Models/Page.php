@@ -30,6 +30,7 @@ class Page extends Model
 
     protected $casts = [
         'title' => 'array',
+        'meta_fields' => 'array',
         'is_homepage' => 'boolean',
         'scheduled_at' => 'datetime',
     ];

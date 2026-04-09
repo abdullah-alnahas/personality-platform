@@ -849,6 +849,18 @@ export default function Form({
                                                 />
                                             </Grid>
                                         ))}
+                                        {activeLanguages.map((lang) => (
+                                            <Grid item xs={12} sm={3} key={`stat-${i}-suffix-${lang}`}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label={`Suffix (${lang.toUpperCase()})`}
+                                                    value={stat.suffix?.[lang] ?? ''}
+                                                    onChange={(e) => updateStat(i, 'suffix', lang, e.target.value)}
+                                                    helperText='e.g. "ألف" or "+"'
+                                                />
+                                            </Grid>
+                                        ))}
                                     </Grid>
                                 </Paper>
                             ))}

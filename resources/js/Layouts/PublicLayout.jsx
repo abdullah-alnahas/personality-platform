@@ -845,9 +845,9 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                         >
                                             {getTranslatedField(
                                                 col.items[0]?.label,
-                                                pageProps,
+                                                { current_locale: currentLocale },
                                                 '',
-                                            ) ? '' : ''}
+                                            )}
                                         </Typography>
                                     )}
                                     {col.items.map((item) => (

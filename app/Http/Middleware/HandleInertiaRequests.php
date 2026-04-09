@@ -128,6 +128,8 @@ class HandleInertiaRequests extends Middleware
                         "site_name",
                         "site_description",
                         "footer_copyright_text",
+                        "logo_url",
+                        "logo_width",
                     ])
                         ->get()
                         ->keyBy("key")

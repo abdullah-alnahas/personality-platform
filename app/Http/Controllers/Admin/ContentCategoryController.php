@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\UpdateContentCategoryRequest;
 use App\Models\ContentCategory;
 use App\Models\Page;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,9 +19,7 @@ class ContentCategoryController extends Controller
      */
     public function index(): Response
     {
-        // Add authorization check (example using Gate)
-        // Gate::authorize('viewAny', ContentCategory::class);
-        // Or directly: if (!auth()->user()->can('manage categories')) { abort(403); }
+        Gate::authorize('manage categories');
 
         $categories = ContentCategory::latest()->paginate(15)->withQueryString();
 
@@ -38,7 +37,7 @@ class ContentCategoryController extends Controller
      */
     public function create(): Response
     {
-        $pages = Page::orderBy('title')->get(['id', 'title', 'slug']);
+        $pages = Page::orderBy('id')->get(['id', 'title', 'slug']);
 
         return Inertia::render('Admin/ContentCategories/Form', [
             'category' => null,
@@ -76,7 +75,7 @@ class ContentCategoryController extends Controller
      */
     public function edit(ContentCategory $content_category): Response
     {
-        $pages = Page::orderBy('title')->get(['id', 'title', 'slug']);
+        $pages = Page::orderBy('id')->get(['id', 'title', 'slug']);
 
         return Inertia::render('Admin/ContentCategories/Form', [
             'category' => $content_category,
@@ -106,8 +105,7 @@ class ContentCategoryController extends Controller
      */
     public function destroy(ContentCategory $content_category): RedirectResponse
     {
-        // Add authorization check
-        // Gate::authorize('delete', $content_category);
+        Gate::authorize('manage categories');
 
         $content_category->delete();
 

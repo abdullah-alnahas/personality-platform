@@ -202,6 +202,7 @@ class BlockRegistry
                 'heading'  => ['type' => 'translatable_text', 'required' => true],
                 'subtitle' => ['type' => 'translatable_text'],
                 'stats'    => ['type' => 'stat_list', 'required' => true],
+                // stat_list items support: value (string), label (translatable), suffix (translatable)
             ],
             'config_defaults' => [
                 'background_color' => '#2B3D2F',
