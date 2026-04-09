@@ -241,6 +241,8 @@ export default function PublicLayout({ children, title: pageTitle }) {
         current_locale: currentLocale,
     } = usePage().props;
     const pageProps = usePage().props;
+    const currentLang = availableLocales?.find((l) => l.code === currentLocale);
+    const isRTL = currentLang?.is_rtl || currentLocale === 'ar';
     const {
         data: subData,
         setData: setSubData,
@@ -321,7 +323,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
         /* ... (same as before, with console logs) ... */
         const newLocale = event.target.value;
         if (newLocale && newLocale !== currentLocale) {
-            const baseUrl = ziggy.location.split("?")[0];
+            const baseUrl = (ziggy?.location ?? window.location.href).split("?")[0];
             const currentQuery = { ...ziggy.query };
             currentQuery.lang = newLocale;
             Object.keys(currentQuery).forEach((key) => {
@@ -539,6 +541,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
 
     return (
         <Box
+            dir={isRTL ? "rtl" : "ltr"}
             sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -575,7 +578,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             }}
                         >
                             {logoUrl ? (
-                                <Box component="img" src={logoUrl} alt={siteName} sx={{ height: 40, width: logoWidth, objectFit: "contain" }} />
+                                <Box component="img" src={logoUrl} alt={siteName} sx={{ height: 40, maxWidth: logoWidth, objectFit: "contain" }} />
                             ) : (
                                 <Typography variant="h6">{siteName}</Typography>
                             )}
@@ -592,7 +595,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             }}
                         >
                             {logoUrl ? (
-                                <Box component="img" src={logoUrl} alt={siteName} sx={{ height: 40, width: logoWidth, objectFit: "contain" }} />
+                                <Box component="img" src={logoUrl} alt={siteName} sx={{ height: 40, maxWidth: logoWidth, objectFit: "contain" }} />
                             ) : (
                                 <Typography variant="h6">{siteName}</Typography>
                             )}
@@ -850,7 +853,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                             )}
                                         </Typography>
                                     )}
-                                    {col.items.map((item) => (
+                                    {col.items.slice(1).map((item) => (
                                         <MuiLink
                                             key={`${col.key}-${item.id}`}
                                             component={
