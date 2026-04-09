@@ -22,6 +22,10 @@ use App\Models\ContentCategory;
 use App\Observers\ContentCategoryObserver;
 use App\Models\Quote;
 use App\Observers\QuoteObserver;
+use App\Models\Book;
+use App\Observers\BookObserver;
+use App\Models\Scholar;
+use App\Observers\ScholarObserver;
 use App\Models\Page;
 use App\Observers\PageObserver;
 use App\Models\PageBlock;
@@ -52,6 +56,8 @@ class EventServiceProvider extends ServiceProvider
         ContentItem::observe(ContentItemObserver::class);
         ContentCategory::observe(ContentCategoryObserver::class);
         Quote::observe(QuoteObserver::class);
+        Book::observe(BookObserver::class);
+        Scholar::observe(ScholarObserver::class);
         Page::observe(PageObserver::class);
         PageBlock::observe(PageBlockObserver::class);
     }

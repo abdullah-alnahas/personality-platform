@@ -127,7 +127,7 @@ export default function Index({ categories /* auth, can */ }) { // Destructure p
                                     disabled={!link.url} // Disable if URL is null
                                     size="small"
                                     variant={link.active ? 'contained' : 'outlined'} // Highlight active page
-                                    dangerouslySetInnerHTML={{ __html: link.label }} // Use label from backend
+                                    children={link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')}
                                 />
                              ))}
                          </Box>

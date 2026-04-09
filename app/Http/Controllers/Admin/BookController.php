@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -39,6 +40,8 @@ class BookController extends Controller
 
     public function create(): Response
     {
+        Gate::authorize('manage books');
+
         return Inertia::render('Admin/Books/Form', [
             'book' => null,
         ]);
@@ -46,6 +49,8 @@ class BookController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        Gate::authorize('manage books');
+
         $validated = $request->validate([
             'title'           => 'required|array',
             'title.*'         => 'nullable|string|max:500',
@@ -53,8 +58,8 @@ class BookController extends Controller
             'subtitle.*'      => 'nullable|string|max:500',
             'description'     => 'nullable|array',
             'description.*'   => 'nullable|string',
-            'cover_image_url' => 'nullable|string|max:2048',
-            'buy_link'        => 'nullable|string|max:2048',
+            'cover_image_url' => 'nullable|url|max:2048',
+            'buy_link'        => 'nullable|url|max:2048',
             'category'        => 'nullable|string|max:255',
             'display_order'   => 'integer|min:0',
             'is_featured'     => 'boolean',
@@ -69,6 +74,8 @@ class BookController extends Controller
 
     public function edit(Book $book): Response
     {
+        Gate::authorize('manage books');
+
         return Inertia::render('Admin/Books/Form', [
             'book' => [
                 'id'              => $book->id,
@@ -87,6 +94,8 @@ class BookController extends Controller
 
     public function update(Request $request, Book $book): RedirectResponse
     {
+        Gate::authorize('manage books');
+
         $validated = $request->validate([
             'title'           => 'required|array',
             'title.*'         => 'nullable|string|max:500',
@@ -94,8 +103,8 @@ class BookController extends Controller
             'subtitle.*'      => 'nullable|string|max:500',
             'description'     => 'nullable|array',
             'description.*'   => 'nullable|string',
-            'cover_image_url' => 'nullable|string|max:2048',
-            'buy_link'        => 'nullable|string|max:2048',
+            'cover_image_url' => 'nullable|url|max:2048',
+            'buy_link'        => 'nullable|url|max:2048',
             'category'        => 'nullable|string|max:255',
             'display_order'   => 'integer|min:0',
             'is_featured'     => 'boolean',
@@ -110,6 +119,8 @@ class BookController extends Controller
 
     public function destroy(Book $book): RedirectResponse
     {
+        Gate::authorize('manage books');
+
         $book->delete();
 
         return redirect()->route('admin.books.index')

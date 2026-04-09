@@ -175,7 +175,7 @@ export default function Index({ items, can }) { // Destructure props passed from
                                  disabled={!link.url}
                                  size="small"
                                  variant={link.active ? 'contained' : 'outlined'}
-                                 dangerouslySetInnerHTML={{ __html: link.label }}
+                                 children={link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')}
                              />
                          ))}
                      </Box>

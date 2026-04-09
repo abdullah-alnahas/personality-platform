@@ -67,16 +67,8 @@ class UpdateSettingsRequest extends FormRequest
                         break;
                 }
             } else {
-                // If the key from request is not in settings table, treat as potentially new translatable text
-                // Or you might want to forbid unknown keys
-                $rules[$key] = ["nullable", "array"];
-                foreach (config("translatable.locales") as $locale) {
-                    $rules["{$key}.{$locale}"] = [
-                        "nullable",
-                        "string",
-                        "max:65535",
-                    ];
-                }
+                // Reject keys not defined in the settings table to prevent arbitrary injection
+                $rules[$key] = ["prohibited"];
             }
         }
         return $rules;

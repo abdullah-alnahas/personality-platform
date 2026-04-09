@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Scholar;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,6 +39,8 @@ class ScholarController extends Controller
 
     public function create(): Response
     {
+        Gate::authorize('manage scholars');
+
         return Inertia::render('Admin/Scholars/Form', [
             'scholar' => null,
         ]);
@@ -45,6 +48,7 @@ class ScholarController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        Gate::authorize('manage scholars');
         $validated = $request->validate([
             'name'          => 'required|array',
             'name.*'        => 'nullable|string|max:300',
@@ -65,6 +69,8 @@ class ScholarController extends Controller
 
     public function edit(Scholar $scholar): Response
     {
+        Gate::authorize('manage scholars');
+
         return Inertia::render('Admin/Scholars/Form', [
             'scholar' => [
                 'id'            => $scholar->id,
@@ -80,6 +86,8 @@ class ScholarController extends Controller
 
     public function update(Request $request, Scholar $scholar): RedirectResponse
     {
+        Gate::authorize('manage scholars');
+
         $validated = $request->validate([
             'name'          => 'required|array',
             'name.*'        => 'nullable|string|max:300',
@@ -100,6 +108,8 @@ class ScholarController extends Controller
 
     public function destroy(Scholar $scholar): RedirectResponse
     {
+        Gate::authorize('manage scholars');
+
         $scholar->delete();
 
         return redirect()->route('admin.scholars.index')

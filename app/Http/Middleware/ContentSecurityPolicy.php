@@ -28,7 +28,7 @@ class ContentSecurityPolicy
 
         $directives = [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' {$vite}",
+            "script-src 'self'" . (app()->environment('local') ? " 'unsafe-inline'" : '') . " {$vite}",
             "style-src 'self' 'unsafe-inline' {$fonts}",
             "img-src 'self' data: https:",
             "font-src 'self' {$fonts} https:",

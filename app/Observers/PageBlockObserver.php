@@ -48,6 +48,13 @@ class PageBlockObserver
                 $max = $content['max_items'] ?? 6;
                 Cache::forget("block_social_media_feed_{$max}");
                 break;
+            case 'books_grid':
+                $max = $content['max_items'] ?? 12;
+                Cache::forget("block_books_grid_{$max}");
+                break;
+            case 'scholar_cards':
+                Cache::forget('block_scholar_cards');
+                break;
         }
     }
 }
