@@ -6,8 +6,8 @@ import { useLocale } from '@/Hooks/useLocale';
 export default function LogoGrid({ block }) {
     const { getTranslatedField, currentLocale } = useLocale();
 
-    const content = block.content || {};
-    const config = block.config || {};
+    const content = block?.content || {};
+    const config = block?.config || {};
 
     const heading = getTranslatedField(content.heading, currentLocale, '');
     const subtitle = getTranslatedField(content.subtitle, currentLocale, '');

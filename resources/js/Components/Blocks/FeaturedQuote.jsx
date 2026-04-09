@@ -4,7 +4,7 @@ import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import { useLocale } from "@/Hooks/useLocale";
 
 export default function FeaturedQuote({ block }) {
-    const { getTranslatedField, currentLocale } = useLocale();
+    const { getTranslatedField, currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
     const resolvedData = block?.resolved_data || {};
@@ -55,16 +55,17 @@ export default function FeaturedQuote({ block }) {
                     component="blockquote"
                     sx={{
                         color: textColor,
-                        fontFamily: "'Georgia', 'Times New Roman', serif",
-                        fontStyle: "italic",
+                        fontFamily: isRTL ? "'Amiri', serif" : "'Georgia', 'Times New Roman', serif",
+                        fontStyle: isRTL ? "normal" : "italic",
                         fontWeight: 400,
                         lineHeight: 1.8,
                         fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.75rem" },
                         mb: 3,
                         px: { xs: 1, md: 4 },
+                        direction: isRTL ? "rtl" : "ltr",
                     }}
                 >
-                    &ldquo;{quoteText}&rdquo;
+                    {isRTL ? `«${quoteText}»` : `\u201c${quoteText}\u201d`}
                 </Typography>
 
                 {/* Decorative closing quote */}
@@ -102,7 +103,8 @@ export default function FeaturedQuote({ block }) {
                                 color: textColor,
                                 opacity: 0.8,
                                 fontWeight: 500,
-                                letterSpacing: 0.5,
+                                letterSpacing: isRTL ? 0 : 0.5,
+                                direction: isRTL ? "rtl" : "ltr",
                             }}
                         >
                             {source}

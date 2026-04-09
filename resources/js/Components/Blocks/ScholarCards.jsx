@@ -17,9 +17,9 @@ import { useLocale } from "@/Hooks/useLocale";
 
 const ScholarCards = ({ block }) => {
     const { currentLocale } = useLocale();
-    const content = block.content || {};
-    const config = block.config || {};
-    const groups = block.resolved_data || [];
+    const content = block?.content || {};
+    const config = block?.config || {};
+    const groups = block?.resolved_data || [];
     const [activeTab, setActiveTab] = useState(0);
 
     const t = (field) => {

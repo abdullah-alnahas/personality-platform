@@ -4,8 +4,8 @@ import { useLocale } from "@/Hooks/useLocale";
 
 const StatsCounter = ({ block }) => {
     const { currentLocale } = useLocale();
-    const content = block.content || {};
-    const config = block.config || {};
+    const content = block?.content || {};
+    const config = block?.config || {};
 
     const t = (field) => {
         if (!field) return "";

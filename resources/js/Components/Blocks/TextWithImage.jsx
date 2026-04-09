@@ -18,7 +18,7 @@ import { useLocale } from "@/Hooks/useLocale";
  * Uses dangerouslySetInnerHTML intentionally for pre-sanitized rich text.
  */
 export default function TextWithImage({ block }) {
-    const { getTranslatedField, currentLocale } = useLocale();
+    const { getTranslatedField, currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
 
@@ -29,10 +29,15 @@ export default function TextWithImage({ block }) {
     const imagePosition = content.image_position || "right";
     const items = content.items || [];
 
-    const imageOrder = imagePosition === "left"
+    // In RTL layouts the grid container is already mirrored, so invert position intent
+    const effectivePosition = isRTL
+        ? (imagePosition === "left" ? "right" : "left")
+        : imagePosition;
+
+    const imageOrder = effectivePosition === "left"
         ? { xs: 0, md: 0 }
         : { xs: 0, md: 1 };
-    const textOrder = imagePosition === "left"
+    const textOrder = effectivePosition === "left"
         ? { xs: 1, md: 1 }
         : { xs: 1, md: 0 };
 

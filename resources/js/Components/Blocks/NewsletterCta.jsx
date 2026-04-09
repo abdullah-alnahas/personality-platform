@@ -130,7 +130,7 @@ export default function NewsletterCta({ block }) {
                             minWidth: { xs: "100%", sm: "auto" },
                         }}
                     >
-                        {processing ? "Subscribing..." : buttonText}
+                        {processing ? (currentLocale === 'ar' ? 'جارٍ الاشتراك...' : currentLocale === 'tr' ? 'Kaydediliyor...' : 'Subscribing...') : buttonText}
                     </Button>
                 </Box>
                 {recentlySuccessful && (
@@ -142,7 +142,7 @@ export default function NewsletterCta({ block }) {
                             fontWeight: 500,
                         }}
                     >
-                        Thank you for subscribing!
+                        {currentLocale === 'ar' ? 'شكراً على اشتراكك!' : currentLocale === 'tr' ? 'Abone olduğunuz için teşekkürler!' : 'Thank you for subscribing!'}
                     </Typography>
                 )}
             </Container>
