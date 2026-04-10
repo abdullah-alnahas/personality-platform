@@ -39,8 +39,8 @@ class UpdateContentItemRequest extends FormRequest
 
             'content_category_id'   => ['sometimes', 'required', 'integer', 'exists:content_categories,id'],
 
-            'content'               => ['nullable', 'array'], // Often nullable on update
-            'content.*'             => ['nullable', 'string'],
+            'content'               => ['nullable', 'array'],
+            'content.*'             => ['nullable', 'string', 'max:500000'],
 
             'excerpt'               => ['nullable', 'array'],
             'excerpt.*'             => ['nullable', 'string', 'max:500'],
@@ -75,7 +75,7 @@ class UpdateContentItemRequest extends FormRequest
     protected function getOtherLanguageKeys(string $field): array
     {
         $keys = [];
-        $activeLanguages = ['en', 'ar', 'tr']; // Example - Fetch dynamically later
+        $activeLanguages = config('translatable.locales', ['en', 'ar', 'tr']);
         foreach ($activeLanguages as $langCode) {
              $keys[] = $field . '.' . $langCode;
         }

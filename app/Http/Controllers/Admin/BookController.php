@@ -14,6 +14,8 @@ class BookController extends Controller
 {
     public function index(Request $request): Response
     {
+        Gate::authorize('manage books');
+
         $books = Book::orderBy('display_order')->orderBy('id')
             ->paginate(20)
             ->withQueryString()
@@ -52,12 +54,12 @@ class BookController extends Controller
         Gate::authorize('manage books');
 
         $validated = $request->validate([
-            'title'           => 'required|array',
+            'title'           => ['required', 'array', 'max:10'],
             'title.*'         => 'nullable|string|max:500',
-            'subtitle'        => 'nullable|array',
+            'subtitle'        => ['nullable', 'array', 'max:10'],
             'subtitle.*'      => 'nullable|string|max:500',
-            'description'     => 'nullable|array',
-            'description.*'   => 'nullable|string',
+            'description'     => ['nullable', 'array', 'max:10'],
+            'description.*'   => 'nullable|string|max:65535',
             'cover_image_url' => 'nullable|url|max:2048',
             'buy_link'        => 'nullable|url|max:2048',
             'category'        => 'nullable|string|max:255',
@@ -97,12 +99,12 @@ class BookController extends Controller
         Gate::authorize('manage books');
 
         $validated = $request->validate([
-            'title'           => 'required|array',
+            'title'           => ['required', 'array', 'max:10'],
             'title.*'         => 'nullable|string|max:500',
-            'subtitle'        => 'nullable|array',
+            'subtitle'        => ['nullable', 'array', 'max:10'],
             'subtitle.*'      => 'nullable|string|max:500',
-            'description'     => 'nullable|array',
-            'description.*'   => 'nullable|string',
+            'description'     => ['nullable', 'array', 'max:10'],
+            'description.*'   => 'nullable|string|max:65535',
             'cover_image_url' => 'nullable|url|max:2048',
             'buy_link'        => 'nullable|url|max:2048',
             'category'        => 'nullable|string|max:255',

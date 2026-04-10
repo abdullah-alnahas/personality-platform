@@ -62,7 +62,7 @@ export default function VerifyEmail({ status }) {
 
                     <MuiLink
                         component={InertiaLink}
-                        href={route("logout")}
+                        href={route("admin.logout")}
                         method="post"
                         as="button" /* Important for InertiaLink to function like a button with method="post" */
                         variant="body2"

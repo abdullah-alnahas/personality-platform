@@ -67,7 +67,7 @@ class UpdateContentCategoryRequest extends FormRequest
     {
         $keys = [];
         // Replace with actual logic to get active language codes
-        $activeLanguages = ['en', 'ar', 'tr']; // Example
+        $activeLanguages = config('translatable.locales', ['en', 'ar', 'tr']);
         foreach ($activeLanguages as $langCode) {
              $keys[] = $field . '.' . $langCode;
         }

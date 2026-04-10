@@ -1,22 +1,15 @@
 // Create file: resources/js/Pages/About.jsx
 import React from 'react';
-import { Head, usePage } from '@inertiajs/react';
-import PublicLayout from '@/Layouts/PublicLayout'; // Import the public layout
+import { Head } from '@inertiajs/react';
+import PublicLayout from '@/Layouts/PublicLayout';
 import { Box, Typography, Container, Paper } from '@mui/material';
+import { useLocale } from '@/Hooks/useLocale';
 
-// Helper function to get translated field (copied for self-containment, consider extracting)
-const getTranslatedField = (fieldObject, locale = 'en', fallback = '') => {
-    const currentLocale = usePage().props.locale || locale;
-    if (fieldObject == null) { return fallback; }
-    if (typeof fieldObject !== 'object') { return String(fieldObject) || fallback; }
-    return fieldObject[currentLocale] || fieldObject[locale] || Object.values(fieldObject)[0] || fallback;
-};
+export default function About({ aboutContent, siteName }) {
+    const { getTranslatedField, currentLocale } = useLocale();
 
-export default function About({ aboutContent, siteName }) { // Destructure props
-
-    // Get the translated content for the current locale
-    const translatedContent = getTranslatedField(aboutContent);
-    const pageTitle = `About - ${getTranslatedField(siteName) || 'Platform'}`;
+    const translatedContent = getTranslatedField(aboutContent, currentLocale);
+    const pageTitle = `About - ${getTranslatedField(siteName, currentLocale) || 'Platform'}`;
 
     return (
         <>

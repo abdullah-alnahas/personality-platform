@@ -18,6 +18,7 @@ export default function Login({ status, canResetPassword }) {
         email: "",
         password: "",
         remember: false,
+        _confirm_email: "", // honeypot — must stay empty; bots fill it, humans don't
     });
     useEffect(() => {
         return () => {
@@ -26,7 +27,7 @@ export default function Login({ status, canResetPassword }) {
     }, []);
     const submit = (e) => {
         e.preventDefault();
-        post(route("login"));
+        post(route("admin.login"));
     };
 
     return (
@@ -45,6 +46,26 @@ export default function Login({ status, canResetPassword }) {
                 Log in
             </Typography>
             <Box component="form" onSubmit={submit} noValidate sx={{ mt: 1 }}>
+                {/* Honeypot: visually hidden, real users never fill this */}
+                <Box
+                    component="input"
+                    type="text"
+                    name="_confirm_email"
+                    value={data._confirm_email}
+                    onChange={(e) => setData("_confirm_email", e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    sx={{
+                        position: "absolute",
+                        left: "-9999px",
+                        width: 1,
+                        height: 1,
+                        opacity: 0,
+                        overflow: "hidden",
+                        pointerEvents: "none",
+                    }}
+                />
                 <TextField
                     margin="normal"
                     required
@@ -108,7 +129,7 @@ export default function Login({ status, canResetPassword }) {
                             {/* Grid item */}
                             <MuiLink
                                 component={InertiaLink}
-                                href={route("password.request")}
+                                href={route("admin.password.request")}
                                 variant="body2"
                             >
                                 Forgot your password?

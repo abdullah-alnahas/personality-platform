@@ -14,6 +14,8 @@ class ScholarController extends Controller
 {
     public function index(Request $request): Response
     {
+        Gate::authorize('manage scholars');
+
         $scholars = Scholar::orderBy('group_key')->orderBy('display_order')
             ->paginate(50)
             ->withQueryString()
@@ -50,13 +52,13 @@ class ScholarController extends Controller
     {
         Gate::authorize('manage scholars');
         $validated = $request->validate([
-            'name'          => 'required|array',
+            'name'          => ['required', 'array', 'max:10'],
             'name.*'        => 'nullable|string|max:300',
-            'group_name'    => 'required|array',
+            'group_name'    => ['required', 'array', 'max:10'],
             'group_name.*'  => 'nullable|string|max:200',
             'group_key'     => 'required|string|max:100',
-            'bio'           => 'nullable|array',
-            'bio.*'         => 'nullable|string',
+            'bio'           => ['nullable', 'array', 'max:10'],
+            'bio.*'         => 'nullable|string|max:65535',
             'photo_url'     => 'nullable|url|max:2048',
             'display_order' => 'integer|min:0',
             'status'        => 'required|in:published,draft',
@@ -91,13 +93,13 @@ class ScholarController extends Controller
         Gate::authorize('manage scholars');
 
         $validated = $request->validate([
-            'name'          => 'required|array',
+            'name'          => ['required', 'array', 'max:10'],
             'name.*'        => 'nullable|string|max:300',
-            'group_name'    => 'required|array',
+            'group_name'    => ['required', 'array', 'max:10'],
             'group_name.*'  => 'nullable|string|max:200',
             'group_key'     => 'required|string|max:100',
-            'bio'           => 'nullable|array',
-            'bio.*'         => 'nullable|string',
+            'bio'           => ['nullable', 'array', 'max:10'],
+            'bio.*'         => 'nullable|string|max:65535',
             'photo_url'     => 'nullable|url|max:2048',
             'display_order' => 'integer|min:0',
             'status'        => 'required|in:published,draft',

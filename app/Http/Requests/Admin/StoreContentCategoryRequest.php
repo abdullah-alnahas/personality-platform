@@ -34,7 +34,7 @@ class StoreContentCategoryRequest extends FormRequest
         // e.g., name: { en: 'English Name', ar: 'Arabic Name' }
         // Adjust based on how your frontend form handles translations
         return [
-            'name' => ['required', 'array'],
+            'name' => ['required', 'array', 'max:10'],
             // Validate at least one language has a name provided
             'name.*' => ['required_without_all:'.implode(',', $this->getOtherLanguageKeys('name')), 'nullable', 'string', 'max:255'],
 
@@ -64,7 +64,7 @@ class StoreContentCategoryRequest extends FormRequest
         $keys = [];
         // Assuming active languages are available (e.g., from config or DB)
         // Replace with actual logic to get active language codes
-        $activeLanguages = ['en', 'ar', 'tr']; // Example
+        $activeLanguages = config('translatable.locales', ['en', 'ar', 'tr']);
         foreach ($activeLanguages as $langCode) {
              $keys[] = $field . '.' . $langCode;
         }

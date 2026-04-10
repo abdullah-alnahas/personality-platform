@@ -150,6 +150,7 @@ class ContentController extends Controller
             $itemData = [
                 "id" => $item->id,
                 "title" => $item->getTranslations("title"),
+                "excerpt" => $item->getTranslations("excerpt"),
                 "content" => $item->getTranslations("content"), // Assumes content is sanitized on save
                 "publish_date_formatted" => $item->publish_date?->isoFormat(
                     "LL"
@@ -244,9 +245,9 @@ class ContentController extends Controller
 
             return Inertia::render("Content/ShowCategory", [
                 "category" => [
+                    "slug" => $category->slug,
                     "name" => $category->getTranslations("name"),
                     "description" => $category->getTranslations("description"),
-                    // SEO data for category page
                 ],
                 "items" => $itemsPaginator,
             ]);
