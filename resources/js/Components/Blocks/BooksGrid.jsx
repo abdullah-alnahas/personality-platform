@@ -31,6 +31,9 @@ const BooksGrid = ({ block }) => {
     const columns = config.columns || 4;
     const mdCols = Math.max(1, Math.min(12, Math.floor(12 / columns)));
 
+    const noCoverLabel = currentLocale === 'ar' ? 'لا يوجد غلاف' : currentLocale === 'tr' ? 'Kapak Yok' : '';
+    const noBooksLabel = currentLocale === 'ar' ? 'لا توجد كتب.' : currentLocale === 'tr' ? 'Kitap bulunamadı.' : 'No books found.';
+
     return (
         <Box
             component="section"
@@ -70,7 +73,7 @@ const BooksGrid = ({ block }) => {
 
                 {books.length === 0 ? (
                     <Typography align="center" sx={{ opacity: 0.5, py: 4 }}>
-                        No books found.
+                        {noBooksLabel}
                     </Typography>
                 ) : (
                     <Grid container spacing={3} justifyContent="center">
@@ -108,9 +111,11 @@ const BooksGrid = ({ block }) => {
                                                 justifyContent: "center",
                                             }}
                                         >
-                                            <Typography sx={{ opacity: 0.4, fontSize: "0.75rem" }}>
-                                                No Cover
-                                            </Typography>
+                                            {noCoverLabel && (
+                                                <Typography sx={{ opacity: 0.4, fontSize: "0.75rem" }}>
+                                                    {noCoverLabel}
+                                                </Typography>
+                                            )}
                                         </Box>
                                     )}
                                     <CardContent sx={{ px: 0, pt: 1, pb: 0, flexGrow: 1 }}>

@@ -23,12 +23,15 @@ class ContentCategoryController extends Controller
 
         $categories = ContentCategory::latest()->paginate(15)->withQueryString();
 
+        $canManage = auth()->user()->can('manage categories');
+
         return Inertia::render('Admin/ContentCategories/Index', [
             'categories' => $categories,
-            'can' => [ // Pass permissions (optional, but good practice)
-                'create' => auth()->user()->can('create', ContentCategory::class), // Example policy check
-                // 'manage_categories' => auth()->user()->can('manage categories'), // Example direct permission check
-            ]
+            'can' => [
+                'create' => $canManage,
+                'edit'   => $canManage,
+                'delete' => $canManage,
+            ],
         ]);
     }
 
@@ -37,6 +40,8 @@ class ContentCategoryController extends Controller
      */
     public function create(): Response
     {
+        Gate::authorize('manage categories');
+
         $pages = Page::orderBy('id')->get(['id', 'title', 'slug']);
 
         return Inertia::render('Admin/ContentCategories/Form', [
@@ -75,6 +80,8 @@ class ContentCategoryController extends Controller
      */
     public function edit(ContentCategory $content_category): Response
     {
+        Gate::authorize('manage categories');
+
         $pages = Page::orderBy('id')->get(['id', 'title', 'slug']);
 
         return Inertia::render('Admin/ContentCategories/Form', [

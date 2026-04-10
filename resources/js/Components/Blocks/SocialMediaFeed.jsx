@@ -49,7 +49,7 @@ const platformColors = {
 };
 
 export default function SocialMediaFeed({ block }) {
-    const { getTranslatedField, currentLocale } = useLocale();
+    const { getTranslatedField, currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
     const resolvedData = block?.resolved_data || [];
 
@@ -67,7 +67,7 @@ export default function SocialMediaFeed({ block }) {
                     align="center"
                     sx={{
                         fontWeight: 700,
-                        fontFamily: "'Georgia', 'Times New Roman', serif",
+                        fontFamily: isRTL ? "'Amiri', serif" : "'Georgia', 'Times New Roman', serif",
                         mb: 4,
                     }}
                 >

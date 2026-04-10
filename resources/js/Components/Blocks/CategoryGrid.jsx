@@ -24,6 +24,8 @@ export default function CategoryGrid({ block }) {
     const items = resolvedData.items || [];
     const columns = config.columns || 3;
 
+    const noItemsLabel = currentLocale === 'ar' ? 'لا توجد عناصر للعرض.' : currentLocale === 'tr' ? 'Görüntülenecek öğe yok.' : 'No items to display.';
+
     const mdCols = 12 / Math.min(columns, 4);
 
     return (
@@ -133,18 +135,9 @@ export default function CategoryGrid({ block }) {
                                                         left: 0,
                                                         width: "100%",
                                                         height: "100%",
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        justifyContent: "center",
+                                                        bgcolor: "grey.100",
                                                     }}
-                                                >
-                                                    <Typography
-                                                        variant="caption"
-                                                        color="text.secondary"
-                                                    >
-                                                        No Image
-                                                    </Typography>
-                                                </Box>
+                                                />
                                             )}
                                         </Box>
                                         <CardContent
@@ -223,7 +216,7 @@ export default function CategoryGrid({ block }) {
                     color="text.secondary"
                     sx={{ py: 4 }}
                 >
-                    No items to display.
+                    {noItemsLabel}
                 </Typography>
             )}
         </Container>

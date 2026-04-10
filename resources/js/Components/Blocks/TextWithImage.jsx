@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useLocale } from "@/Hooks/useLocale";
+import { sanitizeHtml } from "@/utils/sanitize";
 
 /**
  * Split layout section with text and image.
@@ -57,7 +58,7 @@ export default function TextWithImage({ block }) {
                             gutterBottom
                             sx={{
                                 fontWeight: 700,
-                                fontFamily: "'Georgia', 'Times New Roman', serif",
+                                fontFamily: isRTL ? "'Amiri', serif" : "'Georgia', 'Times New Roman', serif",
                                 lineHeight: 1.3,
                                 mb: 2,
                             }}
@@ -79,7 +80,7 @@ export default function TextWithImage({ block }) {
                                 },
                                 mb: items.length > 0 ? 2 : 0,
                             }}
-                            dangerouslySetInnerHTML={{ __html: body }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(body) }}
                         />
                     )}
                     {items.length > 0 && (

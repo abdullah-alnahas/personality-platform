@@ -22,6 +22,7 @@ const ScholarCards = ({ block }) => {
     const config = block?.config || {};
     const groups = block?.resolved_data || [];
     const [activeTab, setActiveTab] = useState(0);
+    const noScholarsLabel = currentLocale === 'ar' ? 'لا يوجد علماء.' : currentLocale === 'tr' ? 'Alim bulunamadı.' : 'No scholars found.';
 
     const t = (field) => {
         if (!field) return "";
@@ -96,7 +97,7 @@ const ScholarCards = ({ block }) => {
 
                 {groups.length === 0 ? (
                     <Typography align="center" sx={{ opacity: 0.5, py: 4 }}>
-                        No scholars found.
+                        {noScholarsLabel}
                     </Typography>
                 ) : groups.length === 1 ? (
                     <SingleGroupList

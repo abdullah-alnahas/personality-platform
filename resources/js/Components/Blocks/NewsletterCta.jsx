@@ -10,7 +10,7 @@ import { useForm } from "@inertiajs/react";
 import { useLocale } from "@/Hooks/useLocale";
 
 export default function NewsletterCta({ block }) {
-    const { getTranslatedField, currentLocale } = useLocale();
+    const { getTranslatedField, currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
 
@@ -51,7 +51,7 @@ export default function NewsletterCta({ block }) {
                         sx={{
                             color: textColor,
                             fontWeight: 700,
-                            fontFamily: "'Georgia', 'Times New Roman', serif",
+                            fontFamily: isRTL ? "'Amiri', serif" : "'Georgia', 'Times New Roman', serif",
                             mb: 1,
                         }}
                     >
@@ -85,7 +85,7 @@ export default function NewsletterCta({ block }) {
                 >
                     <TextField
                         type="email"
-                        placeholder="Enter your email"
+                        placeholder={currentLocale === 'ar' ? 'أدخل بريدك الإلكتروني' : currentLocale === 'tr' ? 'E-postanızı girin' : 'Enter your email'}
                         value={data.email}
                         onChange={(e) => setData("email", e.target.value)}
                         required

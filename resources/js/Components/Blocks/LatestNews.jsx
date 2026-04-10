@@ -23,6 +23,8 @@ export default function LatestNews({ block }) {
     const items = Array.isArray(resolvedData) ? resolvedData : resolvedData.items || [];
     const columns = config.columns || 3;
 
+    const noItemsLabel = currentLocale === 'ar' ? 'لا توجد أخبار للعرض.' : currentLocale === 'tr' ? 'Görüntülenecek haber yok.' : 'No news items to display.';
+
     const mdCols = 12 / Math.min(columns, 4);
 
     return (
@@ -117,18 +119,9 @@ export default function LatestNews({ block }) {
                                                         left: 0,
                                                         width: "100%",
                                                         height: "100%",
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        justifyContent: "center",
+                                                        bgcolor: "grey.100",
                                                     }}
-                                                >
-                                                    <Typography
-                                                        variant="caption"
-                                                        color="text.secondary"
-                                                    >
-                                                        No Image
-                                                    </Typography>
-                                                </Box>
+                                                />
                                             )}
                                         </Box>
                                         <CardContent
@@ -208,7 +201,7 @@ export default function LatestNews({ block }) {
                     color="text.secondary"
                     sx={{ py: 4 }}
                 >
-                    No news items to display.
+                    {noItemsLabel}
                 </Typography>
             )}
         </Container>

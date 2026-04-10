@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Container } from "@mui/material";
 import { useLocale } from "@/Hooks/useLocale";
+import { sanitizeHtml } from "@/utils/sanitize";
 
 /**
  * Renders sanitized HTML body content from the page builder.
@@ -8,7 +9,7 @@ import { useLocale } from "@/Hooks/useLocale";
  * Uses dangerouslySetInnerHTML intentionally for pre-sanitized rich text.
  */
 export default function RichTextBlock({ block }) {
-    const { getTranslatedField, currentLocale } = useLocale();
+    const { getTranslatedField, currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
 
@@ -31,7 +32,7 @@ export default function RichTextBlock({ block }) {
             <Box
                 sx={{
                     "& h1, & h2, & h3, & h4, & h5, & h6": {
-                        fontFamily: "'Georgia', 'Times New Roman', serif",
+                        fontFamily: isRTL ? "'Amiri', serif" : "'Georgia', 'Times New Roman', serif",
                         color: "text.primary",
                         mb: 2,
                         mt: 3,
@@ -51,7 +52,8 @@ export default function RichTextBlock({ block }) {
                         },
                     },
                     "& ul, & ol": {
-                        pl: 3,
+                        pl: isRTL ? 0 : 3,
+                        pr: isRTL ? 3 : 0,
                         mb: 2,
                         "& li": {
                             mb: 0.5,
@@ -60,16 +62,18 @@ export default function RichTextBlock({ block }) {
                         },
                     },
                     "& blockquote": {
-                        borderLeft: 4,
+                        borderLeft: isRTL ? 0 : 4,
+                        borderRight: isRTL ? 4 : 0,
                         borderColor: "primary.main",
-                        pl: 3,
+                        pl: isRTL ? 0 : 3,
+                        pr: isRTL ? 3 : 0,
                         py: 1,
                         my: 3,
                         mx: 0,
                         fontStyle: "italic",
                         color: "text.secondary",
                         bgcolor: "grey.50",
-                        borderRadius: "0 8px 8px 0",
+                        borderRadius: isRTL ? "8px 0 0 8px" : "0 8px 8px 0",
                     },
                     "& img": {
                         maxWidth: "100%",
@@ -77,7 +81,7 @@ export default function RichTextBlock({ block }) {
                         borderRadius: 2,
                     },
                 }}
-                dangerouslySetInnerHTML={{ __html: body }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(body) }}
             />
         </Container>
     );

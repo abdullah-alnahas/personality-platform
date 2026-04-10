@@ -31,7 +31,7 @@ const getTranslatedName = (nameObject, defaultLocale = 'en') => {
     return nameObject[defaultLocale] || Object.values(nameObject)[0] || 'N/A';
 };
 
-export default function Index({ categories }) {
+export default function Index({ categories, can }) {
     const [deleteId, setDeleteId] = useState(null);
     const handleDelete = (id) => setDeleteId(id);
     const confirmDelete = () => {
@@ -48,14 +48,16 @@ export default function Index({ categories }) {
             <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h4">Content Categories</Typography>
                 
-                <Button
-                    variant="contained"
-                    component={InertiaLink}
-                    href={route('admin.content-categories.create')}
-                    startIcon={<AddIcon />}
-                >
-                    Create Category
-                </Button>
+                {can?.create && (
+                    <Button
+                        variant="contained"
+                        component={InertiaLink}
+                        href={route('admin.content-categories.create')}
+                        startIcon={<AddIcon />}
+                    >
+                        Create Category
+                    </Button>
+                )}
             </Box>
 
             <Paper>
@@ -84,21 +86,21 @@ export default function Index({ categories }) {
                                     </TableCell>
                                     <TableCell>{category.order ?? 'N/A'}</TableCell>
                                     <TableCell>
-                                        {/* Add permission check later: can?.update */}
                                         <IconButton
                                             aria-label="edit"
                                             size="small"
                                             component={InertiaLink}
                                             href={route('admin.content-categories.edit', category.id)}
+                                            disabled={!can?.edit}
                                         >
                                             <EditIcon fontSize="inherit" />
                                         </IconButton>
-                                         {/* Add permission check later: can?.delete */}
-                                                        <IconButton
+                                        <IconButton
                                             aria-label="delete"
                                             size="small"
                                             onClick={() => handleDelete(category.id)}
                                             color="error"
+                                            disabled={!can?.delete}
                                         >
                                             <DeleteIcon fontSize="inherit" />
                                         </IconButton>
