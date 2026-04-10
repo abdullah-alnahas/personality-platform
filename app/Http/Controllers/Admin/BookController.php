@@ -45,7 +45,8 @@ class BookController extends Controller
         Gate::authorize('manage books');
 
         return Inertia::render('Admin/Books/Form', [
-            'book' => null,
+            'book'            => null,
+            'activeLanguages' => config('translatable.locales'),
         ]);
     }
 
@@ -91,6 +92,7 @@ class BookController extends Controller
                 'is_featured'     => $book->is_featured,
                 'status'          => $book->status,
             ],
+            'activeLanguages' => config('translatable.locales'),
         ]);
     }
 

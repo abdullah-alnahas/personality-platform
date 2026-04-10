@@ -44,7 +44,8 @@ class ScholarController extends Controller
         Gate::authorize('manage scholars');
 
         return Inertia::render('Admin/Scholars/Form', [
-            'scholar' => null,
+            'scholar'         => null,
+            'activeLanguages' => config('translatable.locales'),
         ]);
     }
 
@@ -85,6 +86,7 @@ class ScholarController extends Controller
                 'display_order' => $scholar->display_order,
                 'status'        => $scholar->status,
             ],
+            'activeLanguages' => config('translatable.locales'),
         ]);
     }
 

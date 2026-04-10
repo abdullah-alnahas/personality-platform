@@ -41,7 +41,8 @@ class SocialAccountController extends Controller
         $this->authorize('manage social accounts');
 
         return Inertia::render('Admin/SocialAccounts/Form', [
-            'account' => null,
+            'account'         => null,
+            'activeLanguages' => config('translatable.locales'),
         ]);
     }
 
@@ -72,7 +73,8 @@ class SocialAccountController extends Controller
          $this->authorize('manage social accounts');
 
         return Inertia::render('Admin/SocialAccounts/Form', [
-            'account' => $social_account, // Pass existing account data
+            'account'         => $social_account,
+            'activeLanguages' => config('translatable.locales'),
         ]);
     }
 

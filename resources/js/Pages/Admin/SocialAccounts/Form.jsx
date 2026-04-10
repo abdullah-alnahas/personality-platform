@@ -1,5 +1,5 @@
 import React from "react";
-import { Head, Link as InertiaLink, useForm, usePage } from "@inertiajs/react"; // Added usePage
+import { Head, Link as InertiaLink, useForm, usePage } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import {
     Box,
@@ -16,25 +16,28 @@ import {
     Divider,
 } from "@mui/material";
 
-const activeLanguages = [
+const LANG_NAMES = { en: "English", ar: "Arabic", tr: "Turkish" };
+const DEFAULT_LANGUAGES = [
     { code: "en", name: "English" },
     { code: "ar", name: "Arabic" },
     { code: "tr", name: "Turkish" },
 ];
-const getTranslatedField = (
-    fieldObject,
-    pageProps,
-    locale = "en",
-    fallback = "",
-) => {
-    /* ... (same as before) ... */
-    const currentLocale = pageProps.locale || locale;
+
+/** Normalize: accepts either string[] or {code,name}[] */
+function normalizeLangs(langs) {
+    if (!Array.isArray(langs) || langs.length === 0) return DEFAULT_LANGUAGES;
+    if (typeof langs[0] === "string") {
+        return langs.map((code) => ({ code, name: LANG_NAMES[code] || code.toUpperCase() }));
+    }
+    return langs;
+}
+
+const getTranslatedField = (fieldObject, currentLocale = "en", fallback = "") => {
     if (!fieldObject) return fallback;
-    if (typeof fieldObject !== "object" || fieldObject === null)
-        return String(fieldObject) || fallback;
+    if (typeof fieldObject !== "object") return String(fieldObject) || fallback;
     return (
         fieldObject[currentLocale] ||
-        fieldObject[locale] ||
+        fieldObject.en ||
         Object.values(fieldObject)[0] ||
         fallback
     );
@@ -57,9 +60,8 @@ export default function Form({
 }) {
     const isEditing = !!account;
     const { props: pageProps } = usePage();
-    const currentActiveLanguages = Array.isArray(propActiveLanguages)
-        ? propActiveLanguages
-        : activeLanguages;
+    const currentLocale = pageProps.current_locale || "en";
+    const currentActiveLanguages = normalizeLangs(propActiveLanguages);
 
     const { data, setData, post, put, processing, errors } = useForm({
         account_name: currentActiveLanguages.reduce(
@@ -101,7 +103,7 @@ export default function Form({
             />
             <Typography variant="h4" gutterBottom>
                 {isEditing
-                    ? `Edit Account: ${getTranslatedField(account.account_name, pageProps) || account.platform}`
+                    ? `Edit Account: ${getTranslatedField(account.account_name, currentLocale) || account.platform}`
                     : "Create New Social Account"}
             </Typography>
             <Paper sx={{ p: 3 }}>

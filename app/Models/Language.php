@@ -12,7 +12,7 @@ class Language extends Model
     public $incrementing = false;
     protected $keyType = "string";
 
-    protected $fillable = ["code", "name", "native_name", "is_active"];
+    protected $fillable = ["code", "name", "native_name", "is_active", "is_rtl"];
     protected $casts = ["is_active" => "boolean", "is_rtl" => "boolean"];
 
     protected const RTL_CODES = [

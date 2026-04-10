@@ -217,7 +217,7 @@ class ContentController extends Controller
 
             $itemsPaginator = ContentItem::published()
                 ->where("content_category_id", $category->id)
-                ->with(["media"]) // Eager load media for each item
+                ->with(["media", "category:id,name,slug"]) // Eager load media + category for each item
                 ->latest("publish_date")
                 ->paginate(12)
                 ->withQueryString();
