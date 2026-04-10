@@ -14,7 +14,7 @@ import { Link as InertiaLink } from "@inertiajs/react";
 import { useLocale } from "@/Hooks/useLocale";
 
 export default function LatestNews({ block }) {
-    const { getTranslatedField, currentLocale } = useLocale();
+    const { getTranslatedField, currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
     const resolvedData = block?.resolved_data || [];
@@ -33,8 +33,9 @@ export default function LatestNews({ block }) {
                     component="h2"
                     sx={{
                         fontWeight: 700,
-                        fontFamily: "'Georgia', 'Times New Roman', serif",
+                        fontFamily: isRTL ? "'Amiri', serif" : "'Georgia', 'Times New Roman', serif",
                         mb: 4,
+                        textAlign: isRTL ? 'right' : 'left',
                     }}
                 >
                     {heading}

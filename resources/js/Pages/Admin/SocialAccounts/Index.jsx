@@ -1,9 +1,9 @@
-// Create file: resources/js/Pages/Admin/SocialAccounts/Index.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link as InertiaLink, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import {
-    Box, Typography, Button, Paper, IconButton, Chip, Link as MuiLink, Tooltip
+    Box, Typography, Button, Paper, IconButton, Chip, Link as MuiLink, Tooltip,
+    Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
 } from '@mui/material';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
@@ -43,12 +43,11 @@ const getTranslatedField = (fieldObject, locale = 'en', fallback = 'N/A') => {
 export default function Index({ accounts, can }) {
     const { data, links, current_page, per_page, total } = accounts;
 
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this social account?')) {
-            router.delete(route('admin.social-accounts.destroy', id), {
-                preserveScroll: true,
-            });
-        }
+    const [deleteId, setDeleteId] = useState(null);
+    const handleDelete = (id) => setDeleteId(id);
+    const confirmDelete = () => {
+        router.delete(route('admin.social-accounts.destroy', deleteId), { preserveScroll: true });
+        setDeleteId(null);
     };
 
     const columns = [
@@ -166,11 +165,21 @@ export default function Index({ accounts, can }) {
                     onPaginationModelChange={handlePaginationChange}
                     disableRowSelectionOnClick
                     autoHeight={false}
+                    localeText={{ noRowsLabel: "No social accounts found." }}
                     sx={{ border: 0 }}
                 />
             </Paper>
-            {/* Optional Fallback Pagination */}
-            {/* ... */}
+
+            <Dialog open={!!deleteId} onClose={() => setDeleteId(null)}>
+                <DialogTitle>Delete Social Account</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>Are you sure you want to delete this account? This action cannot be undone.</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteId(null)}>Cancel</Button>
+                    <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }

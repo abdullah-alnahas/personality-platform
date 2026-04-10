@@ -17,7 +17,7 @@ import { useLocale } from "@/Hooks/useLocale";
 import CircleIcon from "@mui/icons-material/Circle";
 
 export default function PillarCards({ block }) {
-    const { getTranslatedField, currentLocale } = useLocale();
+    const { getTranslatedField, currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
 
@@ -134,9 +134,11 @@ export default function PillarCards({ block }) {
                                                 fontStyle: "italic",
                                                 color: isDark ? 'rgba(255,255,255,0.7)' : "text.secondary",
                                                 mb: 2,
-                                                borderLeft: 3,
+                                                borderLeft: isRTL ? 0 : 3,
+                                                borderRight: isRTL ? 3 : 0,
                                                 borderColor: "primary.light",
-                                                pl: 2,
+                                                pl: isRTL ? 0 : 2,
+                                                pr: isRTL ? 2 : 0,
                                                 py: 0.5,
                                                 lineHeight: 1.7,
                                             }}
@@ -160,7 +162,8 @@ export default function PillarCards({ block }) {
                                                             fontSize: 8,
                                                             color: "primary.light",
                                                             mt: 1,
-                                                            mr: 1.5,
+                                                            mr: isRTL ? 0 : 1.5,
+                                                            ml: isRTL ? 1.5 : 0,
                                                             flexShrink: 0,
                                                         }}
                                                     />

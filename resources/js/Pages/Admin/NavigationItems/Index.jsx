@@ -1,9 +1,9 @@
-// Edit file: resources/js/Pages/Admin/NavigationItems/Index.jsx
-import React from 'react';
-import { Head, Link as InertiaLink, router, usePage } from '@inertiajs/react'; // Import usePage
+import React, { useState } from 'react';
+import { Head, Link as InertiaLink, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import {
-    Box, Typography, Button, Paper, IconButton, Chip, Link as MuiLink, Tooltip
+    Box, Typography, Button, Paper, IconButton, Chip, Link as MuiLink, Tooltip,
+    Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
 } from '@mui/material';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
@@ -30,12 +30,11 @@ const getTranslatedField = (fieldObject, locale = 'en', fallback = '') => {
 export default function Index({ items, can }) {
     const { data, links, current_page, per_page, total } = items;
 
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this navigation item? This may also delete child items depending on database constraints.')) {
-            router.delete(route('admin.navigation-items.destroy', id), {
-                preserveScroll: true,
-            });
-        }
+    const [deleteId, setDeleteId] = useState(null);
+    const handleDelete = (id) => setDeleteId(id);
+    const confirmDelete = () => {
+        router.delete(route('admin.navigation-items.destroy', deleteId), { preserveScroll: true });
+        setDeleteId(null);
     };
 
     const columns = [
@@ -145,7 +144,6 @@ export default function Index({ items, can }) {
                 )}
             </Box>
 
-            {/* Apply height constraint to Paper */}
             <Paper sx={{ height: 650, width: '100%' }}>
                 <DataGrid
                     rows={rows}
@@ -153,7 +151,6 @@ export default function Index({ items, can }) {
                     pageSizeOptions={[20, 50, 100]}
                     rowCount={total}
                     paginationMode="server"
-                    // Set initial state based on props
                     initialState={{
                         pagination: {
                             paginationModel: { pageSize: per_page, page: current_page - 1 },
@@ -161,12 +158,21 @@ export default function Index({ items, can }) {
                     }}
                     onPaginationModelChange={handlePaginationChange}
                     disableRowSelectionOnClick
-                    // Removed autoHeight to respect Paper's height
-                    sx={{ border: 0 }} // Remove default border when inside Paper
+                    localeText={{ noRowsLabel: "No navigation items found." }}
+                    sx={{ border: 0 }}
                 />
             </Paper>
-            {/* Fallback Pagination Links (optional) */}
-            {/* ... */}
+
+            <Dialog open={!!deleteId} onClose={() => setDeleteId(null)}>
+                <DialogTitle>Delete Navigation Item</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>Are you sure you want to delete this item? Child items may also be affected.</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteId(null)}>Cancel</Button>
+                    <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }

@@ -273,6 +273,16 @@ export default function PublicLayout({ children, title: pageTitle }) {
         navigationItems?.footer_col4?.filter((item) => !item.parent_id) ?? [];
     const [searchQuery, setSearchQuery] = useState(ziggy?.query?.q || "");
     const [mobileOpen, setMobileOpen] = useState(false);
+
+    // Locale-aware UI labels
+    const uiT = {
+        search:      currentLocale === 'ar' ? 'بحث...'        : currentLocale === 'tr' ? 'Ara...'        : 'Search...',
+        language:    currentLocale === 'ar' ? 'اللغة'          : currentLocale === 'tr' ? 'Dil'           : 'Language',
+        dashboard:   currentLocale === 'ar' ? 'لوحة التحكم'   : currentLocale === 'tr' ? 'Panel'         : 'Dashboard',
+        subscribe:   currentLocale === 'ar' ? 'اشترك'          : currentLocale === 'tr' ? 'Abone Ol'      : 'Subscribe',
+        subscribing: currentLocale === 'ar' ? 'جارٍ الاشتراك...' : currentLocale === 'tr' ? 'Kaydediliyor...' : 'Subscribing...',
+        email:       currentLocale === 'ar' ? 'البريد الإلكتروني' : currentLocale === 'tr' ? 'E-posta'     : 'Email Address',
+    };
     const handleDrawerToggle = () => setMobileOpen((prevState) => !prevState);
     const handleSearchSubmit = (e) => {
         e.preventDefault();
@@ -394,7 +404,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                         <TextField
                             size="small"
                             variant="outlined"
-                            placeholder="Search…"
+                            placeholder={uiT.search}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             InputProps={{
@@ -488,7 +498,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                     color: "text.secondary",
                                 }}
                             >
-                                Language
+                                {uiT.language}
                             </InputLabel>
                             <Select
                                 labelId="drawer-language-select-label"
@@ -510,30 +520,16 @@ export default function PublicLayout({ children, title: pageTitle }) {
                     </ListItem>
                 )}
                 <Divider sx={{ my: 1 }} />
-                {auth.user ? (
+                {auth.user && (
                     <ListItem disablePadding>
                         <ListItemButton
                             component={InertiaLink}
                             href={route("admin.dashboard")}
                             sx={{ textAlign: "left" }}
                         >
-                            <ListItemText primary="Dashboard" />
+                            <ListItemText primary={uiT.dashboard} />
                         </ListItemButton>
                     </ListItem>
-                ) : (
-                    <>
-                        {route().has("login") && (
-                            <ListItem disablePadding>
-                                <ListItemButton
-                                    component={InertiaLink}
-                                    href={route("login")}
-                                    sx={{ textAlign: "left" }}
-                                >
-                                    <ListItemText primary="Login" />
-                                </ListItemButton>
-                            </ListItem>
-                        )}
-                    </>
                 )}
             </List>
         </Box>
@@ -628,7 +624,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             <TextField
                                 size="small"
                                 variant="outlined"
-                                placeholder="Search…"
+                                placeholder={uiT.search}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 InputProps={{
@@ -699,7 +695,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                         <Box
                             sx={{ display: { xs: "none", md: "block" }, ml: 1 }}
                         >
-                            {auth.user ? (
+                            {auth.user && (
                                 <Button
                                     component={InertiaLink}
                                     href={route("admin.dashboard")}
@@ -707,20 +703,8 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                     variant="outlined"
                                     size="small"
                                 >
-                                    Dashboard
+                                    {uiT.dashboard}
                                 </Button>
-                            ) : (
-                                route().has("login") && (
-                                    <Button
-                                        component={InertiaLink}
-                                        href={route("login")}
-                                        color="primary"
-                                        variant="text"
-                                        size="small"
-                                    >
-                                        Login
-                                    </Button>
-                                )
                             )}
                         </Box>
                     </Toolbar>
@@ -900,7 +884,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                     mb: 1.5,
                                 }}
                             >
-                                Subscribe
+                                {uiT.subscribe}
                             </Typography>
                             <Box
                                 component="form"
@@ -910,7 +894,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                 <TextField
                                     fullWidth
                                     size="small"
-                                    placeholder="Email Address"
+                                    placeholder={uiT.email}
                                     variant="outlined"
                                     type="email"
                                     value={subData.email}
@@ -955,9 +939,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                         },
                                     }}
                                 >
-                                    {subProcessing
-                                        ? "Subscribing..."
-                                        : "Subscribe"}
+                                    {subProcessing ? uiT.subscribing : uiT.subscribe}
                                 </Button>
                             </Box>
                         </Grid>

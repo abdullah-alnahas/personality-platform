@@ -1,7 +1,6 @@
-// resources/js/Pages/Admin/ContentCategories/Index.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link as InertiaLink, router } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout'; // Import your layout
+import AdminLayout from '@/Layouts/AdminLayout';
 import {
     Box,
     Typography,
@@ -15,7 +14,11 @@ import {
     TableRow,
     IconButton,
     Chip,
-    Pagination // For pagination controls
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -28,14 +31,12 @@ const getTranslatedName = (nameObject, defaultLocale = 'en') => {
     return nameObject[defaultLocale] || Object.values(nameObject)[0] || 'N/A';
 };
 
-export default function Index({ categories /* auth, can */ }) { // Destructure props passed from controller
-
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this category?')) {
-            router.delete(route('admin.content-categories.destroy', id), {
-                 preserveScroll: true // Keep scroll position after delete
-            });
-        }
+export default function Index({ categories }) {
+    const [deleteId, setDeleteId] = useState(null);
+    const handleDelete = (id) => setDeleteId(id);
+    const confirmDelete = () => {
+        router.delete(route('admin.content-categories.destroy', deleteId), { preserveScroll: true });
+        setDeleteId(null);
     };
 
     // Extract pagination data
@@ -93,7 +94,7 @@ export default function Index({ categories /* auth, can */ }) { // Destructure p
                                             <EditIcon fontSize="inherit" />
                                         </IconButton>
                                          {/* Add permission check later: can?.delete */}
-                                        <IconButton
+                                                        <IconButton
                                             aria-label="delete"
                                             size="small"
                                             onClick={() => handleDelete(category.id)}
@@ -134,9 +135,19 @@ export default function Index({ categories /* auth, can */ }) { // Destructure p
                      </Box>
                  )}
             </Paper>
+
+            <Dialog open={!!deleteId} onClose={() => setDeleteId(null)}>
+                <DialogTitle>Delete Category</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>Are you sure you want to delete this category? This action cannot be undone.</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteId(null)}>Cancel</Button>
+                    <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }
 
-// Assign Layout
 Index.layout = page => <AdminLayout children={page} title="Content Categories" />;

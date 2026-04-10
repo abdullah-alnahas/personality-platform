@@ -14,7 +14,7 @@ import {
 import { useLocale } from "@/Hooks/useLocale";
 
 const BooksGrid = ({ block }) => {
-    const { currentLocale } = useLocale();
+    const { currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
     const books = block?.resolved_data || [];
@@ -52,6 +52,7 @@ const BooksGrid = ({ block }) => {
                             color: accentColor,
                             fontWeight: 700,
                             mb: content.subtitle ? 1 : 6,
+                            direction: isRTL ? 'rtl' : 'ltr',
                         }}
                     >
                         {t(content.heading)}

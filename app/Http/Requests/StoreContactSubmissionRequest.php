@@ -23,9 +23,17 @@ class StoreContactSubmissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'message' => ['required', 'string', 'max:5000'], // Limit message length
+            'name'            => ['required', 'string', 'max:255'],
+            'email'           => ['required', 'string', 'email', 'max:255'],
+            'message'         => ['required', 'string', 'max:5000'],
+            '_confirm_email'  => ['present', 'max:0'], // honeypot — bots fill it, humans leave it empty
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            '_confirm_email.max' => 'Invalid submission.',
         ];
     }
 }

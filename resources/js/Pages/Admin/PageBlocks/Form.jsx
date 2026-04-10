@@ -1140,8 +1140,23 @@ export default function Form({
                             </Grid>
                         )}
 
+                        {/* ornamental_frame toggle for quran_verse */}
+                        {data.block_type === 'quran_verse' && (
+                            <Grid item xs={12} sm={6} md={4}>
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={!!data.config.ornamental_frame}
+                                            onChange={(e) => handleConfigChange('ornamental_frame', e.target.checked)}
+                                        />
+                                    }
+                                    label="Ornamental Frame"
+                                />
+                            </Grid>
+                        )}
+
                         {/* Columns config for grid-based blocks */}
-                        {['pillar_cards', 'category_grid', 'latest_news', 'logo_grid'].includes(data.block_type) && (
+                        {['pillar_cards', 'category_grid', 'latest_news', 'logo_grid', 'stats_counter', 'books_grid'].includes(data.block_type) && (
                             <Grid item xs={12} sm={6} md={4}>
                                 <FormControl fullWidth>
                                     <InputLabel id="config-columns-label">Columns</InputLabel>

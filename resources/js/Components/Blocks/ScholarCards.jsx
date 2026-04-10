@@ -4,6 +4,7 @@
  * (description field comes from the admin rich-text editor).
  */
 import React, { useState } from "react";
+import { sanitizeHtml } from "@/utils/sanitize";
 import {
     Box,
     Container,
@@ -16,7 +17,7 @@ import {
 import { useLocale } from "@/Hooks/useLocale";
 
 const ScholarCards = ({ block }) => {
-    const { currentLocale } = useLocale();
+    const { currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
     const groups = block?.resolved_data || [];
@@ -68,6 +69,7 @@ const ScholarCards = ({ block }) => {
                             fontWeight: 700,
                             color: accentColor,
                             mb: 1,
+                            direction: isRTL ? 'rtl' : 'ltr',
                         }}
                     >
                         {t(content.heading)}
@@ -88,7 +90,7 @@ const ScholarCards = ({ block }) => {
                             lineHeight: 1.8,
                         }}
                         /* pre-sanitized by TipTap / admin rich-text editor */
-                        dangerouslySetInnerHTML={{ __html: description }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
                     />
                 )}
 
@@ -113,6 +115,7 @@ const ScholarCards = ({ block }) => {
                         cardBg={cardBg}
                         textColor={textColor}
                         accentColor={accentColor}
+                        isRTL={isRTL}
                     />
                 )}
             </Container>
@@ -166,12 +169,14 @@ const TabbedGroups = ({
     cardBg,
     textColor,
     accentColor,
+    isRTL,
 }) => (
     <>
         <Tabs
             value={activeTab}
             onChange={(_, v) => setActiveTab(v)}
             centered
+            dir={isRTL ? "rtl" : "ltr"}
             sx={{
                 mb: 4,
                 "& .MuiTab-root": {

@@ -3,7 +3,7 @@ import { Box, Container, Typography, Grid } from "@mui/material";
 import { useLocale } from "@/Hooks/useLocale";
 
 const StatsCounter = ({ block }) => {
-    const { currentLocale } = useLocale();
+    const { currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
 
@@ -62,10 +62,8 @@ const StatsCounter = ({ block }) => {
                             <Box
                                 sx={{
                                     textAlign: "center",
-                                    borderRight:
-                                        idx < stats.length - 1
-                                            ? `1px solid ${accentColor}33`
-                                            : "none",
+                                    borderRight: (!isRTL && idx < stats.length - 1) ? `1px solid ${accentColor}33` : "none",
+                                    borderLeft:  (isRTL  && idx < stats.length - 1) ? `1px solid ${accentColor}33` : "none",
                                     px: 2,
                                 }}
                             >

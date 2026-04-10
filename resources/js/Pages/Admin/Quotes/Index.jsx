@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Head, Link as InertiaLink, router, usePage } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import {
@@ -10,6 +10,11 @@ import {
     Chip,
     Tooltip,
     Link as MuiLink,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
 } from "@mui/material";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
@@ -36,12 +41,11 @@ const getTranslatedField = (fieldObject, locale = "en", fallback = "N/A") => {
 export default function Index({ quotes, can }) {
     const { data, links, current_page, per_page, total } = quotes; // For DataGrid server-side pagination
 
-    const handleDelete = (id) => {
-        if (confirm("Are you sure you want to delete this quote?")) {
-            router.delete(route("admin.quotes.destroy", id), {
-                preserveScroll: true,
-            });
-        }
+    const [deleteId, setDeleteId] = useState(null);
+    const handleDelete = (id) => setDeleteId(id);
+    const confirmDelete = () => {
+        router.delete(route("admin.quotes.destroy", deleteId), { preserveScroll: true });
+        setDeleteId(null);
     };
 
     const columns = [
@@ -199,9 +203,21 @@ export default function Index({ quotes, can }) {
                     onPaginationModelChange={handlePaginationChange}
                     disableRowSelectionOnClick
                     autoHeight={false}
+                    localeText={{ noRowsLabel: "No quotes found." }}
                     sx={{ border: 0 }}
                 />
             </Paper>
+
+            <Dialog open={!!deleteId} onClose={() => setDeleteId(null)}>
+                <DialogTitle>Delete Quote</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>Are you sure you want to delete this quote? This action cannot be undone.</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteId(null)}>Cancel</Button>
+                    <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }

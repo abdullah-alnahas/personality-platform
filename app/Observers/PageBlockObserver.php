@@ -60,6 +60,13 @@ class PageBlockObserver
             case 'scholar_cards':
                 Cache::forget('block_scholar_cards');
                 break;
+            case 'featured_quote':
+                $quoteId = $content['quote_id'] ?? null;
+                if ($quoteId) {
+                    Cache::forget("block_featured_quote_{$quoteId}");
+                }
+                Cache::forget('block_featured_quote_random');
+                break;
         }
     }
 }

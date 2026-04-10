@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Head, Link as InertiaLink, router, usePage } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import {
@@ -9,6 +9,11 @@ import {
     Tooltip,
     Chip,
     Avatar,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
 } from "@mui/material";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
@@ -26,13 +31,12 @@ export default function Index({ books, can }) {
     const { props } = usePage();
     const locale = props.locale || "ar";
     const { data, current_page, per_page, total } = books;
+    const [deleteId, setDeleteId] = useState(null);
 
-    const handleDelete = (id) => {
-        if (confirm("Delete this book?")) {
-            router.delete(route("admin.books.destroy", id), {
-                preserveScroll: true,
-            });
-        }
+    const handleDelete = (id) => setDeleteId(id);
+    const confirmDelete = () => {
+        router.delete(route("admin.books.destroy", deleteId), { preserveScroll: true });
+        setDeleteId(null);
     };
 
     const columns = [
@@ -157,9 +161,21 @@ export default function Index({ books, can }) {
                     }
                     disableRowSelectionOnClick
                     rowHeight={65}
+                    localeText={{ noRowsLabel: "No books found." }}
                     sx={{ border: 0 }}
                 />
             </Paper>
+
+            <Dialog open={!!deleteId} onClose={() => setDeleteId(null)}>
+                <DialogTitle>Delete Book</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>Are you sure you want to delete this book? This action cannot be undone.</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteId(null)}>Cancel</Button>
+                    <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }
