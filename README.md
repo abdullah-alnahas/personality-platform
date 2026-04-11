@@ -6,7 +6,7 @@
 > 1. **Set `APP_DEBUG=false` in `.env`** — `true` exposes full stack traces, config values, and environment variables to any visitor who triggers an error.
 > 2. **Use a strong, unique `DB_PASSWORD`** — the default seeder creates `admin@example.com / password`. Change the admin password and use a randomly generated DB password (20+ chars, mixed). Never reuse a password from another service.
 >
-> See [Configure `.env`](#4-configure-env) in the deployment section for the full checklist.
+> See [Configure `.env`](#4-configure-env) in the deployment section for the full checklist, or read the [full deployment guide](docs/deployment-cpanel.md).
 
 A dynamic CMS and page builder for Islamic educational websites. Build full pages visually using drag-and-drop blocks — no code required for content editors.
 
@@ -17,14 +17,14 @@ Built with Laravel + Inertia.js + React + Material-UI. Supports Arabic, English,
 | Layer | Technology |
 |-------|-----------|
 | Backend | Laravel 10, PHP 8.1+ |
-| Frontend | React 18, Inertia.js, Material-UI (MUI) |
-| Build | Vite |
+| Frontend | React 18, Inertia.js, Material-UI (MUI) 7 |
+| Build | Vite 6 |
 | Database | MySQL 8+ |
-| Key Packages | Spatie (permissions, media-library, translatable, sluggable), Laravel Breeze |
+| Key Packages | Spatie (permissions, media-library, translatable, sluggable, sitemap), Laravel Breeze, Ziggy, mews/purifier |
 
 ## What It Does
 
-**For content editors** — A page builder with 15 block types. Create pages by stacking blocks (hero banners, text sections, card grids, Quran verses, logo grids, etc.) and configuring them via the admin panel.
+**For content editors** — A page builder with 15 block types. Create pages by stacking blocks (hero banners, text sections, card grids, Quran verses, logo grids, etc.) and configuring them via the admin panel. See the [Admin Walkthrough](docs/admin-walkthrough.md) for step-by-step instructions.
 
 **For visitors** — A fast, cached public website with Islamic design language (dark green palette, gold accents, Amiri calligraphic headings, RTL support).
 
@@ -106,9 +106,9 @@ php artisan migrate --seed
 This runs all seeders in order and creates:
 - Default admin user (`admin@example.com` / `password`)
 - Roles and permissions (Spatie)
-- Site settings
+- Site settings (general, content, contact, SEO, branding groups)
 - Two prototype pages (Home + About) with sample blocks
-- Four content categories (الإسلام, الإيمان, الإحسان, علامات الساعة) with sample items
+- Four content categories (Islam, Iman, Ihsan, Signs of the Hour) with sample items
 - Books and scholars with grouped/tabbed display
 - Quotes for the featured quote block
 - Social media accounts and navigation structure
@@ -120,6 +120,7 @@ php artisan db:seed --class=PrototypeHomepageSeeder
 php artisan db:seed --class=PrototypeAboutPageSeeder
 php artisan db:seed --class=PrototypeBooksAndScholarsSeeder
 php artisan db:seed --class=PrototypeNavigationSeeder
+php artisan db:seed --class=PrototypeIslamCategorySeeder
 ```
 
 ### Step 5: Build and Run
@@ -152,84 +153,20 @@ Without these images, the page still renders correctly; the image areas will sim
 
 ## Deployment on Shared Hosting (cPanel / phpMyAdmin)
 
-### 1. Database Setup via phpMyAdmin
+A complete step-by-step deployment guide is available at **[docs/deployment-cpanel.md](docs/deployment-cpanel.md)**. It covers database setup, file upload structure, `.env` configuration, running setup commands, file permissions, storage symlink workarounds, and troubleshooting.
 
-1. Log in to **phpMyAdmin** from your hosting panel (cPanel, Plesk, etc.)
-2. Click **"New"** in the left sidebar to create a new database
-3. Name it (e.g., `personality_platform`), select **utf8mb4_unicode_ci** collation
-4. Click **Create**
-5. Note down the database name, username, and password from your hosting panel (cPanel > MySQL Databases)
+**Quick summary:**
 
-### 2. Upload Files
-
-Upload the entire project to your hosting via FTP or File Manager. The typical structure:
-
-```
-/home/youraccount/
-    public_html/          <-- point your domain here
-        index.php         <-- from public/index.php (modified)
-        build/            <-- from public/build/
-        images/           <-- from public/images/
-        ...
-    personality-platform/ <-- the rest of the Laravel app
-        app/
-        config/
-        database/
-        resources/
-        vendor/
-        ...
-```
-
-**Important**: The `public/` folder contents go into `public_html/`. Everything else goes into a folder *above* `public_html/`.
-
-### 3. Update `public_html/index.php`
-
-Edit the paths at the top of `index.php` to point to your app directory:
-
-```php
-require __DIR__.'/../personality-platform/vendor/autoload.php';
-$app = require_once __DIR__.'/../personality-platform/bootstrap/app.php';
-```
-
-### 4. Configure `.env`
-
-Copy `.env.example` to `.env` in the app directory and update:
-
-```
-APP_ENV=production
-APP_DEBUG=false          # MUST be false — true leaks stack traces and env vars to visitors
-APP_URL=https://yourdomain.com
-
-DB_CONNECTION=mysql
-DB_HOST=localhost
-DB_DATABASE=your_db_name
-DB_USERNAME=your_db_user
-DB_PASSWORD=your_strong_unique_password  # Use 20+ random chars — never reuse a password
-```
+1. Create a MySQL database via phpMyAdmin with `utf8mb4_unicode_ci` collation
+2. Upload: `public/` contents go into `public_html/`; everything else goes into a folder above `public_html/`
+3. Edit `public_html/index.php` to point to your app directory
+4. Configure `.env` with `APP_DEBUG=false` and production values
+5. Run `php artisan key:generate`, `migrate --seed --force`, `storage:link`, and cache commands
+6. Set `chmod -R 775 storage bootstrap/cache`
 
 > [!CAUTION]
 > - `APP_DEBUG=true` on a public server is a critical vulnerability. Every unhandled exception shows full stack traces including `.env` values, database credentials, and source file paths.
 > - The seeder creates `admin@example.com / password`. Log in immediately after first deploy and change the password via the admin panel.
-
-### 5. Run Setup Commands
-
-SSH into your server (or use cPanel Terminal):
-
-```bash
-cd ~/personality-platform
-php artisan key:generate
-php artisan migrate --seed --force
-php artisan storage:link
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-```
-
-### 6. File Permissions
-
-```bash
-chmod -R 775 storage bootstrap/cache
-```
 
 ---
 
@@ -244,6 +181,8 @@ ADMIN_PATH=my-secret-path
 ```
 
 After changing it, run `php artisan route:clear && php artisan config:clear`. The login button is not shown in the public navigation — navigate directly to the URL.
+
+For a complete walkthrough of the admin panel and page builder, see **[docs/admin-walkthrough.md](docs/admin-walkthrough.md)**.
 
 | Section | URL | Description |
 |---------|-----|-------------|
@@ -279,6 +218,8 @@ app/
     Services/
         BlockRegistry.php       # Central registry of all 15 block types and their field definitions
         BlockDataResolver.php   # Hydrates dynamic blocks with DB data (cached)
+        ResponsiveImageHelper.php # Generates srcset data for content item images
+        SWRCache.php            # Stale-while-revalidate cache wrapper
     Http/Controllers/
         Admin/
             DashboardController.php  # Real stats (8 counts) + recent content items
@@ -290,16 +231,38 @@ app/
             SocialAccountController.php
             LanguageController.php
             MediaController.php
-    Observers/                  # 12 observers — cache invalidation on every model change
+            ContentCategoryController.php
+            ContentItemController.php
+            NavigationItemController.php
+            SettingController.php
+        AboutPageController.php     # Public /about route
+        ContactPageController.php   # Public /contact route
+        ContentController.php       # Public /item/{slug} and /category/{slug}
+        PageDisplayController.php   # Public /page/{slug} and homepage
+        SearchController.php        # Public /search
+        SubscriptionController.php  # POST /subscribe (newsletter)
+        Api/
+            EngagementController.php # Content engagement tracking
+    Console/Commands/
+        CacheDebug.php              # Inspect cache keys for debugging
+        GenerateSitemap.php         # Generate sitemap.xml (Spatie)
+        PublishScheduledContent.php # Publish scheduled pages/blocks
+    Observers/                  # 11 observers — cache invalidation on every model change
                                 # Clears both keyed and shared (*_shared) Inertia prop caches
 
 resources/js/
     Components/
         Blocks/                 # 15 block components + BlockRenderer.jsx
         Decorative/             # IslamicStar, ScatteredStars, OrnamentalDivider, DotPattern
+        ContentCard.jsx         # Reusable content card with responsive images
+        CookieConsentBanner.jsx # GDPR cookie consent
+        RichTextEditor.jsx      # Quill-based WYSIWYG editor
+        SocialIcon.jsx          # Platform-aware social media icon
     Layouts/
         PublicLayout.jsx        # Header + dark footer with RTL support
         AdminLayout.jsx
+    Hooks/
+        useLocale.js            # Returns isRTL, currentLocale, getTranslatedField
     Pages/
         PageDisplay.jsx         # Public page renderer
         Admin/
@@ -308,11 +271,18 @@ resources/js/
 
 database/
     seeders/
-        PrototypeHomepageSeeder.php         # Homepage with full block set
-        PrototypeAboutPageSeeder.php        # About page (4 blocks)
-        PrototypeBooksAndScholarsSeeder.php # Books + scholar groups
-        PrototypeIslamCategorySeeder.php    # 4 categories + content items
+        RolesAndPermissionsSeeder.php       # Spatie roles and permissions
+        AdminUserSeeder.php                 # Default admin user
+        SettingsSeeder.php                  # Site settings (general, content, contact, SEO, branding)
+        PrototypeHomepageSeeder.php         # Homepage with 13 blocks
+        PrototypeAboutPageSeeder.php        # About page (7 blocks)
+        PrototypeIslamCategorySeeder.php    # Islam initiative category page
         PrototypeNavigationSeeder.php       # Header + footer navigation
+        PrototypeBooksAndScholarsSeeder.php # Books + scholar groups
+
+docs/
+    deployment-cpanel.md        # Full shared hosting deployment guide
+    admin-walkthrough.md        # Step-by-step admin panel and page builder guide
 ```
 
 ---
