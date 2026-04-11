@@ -42,16 +42,18 @@ class PageDisplayController extends Controller
 
     public function show(string $slug): Response
     {
-        $page = Cache::remember("page_data_{$slug}", 3600, function () use ($slug) {
-            return Page::published()
-                ->where('slug', $slug)
-                ->with(['publishedBlocks'])
-                ->first();
-        });
+        // Fetch without caching first so a missing page never poisons the cache.
+        $page = Page::published()
+            ->where('slug', $slug)
+            ->with(['publishedBlocks'])
+            ->first();
 
         if (!$page) {
             abort(404);
         }
+
+        // Only cache once we know the page exists.
+        $page = Cache::remember("page_data_{$slug}", 3600, fn() => $page);
 
         return $this->renderPage($page);
     }
@@ -86,7 +88,12 @@ class PageDisplayController extends Controller
     protected function getSettings(): mixed
     {
         return Cache::remember('site_settings_all', 3600, function () {
-            return Setting::all()->keyBy('key');
+            return Setting::all()->keyBy('key')->map(function ($setting) {
+                return [
+                    'value' => $setting->value,
+                    'type'  => $setting->type,
+                ];
+            });
         });
     }
 }

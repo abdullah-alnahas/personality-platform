@@ -92,6 +92,7 @@ class PageController extends Controller
 
     public function update(UpdatePageRequest $request, Page $page): RedirectResponse
     {
+        Gate::authorize('manage pages');
         $page->update($request->validated());
 
         return redirect()

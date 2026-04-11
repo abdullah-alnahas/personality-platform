@@ -72,6 +72,7 @@ class NavigationItemController extends Controller
      */
     public function show(NavigationItem $navigationItem): RedirectResponse
     {
+        $this->authorize('manage navigation');
         return redirect()->route('admin.navigation-items.edit', $navigationItem);
     }
 
