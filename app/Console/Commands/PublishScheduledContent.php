@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Page;
 use App\Models\PageBlock;
 use Illuminate\Console\Command;
+use App\Services\SWRCache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -55,9 +56,9 @@ class PublishScheduledContent extends Command
         Cache::forget('homepage_data');
         Cache::forget('homepage_sections_data_v2');
         Cache::forget('about_page_builder');
-        Cache::forget('site_settings_all_shared');
-        Cache::forget('published_navigation_items_structured_shared');
-        Cache::forget('active_social_accounts_shared');
+        SWRCache::forget('site_settings_all_shared');
+        SWRCache::forget('published_navigation_items_structured_shared');
+        SWRCache::forget('active_social_accounts_shared');
 
         $totalCount = $pageCount + $blockCount;
 

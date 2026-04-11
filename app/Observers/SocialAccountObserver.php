@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\SocialAccount;
+use App\Services\SWRCache;
 use Illuminate\Support\Facades\Cache;
 
 class SocialAccountObserver
@@ -20,7 +21,7 @@ class SocialAccountObserver
     protected function clearCaches(): void
     {
         Cache::forget("active_social_accounts");
-        Cache::forget("active_social_accounts_shared");
+        SWRCache::forget("active_social_accounts_shared");
 
         foreach ($this->getMaxItemsVariants() as $maxItems) {
             Cache::forget("block_social_media_feed_{$maxItems}");

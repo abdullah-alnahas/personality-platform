@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useCallback } from "react";
-import ReactQuill, { Quill } from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import ReactQuill, { Quill } from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 import { Box, Typography } from "@mui/material";
 
 // Optional: Add support for text direction to the default Quill formats

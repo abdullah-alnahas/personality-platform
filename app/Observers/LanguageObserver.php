@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Language;
+use App\Services\SWRCache;
 use Illuminate\Support\Facades\Cache;
 
 class LanguageObserver
@@ -19,7 +20,7 @@ class LanguageObserver
 
     protected function clearCaches(): void
     {
-        Cache::forget('available_locales_shared');
+        SWRCache::forget('available_locales_shared');
         Cache::forget('active_language_codes_for_middleware');
     }
 }

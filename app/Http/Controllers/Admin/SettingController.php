@@ -5,7 +5,8 @@ use App\Http\Requests\Admin\UpdateSettingsRequest;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Cache; // Added Cache for clearing
+use App\Services\SWRCache;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -78,11 +79,11 @@ class SettingController extends Controller
 
         // Clear relevant caches (both direct and _shared keys used by HandleInertiaRequests)
         Cache::forget("site_settings_all");
-        Cache::forget("site_settings_all_shared");
+        SWRCache::forget("site_settings_all_shared");
         Cache::forget("active_social_accounts");
-        Cache::forget("active_social_accounts_shared");
+        SWRCache::forget("active_social_accounts_shared");
         Cache::forget("published_navigation_items_structured");
-        Cache::forget("published_navigation_items_structured_shared");
+        SWRCache::forget("published_navigation_items_structured_shared");
         // Specific setting caches (observers will also handle this, but belt-and-suspenders here is fine)
         if (isset($validatedData["about_page_content"])) {
             Cache::forget("setting_about_page_content");

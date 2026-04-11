@@ -8,8 +8,7 @@ use Tighten\Ziggy\Ziggy;
 use App\Models\SocialAccount;
 use App\Models\NavigationItem;
 use App\Models\Language;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
+use App\Services\SWRCache;
 use Illuminate\Support\Facades\App;
 
 class HandleInertiaRequests extends Middleware
@@ -25,13 +24,13 @@ class HandleInertiaRequests extends Middleware
     {
         $currentLocaleCode = App::getLocale();
 
-        $availableLocales = Cache::remember(
+        $availableLocales = SWRCache::remember(
             "available_locales_shared",
-            3600,
+            300,
             function () {
                 return Language::where("is_active", true)
                     ->orderBy("name")
-                    ->get(["code", "name", "native_name", "is_rtl"]) // Ensure is_rtl is selected
+                    ->get(["code", "name", "native_name", "is_rtl"])
                     ->toArray();
             }
         );
@@ -76,18 +75,18 @@ class HandleInertiaRequests extends Middleware
             // "current_locale_is_rtl" => $currentLocaleIsRTL, // Can be removed if app.jsx handles it
 
             // Other shared data...
-            "socialAccounts" => Cache::remember(
+            "socialAccounts" => SWRCache::remember(
                 "active_social_accounts_shared",
-                3600,
+                300,
                 function () {
                     return SocialAccount::active()
                         ->orderBy("display_order")
                         ->get(["id", "platform", "url", "account_name"]);
                 }
             ),
-            "navigationItems" => Cache::remember(
+            "navigationItems" => SWRCache::remember(
                 "published_navigation_items_structured_shared",
-                3600,
+                300,
                 function () {
                     // ... (same logic as before)
                     $locations = NavigationItem::published()
@@ -117,9 +116,9 @@ class HandleInertiaRequests extends Middleware
                     return $structuredNav;
                 }
             ),
-            "settings" => Cache::remember(
+            "settings" => SWRCache::remember(
                 "site_settings_all_shared",
-                3600,
+                300,
                 function () {
                     // Share essential, non-sensitive settings if needed globally
                     // Be cautious about sharing too much data on every request

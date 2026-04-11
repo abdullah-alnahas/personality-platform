@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Setting;
+use App\Services\SWRCache;
 use Illuminate\Support\Facades\Cache;
 
 class SettingObserver
@@ -10,7 +11,7 @@ class SettingObserver
     private function clearSettingCaches(Setting $setting): void
     {
         Cache::forget("site_settings_all"); // Used in HomepageController
-        Cache::forget("site_settings_all_shared"); // Used in HandleInertiaRequests
+        SWRCache::forget("site_settings_all_shared"); // Used in HandleInertiaRequests
         // Specific keys used in AboutPageController
         if (in_array($setting->key, ["about_page_content", "site_name"])) {
             Cache::forget("setting_" . $setting->key);

@@ -7,6 +7,7 @@ use App\Models\NavigationItem;
 use App\Http\Requests\Admin\StoreNavigationItemRequest;
 use App\Http\Requests\Admin\UpdateNavigationItemRequest;
 use Illuminate\Http\RedirectResponse;
+use App\Services\SWRCache;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -58,7 +59,7 @@ class NavigationItemController extends Controller
 
         // --- Clear the navigation cache ---
         Cache::forget('published_navigation_items_structured');
-        Cache::forget('published_navigation_items_structured_shared');
+        SWRCache::forget('published_navigation_items_structured_shared');
         // --- End Cache Clear ---
 
         return redirect()->route('admin.navigation-items.index')
@@ -99,7 +100,7 @@ class NavigationItemController extends Controller
 
         // --- Clear the navigation cache ---
         Cache::forget('published_navigation_items_structured');
-        Cache::forget('published_navigation_items_structured_shared');
+        SWRCache::forget('published_navigation_items_structured_shared');
         // --- End Cache Clear ---
 
         return redirect()->route('admin.navigation-items.index')
@@ -116,7 +117,7 @@ class NavigationItemController extends Controller
 
         // --- Clear the navigation cache ---
         Cache::forget('published_navigation_items_structured');
-        Cache::forget('published_navigation_items_structured_shared');
+        SWRCache::forget('published_navigation_items_structured_shared');
         // --- End Cache Clear ---
 
         return redirect()->route('admin.navigation-items.index')

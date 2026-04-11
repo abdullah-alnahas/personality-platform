@@ -44,8 +44,9 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         // Honeypot: a real browser never fills this field; bots usually do.
+        // ConvertEmptyStringsToNull middleware converts '' → null, so check for both.
         // Return generic auth error so the rejection reason is not revealed.
-        if ($this->input('_confirm_email') !== '') {
+        if (!empty($this->input('_confirm_email'))) {
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
