@@ -19,9 +19,8 @@ class Setting extends Model
     // Define which attributes are translatable
     public array $translatable = ['value'];
 
-    // Cast the 'value' field (which is JSON in DB) to array/object
     protected $casts = [
-        'value' => 'array',
+        // 'value' is handled by HasTranslations — no separate array cast needed
     ];
 
     // Disable timestamps if your 'settings' table doesn't have created_at/updated_at

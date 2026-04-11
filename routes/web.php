@@ -44,7 +44,9 @@ Route::middleware(['page.cache', 'csp'])->group(function () {
         "contact.show"
     );
 
-    Route::get("/search", SearchController::class)->name("search");
+    Route::get("/search", SearchController::class)
+        ->middleware('throttle:30,1')
+        ->name("search");
 
     // Dynamic pages (catch-all for page slugs - must be after all specific routes)
     Route::get("/page/{slug}", [PageDisplayController::class, "show"])

@@ -42,18 +42,16 @@ class PageDisplayController extends Controller
 
     public function show(string $slug): Response
     {
-        // Fetch without caching first so a missing page never poisons the cache.
-        $page = Page::published()
-            ->where('slug', $slug)
-            ->with(['publishedBlocks'])
-            ->first();
+        $page = Cache::remember("page_data_{$slug}", 3600, function () use ($slug) {
+            return Page::published()
+                ->where('slug', $slug)
+                ->with(['publishedBlocks'])
+                ->first();
+        });
 
         if (!$page) {
             abort(404);
         }
-
-        // Only cache once we know the page exists.
-        $page = Cache::remember("page_data_{$slug}", 3600, fn() => $page);
 
         return $this->renderPage($page);
     }

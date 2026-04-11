@@ -8,15 +8,25 @@ use Illuminate\Validation\Rule;
 
 class UpdateSettingsRequest extends FormRequest
 {
+    private $settingsCache;
+
     public function authorize(): bool
     {
         return $this->user()->can("manage settings");
     }
 
+    protected function getSettingsMap()
+    {
+        if (!$this->settingsCache) {
+            $this->settingsCache = Setting::all()->keyBy("key");
+        }
+        return $this->settingsCache;
+    }
+
     public function rules(): array
     {
         $rules = [];
-        $settings = Setting::all()->keyBy("key"); // Get all defined settings
+        $settings = $this->getSettingsMap();
 
         foreach ($this->all() as $key => $value) {
             if ($key === "_method" || $key === "_token") {
@@ -76,7 +86,7 @@ class UpdateSettingsRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $settings = Setting::all()->keyBy("key");
+        $settings = $this->getSettingsMap();
         $data = $this->all();
 
         foreach ($data as $key => $value) {

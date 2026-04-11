@@ -844,11 +844,11 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                         <MuiLink
                                             key={`${col.key}-${item.id}`}
                                             component={
-                                                item.url.startsWith('http')
+                                                (item.url || '').startsWith('http')
                                                     ? 'a'
                                                     : InertiaLink
                                             }
-                                            href={item.url}
+                                            href={item.url || '#'}
                                             target={item.target}
                                             rel={
                                                 item.target === '_blank'

@@ -36,10 +36,6 @@ class ContentCategory extends Model
     ];
 
     protected $casts = [
-        "name" => "array",
-        "description" => "array",
-        "quote" => "array",
-        "meta_fields" => "array",
         "order" => "integer",
         "page_id" => "integer",
     ];

@@ -9,11 +9,18 @@ class HomepageSectionObserver
 {
     public function saved(HomepageSection $homepageSection): void
     {
-        Cache::forget("homepage_sections_data");
+        $this->clearCaches();
     }
 
     public function deleted(HomepageSection $homepageSection): void
     {
+        $this->clearCaches();
+    }
+
+    protected function clearCaches(): void
+    {
         Cache::forget("homepage_sections_data");
+        Cache::forget("homepage_sections_data_v2");
+        Cache::forget("homepage_data");
     }
 }

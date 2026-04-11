@@ -90,11 +90,6 @@ class ContentItem extends Model implements HasMedia
      * @var array<string, string>
      */
     protected $casts = [
-        "title" => "array",
-        "content" => "array",
-        "excerpt" => "array",
-        "meta_fields" => "array",
-        "featured_image_alt_text" => "array",
         "publish_date" => "datetime",
         "is_featured_home" => "boolean",
     ];

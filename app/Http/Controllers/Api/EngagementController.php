@@ -27,7 +27,14 @@ class EngagementController extends Controller
         ]);
 
         $modelClass = self::MODEL_MAP[$validated['content_type']] ?? null;
-        if (!$modelClass || !$modelClass::where('id', $validated['content_id'])->exists()) {
+        if (!$modelClass) {
+            return response()->json(['message' => 'Content not found.'], 404);
+        }
+        $query = $modelClass::where('id', $validated['content_id']);
+        if (method_exists($modelClass, 'scopePublished')) {
+            $query->published();
+        }
+        if (!$query->exists()) {
             return response()->json(['message' => 'Content not found.'], 404);
         }
 

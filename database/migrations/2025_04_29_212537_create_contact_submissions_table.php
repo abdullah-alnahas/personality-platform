@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('email');
             $table->text('message');
             $table->string('status')->default('new'); // new, read, archived
-            $table->ipAddress('ip_address')->nullable();
+            $table->string('ip_address', 64)->nullable();
             $table->text('user_agent')->nullable();
             $table->timestamps();
         });

@@ -35,19 +35,21 @@ class SubscriptionController extends Controller
             // ... generate new token, send email ...
             // return back()->with('success', 'Please check your email to confirm your subscription.');
         } elseif (!$subscriber) {
-            // Create new subscriber (pending confirmation - implement confirmation later if needed)
-            $newSubscriber = Subscriber::create([
-                'email' => $validated['email'],
-            ]);
-            $newSubscriber->status = 'confirmed';
-            $newSubscriber->confirmed_at = now();
-            $newSubscriber->save();
+            try {
+                $newSubscriber = Subscriber::create([
+                    'email' => $validated['email'],
+                ]);
+                $newSubscriber->status = 'confirmed';
+                $newSubscriber->confirmed_at = now();
+                $newSubscriber->save();
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($e->errorInfo[1] == 1062) {
+                    return back()->with('success', 'If this address is new, you will be subscribed shortly.');
+                }
+                throw $e;
+            }
 
-            // Optional: Send confirmation email for double opt-in
-            // Mail::to($newSubscriber->email)->send(new ConfirmSubscription($newSubscriber));
-            // return back()->with('success', 'Please check your email to confirm your subscription.');
-
-            return back()->with('success', 'Thank you for subscribing!'); // MVP success message
+            return back()->with('success', 'Thank you for subscribing!');
         } else {
             // Generic response — do not confirm whether the email is already subscribed.
             return back()->with('success', 'If this address is new, you will be subscribed shortly.');

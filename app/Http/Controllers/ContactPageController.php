@@ -33,12 +33,11 @@ class ContactPageController extends Controller
     {
         $validated = $request->validated();
 
-        $submission = ContactSubmission::create([
-            'name'       => $validated['name'],
-            'email'      => $validated['email'],
-            'message'    => $validated['message'],
-            'user_agent' => mb_substr((string) $request->userAgent(), 0, 500),
-        ]);
+        $submission = new ContactSubmission();
+        $submission->name = $validated['name'];
+        $submission->email = $validated['email'];
+        $submission->message = $validated['message'];
+        $submission->user_agent = mb_substr((string) $request->userAgent(), 0, 500);
         $submission->status = 'new';
         $submission->ip_address = hash('sha256', $request->ip() . config('app.key'));
         $submission->save();

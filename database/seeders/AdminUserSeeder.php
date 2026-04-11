@@ -13,11 +13,16 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
+        if (app()->environment('production') && !env('ADMIN_SEED_PASSWORD')) {
+            $this->command?->warn('Skipping AdminUserSeeder in production (set ADMIN_SEED_PASSWORD env var to override).');
+            return;
+        }
+
         $adminUser = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
+            ['email' => env('ADMIN_SEED_EMAIL', 'admin@example.com')],
             [
-                'name' => 'Admin User',
-                'password' => Hash::make('password'), // Change this in production!
+                'name' => env('ADMIN_SEED_NAME', 'Admin User'),
+                'password' => Hash::make(env('ADMIN_SEED_PASSWORD', 'password')),
                 'email_verified_at' => now(),
             ]
         );
