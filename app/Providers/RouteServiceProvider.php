@@ -20,6 +20,14 @@ class RouteServiceProvider extends ServiceProvider
     public const HOME = '/admin/dashboard';
 
     /**
+     * Get the post-authentication redirect path, respecting configurable admin prefix.
+     */
+    public static function home(): string
+    {
+        return '/' . config('admin.path', 'admin') . '/dashboard';
+    }
+
+    /**
      * Define your route model bindings, pattern filters, and other route configuration.
      */
     public function boot(): void

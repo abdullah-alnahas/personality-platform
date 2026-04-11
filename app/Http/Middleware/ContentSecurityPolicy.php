@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Vite;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -11,12 +12,18 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * CSP notes:
  * - style-src requires 'unsafe-inline' because MUI injects inline styles.
- * - script-src allows 'unsafe-inline' only in local env (Vite HMR requirement).
+ * - script-src uses a per-request nonce for inline scripts (Ziggy @routes,
+ *   Vite manifest). The nonce is shared via app('csp-nonce') for use in Blade.
  */
 class ContentSecurityPolicy
 {
     public function handle(Request $request, Closure $next): Response
     {
+        // Generate a per-request nonce for inline scripts (Ziggy @routes, Vite)
+        $nonce = base64_encode(random_bytes(16));
+        app()->instance('csp-nonce', $nonce);
+        Vite::useCspNonce($nonce);
+
         /** @var Response $response */
         $response = $next($request);
 
@@ -25,7 +32,7 @@ class ContentSecurityPolicy
 
         $directives = [
             "default-src 'self'",
-            "script-src 'self'" . (app()->environment('local') ? " 'unsafe-inline'" : '') . " {$vite}",
+            "script-src 'self' 'nonce-{$nonce}'" . (app()->environment('local') ? " 'unsafe-inline'" : '') . " {$vite}",
             "style-src 'self' 'unsafe-inline' {$fonts}",
             "img-src 'self' data: https:",
             "font-src 'self' {$fonts} https:",

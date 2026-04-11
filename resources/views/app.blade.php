@@ -12,7 +12,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Tajawal:wght@300;400;500;700&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        @routes
+        @routes(nonce: app()->bound('csp-nonce') ? app('csp-nonce') : '')
         @viteReactRefresh
         @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
         @inertiaHead
