@@ -8,7 +8,7 @@ import {
     TextField,
     Button,
     Paper,
-    Grid,
+    Grid2 as Grid,
     FormHelperText,
     Divider,
     Switch,

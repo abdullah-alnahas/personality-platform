@@ -29,11 +29,11 @@ class SubscriptionController extends Controller
             $subscriber->confirmed_at = now(); // Or null if pending
             $subscriber->token = null; // Clear old token
             $subscriber->save();
-            return back()->with('success', 'You have been re-subscribed successfully!');
+            return back()->with('success', __('You have been re-subscribed successfully!'));
 
             // Option 2: Trigger re-confirmation email (more complex)
             // ... generate new token, send email ...
-            // return back()->with('success', 'Please check your email to confirm your subscription.');
+            // return back()->with('success', __('Please check your email to confirm your subscription.'));
         } elseif (!$subscriber) {
             try {
                 $newSubscriber = Subscriber::create([
@@ -44,15 +44,15 @@ class SubscriptionController extends Controller
                 $newSubscriber->save();
             } catch (\Illuminate\Database\QueryException $e) {
                 if ($e->errorInfo[1] == 1062) {
-                    return back()->with('success', 'If this address is new, you will be subscribed shortly.');
+                    return back()->with('success', __('If this address is new, you will be subscribed shortly.'));
                 }
                 throw $e;
             }
 
-            return back()->with('success', 'Thank you for subscribing!');
+            return back()->with('success', __('Thank you for subscribing!'));
         } else {
             // Generic response — do not confirm whether the email is already subscribed.
-            return back()->with('success', 'If this address is new, you will be subscribed shortly.');
+            return back()->with('success', __('If this address is new, you will be subscribed shortly.'));
         }
     }
 }

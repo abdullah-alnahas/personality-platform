@@ -7,8 +7,6 @@ use App\Models\NavigationItem;
 use App\Http\Requests\Admin\StoreNavigationItemRequest;
 use App\Http\Requests\Admin\UpdateNavigationItemRequest;
 use Illuminate\Http\RedirectResponse;
-use App\Services\SWRCache;
-use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -57,13 +55,8 @@ class NavigationItemController extends Controller
     {
         NavigationItem::create($request->validated());
 
-        // --- Clear the navigation cache ---
-        Cache::forget('published_navigation_items_structured');
-        SWRCache::forget('published_navigation_items_structured_shared');
-        // --- End Cache Clear ---
-
         return redirect()->route('admin.navigation-items.index')
-            ->with('success', 'Navigation item created successfully.');
+            ->with('success', __('Navigation item created successfully.'));
     }
 
     /**
@@ -98,13 +91,8 @@ class NavigationItemController extends Controller
     {
         $navigation_item->update($request->validated());
 
-        // --- Clear the navigation cache ---
-        Cache::forget('published_navigation_items_structured');
-        SWRCache::forget('published_navigation_items_structured_shared');
-        // --- End Cache Clear ---
-
         return redirect()->route('admin.navigation-items.index')
-            ->with('success', 'Navigation item updated successfully.');
+            ->with('success', __('Navigation item updated successfully.'));
     }
 
     /**
@@ -115,12 +103,7 @@ class NavigationItemController extends Controller
         $this->authorize('manage navigation');
         $navigation_item->delete();
 
-        // --- Clear the navigation cache ---
-        Cache::forget('published_navigation_items_structured');
-        SWRCache::forget('published_navigation_items_structured_shared');
-        // --- End Cache Clear ---
-
         return redirect()->route('admin.navigation-items.index')
-            ->with('success', 'Navigation item deleted successfully.');
+            ->with('success', __('Navigation item deleted successfully.'));
     }
 }

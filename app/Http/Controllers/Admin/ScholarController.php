@@ -68,7 +68,7 @@ class ScholarController extends Controller
         Scholar::create($validated);
 
         return redirect()->route('admin.scholars.index')
-            ->with('success', 'Scholar created successfully.');
+            ->with('success', __('Scholar created successfully.'));
     }
 
     public function edit(Scholar $scholar): Response
@@ -110,7 +110,7 @@ class ScholarController extends Controller
         $scholar->update($validated);
 
         return redirect()->route('admin.scholars.index')
-            ->with('success', 'Scholar updated successfully.');
+            ->with('success', __('Scholar updated successfully.'));
     }
 
     public function destroy(Scholar $scholar): RedirectResponse
@@ -120,6 +120,6 @@ class ScholarController extends Controller
         $scholar->delete();
 
         return redirect()->route('admin.scholars.index')
-            ->with('success', 'Scholar deleted.');
+            ->with('success', __('Scholar deleted.'));
     }
 }

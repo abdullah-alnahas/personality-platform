@@ -119,7 +119,7 @@ class ContentItemController extends Controller
 
         return redirect()
             ->route("admin.content-items.index")
-            ->with("success", "Content item created successfully.");
+            ->with("success", __("Content item created successfully."));
     }
 
     /**
@@ -196,7 +196,7 @@ class ContentItemController extends Controller
 
         return redirect()
             ->route("admin.content-items.index")
-            ->with("success", "Content item updated successfully.");
+            ->with("success", __("Content item updated successfully."));
     }
 
     /**
@@ -212,6 +212,6 @@ class ContentItemController extends Controller
 
         return redirect()
             ->route("admin.content-items.index")
-            ->with("success", "Content item deleted successfully.");
+            ->with("success", __("Content item deleted successfully."));
     }
 }

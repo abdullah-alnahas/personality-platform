@@ -7,7 +7,7 @@ import {
     TextField,
     Button,
     Paper,
-    Grid,
+    Grid2 as Grid,
     Switch,
     FormControlLabel,
     FormHelperText,

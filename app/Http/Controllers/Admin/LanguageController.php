@@ -55,7 +55,7 @@ class LanguageController extends Controller
 
         return redirect()
             ->route("admin.languages.index")
-            ->with("success", "Language created successfully.");
+            ->with("success", __("Language created successfully."));
     }
 
     /**
@@ -84,7 +84,7 @@ class LanguageController extends Controller
 
         return redirect()
             ->route("admin.languages.index")
-            ->with("success", "Language updated successfully.");
+            ->with("success", __("Language updated successfully."));
     }
 
     /**
@@ -111,6 +111,6 @@ class LanguageController extends Controller
 
         return redirect()
             ->route("admin.languages.index")
-            ->with("success", "Language deleted successfully.");
+            ->with("success", __("Language deleted successfully."));
     }
 }

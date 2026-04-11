@@ -39,7 +39,7 @@ class QuoteController extends Controller
         Quote::create($validatedData);
         return redirect()
             ->route("admin.quotes.index")
-            ->with("success", "Quote created successfully.");
+            ->with("success", __("Quote created successfully."));
     }
 
     public function edit(Quote $quote): Response
@@ -59,7 +59,7 @@ class QuoteController extends Controller
         $quote->update($validatedData);
         return redirect()
             ->route("admin.quotes.index")
-            ->with("success", "Quote updated successfully.");
+            ->with("success", __("Quote updated successfully."));
     }
 
     public function destroy(Quote $quote): RedirectResponse
@@ -68,6 +68,6 @@ class QuoteController extends Controller
         $quote->delete();
         return redirect()
             ->route("admin.quotes.index")
-            ->with("success", "Quote deleted successfully.");
+            ->with("success", __("Quote deleted successfully."));
     }
 }

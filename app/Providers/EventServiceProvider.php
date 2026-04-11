@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Event;
 // Import Models and Observers
 use App\Models\Setting;
 use App\Observers\SettingObserver;
-use App\Models\HomepageSection;
-use App\Observers\HomepageSectionObserver;
 use App\Models\SocialAccount;
 use App\Observers\SocialAccountObserver;
 use App\Models\NavigationItem;
@@ -52,7 +50,6 @@ class EventServiceProvider extends ServiceProvider
         parent::boot();
 
         Setting::observe(SettingObserver::class);
-        HomepageSection::observe(HomepageSectionObserver::class);
         SocialAccount::observe(SocialAccountObserver::class);
         NavigationItem::observe(NavigationItemObserver::class);
         ContentItem::observe(ContentItemObserver::class);

@@ -14,7 +14,7 @@ import {
     TextField,
     Button,
     Paper,
-    Grid,
+    Grid2 as Grid,
     FormControl,
     InputLabel,
     Select,

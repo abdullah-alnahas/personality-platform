@@ -72,7 +72,7 @@ class BookController extends Controller
         Book::create($validated);
 
         return redirect()->route('admin.books.index')
-            ->with('success', 'Book created successfully.');
+            ->with('success', __('Book created successfully.'));
     }
 
     public function edit(Book $book): Response
@@ -118,7 +118,7 @@ class BookController extends Controller
         $book->update($validated);
 
         return redirect()->route('admin.books.index')
-            ->with('success', 'Book updated successfully.');
+            ->with('success', __('Book updated successfully.'));
     }
 
     public function destroy(Book $book): RedirectResponse
@@ -128,6 +128,6 @@ class BookController extends Controller
         $book->delete();
 
         return redirect()->route('admin.books.index')
-            ->with('success', 'Book deleted.');
+            ->with('success', __('Book deleted.'));
     }
 }

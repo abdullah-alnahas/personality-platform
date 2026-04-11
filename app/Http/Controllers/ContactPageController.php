@@ -45,6 +45,6 @@ class ContactPageController extends Controller
         // Optional: Send notification email to admin
         // Mail::to(config('mail.admin_address'))->send(new ContactFormSubmitted($validated));
 
-        return back()->with('success', 'Thank you for your message! We will get back to you soon.');
+        return back()->with('success', __('Thank you for your message! We will get back to you soon.'));
     }
 }

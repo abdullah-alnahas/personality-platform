@@ -33,49 +33,19 @@ import {
     FormControl,
     InputLabel,
 } from "@mui/material";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import YouTubeIcon from "@mui/icons-material/YouTube";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import TelegramIcon from "@mui/icons-material/Telegram";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LanguageIcon from "@mui/icons-material/Language";
-import LinkIconOriginal from "@mui/icons-material/Link";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CookieConsentBanner from "@/Components/CookieConsentBanner";
-
-const SocialIcon = ({ platform }) => {
-    /* ... (same as before) ... */
-    switch (platform?.toLowerCase()) {
-        case "facebook":
-            return <FacebookIcon />;
-        case "x":
-            return <TwitterIcon />;
-        case "twitter":
-            return <TwitterIcon />;
-        case "youtube":
-            return <YouTubeIcon />;
-        case "instagram":
-            return <InstagramIcon />;
-        case "telegram":
-            return <TelegramIcon />;
-        case "linkedin":
-            return <LinkedInIcon />;
-        default:
-            return <LinkIconOriginal />;
-    }
-};
-const getTranslatedField = (fieldObject, pageProps, fallback = "") => {
-    /* ... (same as before) ... */
-    const currentLocale = pageProps.current_locale || "en";
+import SocialIcon from "@/Components/SocialIcon";
+const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
     if (fieldObject == null) return fallback;
     if (typeof fieldObject !== "object") return String(fieldObject) || fallback;
     return (
-        fieldObject[currentLocale] ||
-        fieldObject[Object.keys(fieldObject)[0]] ||
+        fieldObject[locale] ||
+        Object.values(fieldObject)[0] ||
         fallback
     );
 };
@@ -86,9 +56,7 @@ const NavLink = ({
     currentLocale,
 }) => {
     /* ... (same as before, ensure `pageProps` is passed if `usePage` was used inside) ... */
-    const label = getTranslatedField(item.label, {
-        current_locale: currentLocale,
-    });
+    const label = getTranslatedField(item.label, currentLocale);
     const commonProps = {
         color: isMenuItem || isDrawerItem ? "inherit" : "text.secondary",
         underline: "hover",
@@ -149,9 +117,7 @@ const HeaderNavLink = ({ item, currentLocale }) => {
         if (hasChildren) setAnchorEl(event.currentTarget);
     };
     const handleClose = () => setAnchorEl(null);
-    const label = getTranslatedField(item.label, {
-        current_locale: currentLocale,
-    });
+    const label = getTranslatedField(item.label, currentLocale);
     const commonProps = {
         color: "inherit",
         underline: "hover",
@@ -243,7 +209,6 @@ export default function PublicLayout({ children, title: pageTitle }) {
         available_locales: availableLocales,
         current_locale: currentLocale,
     } = usePage().props;
-    const pageProps = usePage().props;
     const currentLang = availableLocales?.find((l) => l.code === currentLocale);
     const isRTL = currentLang?.is_rtl || currentLocale === 'ar';
     const {
@@ -260,11 +225,11 @@ export default function PublicLayout({ children, title: pageTitle }) {
     const [snackbarSeverity, setSnackbarSeverity] = useState("success");
     const siteName = getTranslatedField(
         settings?.site_name?.value,
-        pageProps,
+        currentLocale,
         "Personality Platform",
     );
-    const logoUrl = getTranslatedField(settings?.logo_url?.value, pageProps, "");
-    const logoWidth = parseInt(getTranslatedField(settings?.logo_width?.value, pageProps, "120"), 10) || 120;
+    const logoUrl = getTranslatedField(settings?.logo_url?.value, currentLocale, "");
+    const logoWidth = parseInt(getTranslatedField(settings?.logo_width?.value, currentLocale, "120"), 10) || 120;
     const headerNavItems = navigationItems?.header ?? [];
     const footerCol1Items =
         navigationItems?.footer_col1?.filter((item) => !item.parent_id) ?? [];
@@ -440,7 +405,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             <ListItemText
                                 primary={getTranslatedField(
                                     item.label,
-                                    pageProps,
+                                    currentLocale,
                                 )}
                             />
                         </ListItemButton>
@@ -472,7 +437,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                             <ListItemText
                                                 primary={getTranslatedField(
                                                     child.label,
-                                                    pageProps,
+                                                    currentLocale,
                                                 )}
                                             />
                                         </ListItemButton>
@@ -764,7 +729,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             >
                                 {getTranslatedField(
                                     settings?.site_description?.value,
-                                    pageProps,
+                                    currentLocale,
                                     "Sharing knowledge and insights.",
                                 )}
                             </Typography>
@@ -775,7 +740,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                             title={
                                                 getTranslatedField(
                                                     acc.account_name,
-                                                    pageProps,
+                                                    currentLocale,
                                                 ) || acc.platform
                                             }
                                             key={acc.id}
@@ -789,7 +754,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                                     aria-label={
                                                         getTranslatedField(
                                                             acc.account_name,
-                                                            pageProps,
+                                                            currentLocale,
                                                         ) || acc.platform
                                                     }
                                                     disabled={!acc.url}
@@ -956,7 +921,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                     >
                         {getTranslatedField(
                             settings?.footer_copyright_text?.value,
-                            pageProps,
+                            currentLocale,
                             `© {year} ${siteName}. All rights reserved.`,
                         ).replace("{year}", new Date().getFullYear())}
                     </Typography>

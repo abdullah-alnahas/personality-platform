@@ -54,7 +54,7 @@ class SocialAccountController extends Controller
         SocialAccount::create($request->validated());
 
         return redirect()->route('admin.social-accounts.index')
-                         ->with('success', 'Social account created successfully.');
+                         ->with('success', __('Social account created successfully.'));
     }
 
     /**
@@ -90,7 +90,7 @@ class SocialAccountController extends Controller
         // Cache::forget('active_social_accounts'); // Example cache key
 
         return redirect()->route('admin.social-accounts.index')
-                         ->with('success', 'Social account updated successfully.');
+                         ->with('success', __('Social account updated successfully.'));
     }
 
     /**
@@ -105,6 +105,6 @@ class SocialAccountController extends Controller
         // Cache::forget('active_social_accounts'); // Example cache key
 
         return redirect()->route('admin.social-accounts.index')
-                         ->with('success', 'Social account deleted successfully.');
+                         ->with('success', __('Social account deleted successfully.'));
     }
 }

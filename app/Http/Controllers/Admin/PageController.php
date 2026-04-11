@@ -57,7 +57,7 @@ class PageController extends Controller
 
         return redirect()
             ->route('admin.pages.edit', $page)
-            ->with('success', 'Page created. Now add blocks to build the layout.');
+            ->with('success', __('Page created. Now add blocks to build the layout.'));
     }
 
     public function edit(Page $page): InertiaResponse
@@ -97,7 +97,7 @@ class PageController extends Controller
 
         return redirect()
             ->route('admin.pages.edit', $page)
-            ->with('success', 'Page updated successfully.');
+            ->with('success', __('Page updated successfully.'));
     }
 
     public function destroy(Page $page): RedirectResponse
@@ -107,6 +107,6 @@ class PageController extends Controller
 
         return redirect()
             ->route('admin.pages.index')
-            ->with('success', 'Page deleted successfully.');
+            ->with('success', __('Page deleted successfully.'));
     }
 }

@@ -5,8 +5,6 @@ use App\Http\Requests\Admin\UpdateSettingsRequest;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
-use App\Services\SWRCache;
-use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -77,23 +75,8 @@ class SettingController extends Controller
             $setting->save();
         }
 
-        // Clear relevant caches (both direct and _shared keys used by HandleInertiaRequests)
-        Cache::forget("site_settings_all");
-        SWRCache::forget("site_settings_all_shared");
-        Cache::forget("active_social_accounts");
-        SWRCache::forget("active_social_accounts_shared");
-        Cache::forget("published_navigation_items_structured");
-        SWRCache::forget("published_navigation_items_structured_shared");
-        // Specific setting caches (observers will also handle this, but belt-and-suspenders here is fine)
-        if (isset($validatedData["about_page_content"])) {
-            Cache::forget("setting_about_page_content");
-        }
-        if (isset($validatedData["site_name"])) {
-            Cache::forget("setting_site_name");
-        }
-
         return redirect()
             ->route("admin.settings.edit")
-            ->with("success", "Settings updated successfully.");
+            ->with("success", __("Settings updated successfully."));
     }
 }

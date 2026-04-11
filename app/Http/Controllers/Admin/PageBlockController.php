@@ -57,7 +57,7 @@ class PageBlockController extends Controller
 
         return redirect()
             ->route('admin.pages.edit', $page)
-            ->with('success', 'Block added successfully.');
+            ->with('success', __('Block added successfully.'));
     }
 
     public function edit(Page $page, PageBlock $block): InertiaResponse
@@ -105,7 +105,7 @@ class PageBlockController extends Controller
 
         return redirect()
             ->route('admin.pages.edit', $page)
-            ->with('success', 'Block updated successfully.');
+            ->with('success', __('Block updated successfully.'));
     }
 
     public function destroy(Page $page, PageBlock $block): RedirectResponse
@@ -116,7 +116,7 @@ class PageBlockController extends Controller
 
         return redirect()
             ->route('admin.pages.edit', $page)
-            ->with('success', 'Block deleted successfully.');
+            ->with('success', __('Block deleted successfully.'));
     }
 
     public function reorder(Request $request, Page $page): JsonResponse

@@ -6,6 +6,7 @@ use App\Models\ContentCategory;
 use App\Models\ContentItem;
 use App\Models\Setting;
 use App\Services\BlockDataResolver;
+use App\Services\ResponsiveImageHelper;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -14,126 +15,6 @@ use Illuminate\Support\Facades\Cache;
 
 class ContentController extends Controller
 {
-    /**
-     * Helper function to prepare responsive image data for the frontend.
-     *
-     * @param ContentItem $item The content item model.
-     * @param string $collectionName The name of the media collection.
-     * @return array|null An array of image details or null if no media.
-     */
-    private function getResponsiveImageData(
-        ContentItem $item,
-        string $collectionName = "featured_image"
-    ): ?array {
-        $media = $item->getFirstMedia($collectionName);
-        if (!$media) {
-            return null;
-        }
-
-        // Prioritize dedicated alt text, fallback to item title for the current locale
-        $currentLocale = App::getLocale();
-        $altText = $item->getTranslation(
-            "featured_image_alt_text",
-            $currentLocale,
-            false
-        ); // Don't use fallback here initially
-
-        if (empty($altText) || $altText === $item->featured_image_alt_text) {
-            // Check if it's the raw JSON or empty
-            $altText = $item->getTranslation("title", $currentLocale); // Fallback to title
-        }
-
-        $imageData = [
-            "alt" => $altText,
-            "original_url" => $media->getFullUrl(), // Use getFullUrl() for original
-            "webp_sources" => [],
-            "jpg_sources" => [],
-            "thumbnail_webp" => $media->hasGeneratedConversion("thumbnail")
-                ? $media->getUrl("thumbnail")
-                : null,
-            "thumbnail_jpg" => $media->hasGeneratedConversion("thumbnail_jpg")
-                ? $media->getUrl("thumbnail_jpg")
-                : null,
-        ];
-
-        // Fallback for thumbnail_jpg if thumbnail_webp exists but thumbnail_jpg doesn't (e.g. original was webp)
-        if ($imageData["thumbnail_webp"] && !$imageData["thumbnail_jpg"]) {
-            // If original is not webp, this might point to original if it's a jpg/png
-            if (!in_array($media->mime_type, ["image/webp"])) {
-                $imageData["thumbnail_jpg"] = $media->hasGeneratedConversion(
-                    "thumbnail_jpg"
-                )
-                    ? $media->getUrl("thumbnail_jpg")
-                    : $media->getFullUrl();
-            }
-        } elseif (
-            !$imageData["thumbnail_webp"] &&
-            !$imageData["thumbnail_jpg"]
-        ) {
-            // If no conversions at all, use original
-            $imageData["thumbnail_jpg"] = $media->getFullUrl();
-        }
-
-        $responsiveSizes = [
-            "sm" => [
-                "width" => 320,
-                "conversion_webp" => "responsive_sm",
-                "conversion_jpg" => "responsive_sm_jpg",
-            ],
-            "md" => [
-                "width" => 768,
-                "conversion_webp" => "responsive_md",
-                "conversion_jpg" => "responsive_md_jpg",
-            ],
-            "lg" => [
-                "width" => 1200,
-                "conversion_webp" => "responsive_lg",
-                "conversion_jpg" => "responsive_lg_jpg",
-            ],
-        ];
-
-        foreach ($responsiveSizes as $sizeInfo) {
-            if ($media->hasGeneratedConversion($sizeInfo["conversion_webp"])) {
-                $imageData["webp_sources"][] = [
-                    "url" => $media->getUrl($sizeInfo["conversion_webp"]),
-                    "width" => $sizeInfo["width"],
-                ];
-            }
-            if ($media->hasGeneratedConversion($sizeInfo["conversion_jpg"])) {
-                $imageData["jpg_sources"][] = [
-                    "url" => $media->getUrl($sizeInfo["conversion_jpg"]),
-                    "width" => $sizeInfo["width"],
-                ];
-            }
-        }
-
-        // If no specific jpg sources but webp exists, add original as a basic jpg source for <picture> fallback
-        // This is a basic fallback, ideally, you'd have actual JPG conversions.
-        if (
-            empty($imageData["jpg_sources"]) &&
-            !empty($imageData["webp_sources"]) &&
-            !in_array($media->mime_type, ["image/webp"])
-        ) {
-            $imageData["jpg_sources"][] = [
-                "url" => $media->getFullUrl(),
-                "width" => $media->getCustomProperty("width", 1200),
-            ]; // Approximate width
-        }
-        // If no sources at all, provide the original URL as a single jpg_source (if it's not webp)
-        if (
-            empty($imageData["webp_sources"]) &&
-            empty($imageData["jpg_sources"]) &&
-            !in_array($media->mime_type, ["image/webp"])
-        ) {
-            $imageData["jpg_sources"][] = [
-                "url" => $media->getFullUrl(),
-                "width" => $media->getCustomProperty("width", 1200),
-            ];
-        }
-
-        return $imageData;
-    }
-
     /**
      * Display a single content item.
      *
@@ -160,7 +41,7 @@ class ContentController extends Controller
                 "category_name" => $item->category?->getTranslations("name"),
                 "category_slug" => $item->category?->slug,
                 "meta_fields" => $item->getTranslations("meta_fields"),
-                "image_details" => $this->getResponsiveImageData(
+                "image_details" => ResponsiveImageHelper::fromContentItem(
                     $item,
                     "featured_image"
                 ),
@@ -239,7 +120,7 @@ class ContentController extends Controller
                         "name"
                     ), // For consistency, though already have category
                     "category_slug" => $item->category?->slug,
-                    "image_details" => $this->getResponsiveImageData(
+                    "image_details" => ResponsiveImageHelper::fromContentItem(
                         $item,
                         "featured_image"
                     ),

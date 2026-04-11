@@ -64,6 +64,6 @@ class MediaController extends Controller
 
         return redirect()
             ->route("admin.media.index")
-            ->with("success", "Media item deleted successfully.");
+            ->with("success", __("Media item deleted successfully."));
     }
 }

@@ -220,51 +220,8 @@ class BlockDataResolver
             'category_name' => $item->category?->getTranslations('name'),
             'publish_date_formatted' => $item->publish_date?->isoFormat('LL'),
             'publish_date' => $item->publish_date?->toDateString(),
-            'image_details' => $this->getResponsiveImageData($item),
+            'image_details' => ResponsiveImageHelper::fromContentItem($item),
         ];
     }
 
-    protected function getResponsiveImageData(ContentItem $item): ?array
-    {
-        $media = $item->getFirstMedia('featured_image');
-        if (!$media) {
-            return null;
-        }
-
-        $imageData = [
-            'alt' => $item->getTranslation('title', app()->getLocale()),
-            'original_url' => $media->getUrl(),
-            'webp_sources' => [],
-            'jpg_sources' => [],
-            'thumbnail_webp' => $media->hasGeneratedConversion('thumbnail')
-                ? $media->getUrl('thumbnail')
-                : null,
-            'thumbnail_jpg' => $media->hasGeneratedConversion('thumbnail_jpg')
-                ? $media->getUrl('thumbnail_jpg')
-                : null,
-        ];
-
-        $responsiveSizes = [
-            'sm' => ['width' => 320, 'conversion_webp' => 'responsive_sm', 'conversion_jpg' => 'responsive_sm_jpg'],
-            'md' => ['width' => 768, 'conversion_webp' => 'responsive_md', 'conversion_jpg' => 'responsive_md_jpg'],
-            'lg' => ['width' => 1200, 'conversion_webp' => 'responsive_lg', 'conversion_jpg' => 'responsive_lg_jpg'],
-        ];
-
-        foreach ($responsiveSizes as $sizeInfo) {
-            if ($media->hasGeneratedConversion($sizeInfo['conversion_webp'])) {
-                $imageData['webp_sources'][] = [
-                    'url' => $media->getUrl($sizeInfo['conversion_webp']),
-                    'width' => $sizeInfo['width'],
-                ];
-            }
-            if ($media->hasGeneratedConversion($sizeInfo['conversion_jpg'])) {
-                $imageData['jpg_sources'][] = [
-                    'url' => $media->getUrl($sizeInfo['conversion_jpg']),
-                    'width' => $sizeInfo['width'],
-                ];
-            }
-        }
-
-        return $imageData;
-    }
 }

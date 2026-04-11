@@ -64,7 +64,7 @@ class ContentCategoryController extends Controller
         ContentCategory::create($request->validated());
 
         return redirect()->route('admin.content-categories.index')
-                         ->with('success', 'Category created successfully.');
+                         ->with('success', __('Category created successfully.'));
     }
 
     /**
@@ -104,7 +104,7 @@ class ContentCategoryController extends Controller
         $content_category->update($request->validated());
 
         return redirect()->route('admin.content-categories.index')
-                         ->with('success', 'Category updated successfully.');
+                         ->with('success', __('Category updated successfully.'));
     }
 
     /**
@@ -116,12 +116,12 @@ class ContentCategoryController extends Controller
 
         if ($content_category->items()->exists()) {
             return redirect()->route('admin.content-categories.index')
-                ->with('error', 'Cannot delete this category: it still has content items. Reassign or delete the items first.');
+                ->with('error', __('Cannot delete this category: it still has content items. Reassign or delete the items first.'));
         }
 
         $content_category->delete();
 
         return redirect()->route('admin.content-categories.index')
-                         ->with('success', 'Category deleted successfully.');
+                         ->with('success', __('Category deleted successfully.'));
     }
 }
