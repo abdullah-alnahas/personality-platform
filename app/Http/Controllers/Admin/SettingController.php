@@ -76,10 +76,13 @@ class SettingController extends Controller
             $setting->save();
         }
 
-        // Clear relevant caches
+        // Clear relevant caches (both direct and _shared keys used by HandleInertiaRequests)
         Cache::forget("site_settings_all");
+        Cache::forget("site_settings_all_shared");
         Cache::forget("active_social_accounts");
+        Cache::forget("active_social_accounts_shared");
         Cache::forget("published_navigation_items_structured");
+        Cache::forget("published_navigation_items_structured_shared");
         // Specific setting caches (observers will also handle this, but belt-and-suspenders here is fine)
         if (isset($validatedData["about_page_content"])) {
             Cache::forget("setting_about_page_content");

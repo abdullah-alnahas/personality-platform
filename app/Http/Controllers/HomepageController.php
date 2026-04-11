@@ -86,7 +86,12 @@ class HomepageController extends Controller
     public function __invoke(Request $request): Response
     {
         $settings = Cache::remember("site_settings_all", 3600, function () {
-            return Setting::all()->keyBy("key");
+            return Setting::all()->keyBy("key")->map(function ($setting) {
+                return [
+                    'value' => $setting->value,
+                    'type'  => $setting->type,
+                ];
+            });
         });
 
         $homepageSectionsData = Cache::remember(

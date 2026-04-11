@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContentCategory;
 use App\Models\ContentItem;
+use App\Models\Setting;
 use App\Services\BlockDataResolver;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -190,7 +191,7 @@ class ContentController extends Controller
 
             // If the category has a linked page-builder page, render that instead
             if ($category->page && $category->page->status === 'published') {
-                $resolver = new BlockDataResolver();
+                $resolver = app(BlockDataResolver::class);
                 $blocks = $category->page->blocks()
                     ->where('status', 'published')
                     ->orderBy('display_order')
@@ -210,8 +211,13 @@ class ContentController extends Controller
                         'id'    => $category->page->id,
                         'title' => $category->page->getTranslations('title'),
                         'slug'  => $category->page->slug,
+                        'layout' => $category->page->layout,
+                        'meta_fields' => $category->page->meta_fields,
                     ],
                     'blocks' => $blocks,
+                    'settings' => Cache::remember('site_settings_all', 3600, fn() =>
+                        Setting::all()->keyBy('key')->map(fn($s) => ['value' => $s->value, 'type' => $s->type])
+                    ),
                 ]);
             }
 

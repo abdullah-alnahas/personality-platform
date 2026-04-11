@@ -33,14 +33,6 @@ class Language extends Model
             $language->is_rtl = in_array($languageCodePrefix, self::RTL_CODES);
         });
 
-        // Clear relevant caches on save or delete
-        $clearCaches = function () {
-            Cache::forget("available_locales_shared"); // Used in HandleInertiaRequests
-            Cache::forget("active_language_codes_for_middleware"); // Used in SetLocale middleware
-            // Add any other related cache keys here
-        };
-
-        static::saved($clearCaches);
-        static::deleted($clearCaches);
+        // Cache clearing handled by LanguageObserver — no duplication here
     }
 }

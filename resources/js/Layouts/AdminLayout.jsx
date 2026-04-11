@@ -74,7 +74,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
     const handleLanguageChange = (event) => {
         const newLocale = event.target.value;
         if (newLocale && newLocale !== currentLocale) {
-            const baseUrl = ziggy.location.split("?")[0];
+            const baseUrl = (ziggy?.location ?? window.location.href).split("?")[0];
             const currentQuery = { ...ziggy.query };
             currentQuery.lang = newLocale;
             Object.keys(currentQuery).forEach((key) => {

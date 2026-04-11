@@ -330,7 +330,7 @@ export default function Welcome({
                 homepageSections.map((section) => renderSection(section))}
             {genericFeaturedItems &&
                 genericFeaturedItems.length > 0 &&
-                !homepageSections.some((s) =>
+                !(homepageSections || []).some((s) =>
                     ["thematic_carousel", "latest_news"].includes(
                         s.section_type,
                     ),

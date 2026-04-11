@@ -63,8 +63,8 @@ return new class extends Migration
 
     private function hasIndex(string $table, string $index): bool
     {
-        return collect(\Illuminate\Support\Facades\DB::select("SHOW INDEX FROM `{$table}`"))
-            ->pluck('Key_name')
+        return collect(Schema::getIndexes($table))
+            ->pluck('name')
             ->contains($index);
     }
 };

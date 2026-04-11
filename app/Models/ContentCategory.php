@@ -40,6 +40,8 @@ class ContentCategory extends Model
         "description" => "array",
         "quote" => "array",
         "meta_fields" => "array",
+        "order" => "integer",
+        "page_id" => "integer",
     ];
 
     public function getSlugOptions(): SlugOptions
@@ -81,7 +83,16 @@ class ContentCategory extends Model
         string $direction = "asc",
         ?string $locale = null
     ): Builder {
-        $locale = $locale ?? App::currentLocale();
+        // Whitelist all interpolated values to prevent SQL injection.
+        $allowedColumns = $this->translatable;
+        $column = in_array($column, $allowedColumns, true) ? $column : 'name';
+
+        $direction = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
+
+        $allowedLocales = config('translatable.locales', ['ar', 'en', 'tr']);
+        $rawLocale = $locale ?? App::currentLocale();
+        $locale = in_array($rawLocale, $allowedLocales, true) ? $rawLocale : 'ar';
+
         $dbDriver = $query->getConnection()->getDriverName();
 
         // Customize JSON extraction based on database driver if needed
@@ -96,6 +107,7 @@ class ContentCategory extends Model
                 $direction
             );
         } elseif ($dbDriver === "pgsql") {
+            // All three variables are whitelisted above — safe to interpolate.
             return $query->orderByRaw(
                 "({$this->getTable()}.{$column}->>'{$locale}') {$direction}"
             );

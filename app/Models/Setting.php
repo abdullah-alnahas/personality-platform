@@ -14,13 +14,7 @@ class Setting extends Model
     public $incrementing = false;   // Primary key is not auto-incrementing
     protected $keyType = 'string';  // Primary key is a string
 
-    // Define which attributes are mass assignable
-    protected $fillable = [
-        'key',
-        'value',
-        'type', // Optional: For rendering different input types later
-        'group' // Optional: For grouping settings in UI later
-    ];
+    protected $fillable = ['key', 'value', 'type', 'group'];
 
     // Define which attributes are translatable
     public array $translatable = ['value'];

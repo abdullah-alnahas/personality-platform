@@ -20,7 +20,6 @@ return new class extends Migration
 
             $table->index('status');
             $table->index('is_homepage');
-            $table->index('slug');
         });
     }
 

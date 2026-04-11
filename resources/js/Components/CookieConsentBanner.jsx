@@ -27,7 +27,6 @@ export default function CookieConsentBanner() {
         // Here you could also dispatch a custom event or call a function
         // if other parts of the app need to react immediately to consent change.
         // e.g., if (status === 'accepted_all') { loadAnalytics(); }
-        console.log(`Cookie consent status: ${status}`);
     };
 
     if (!open) {

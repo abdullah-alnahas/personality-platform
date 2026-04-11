@@ -60,10 +60,10 @@ class SocialAccountController extends Controller
     /**
      * Display the specified resource. (Usually redirect to edit)
      */
-    public function show(SocialAccount $socialAccount): RedirectResponse
+    public function show(SocialAccount $social_account): RedirectResponse
     {
         $this->authorize('manage social accounts');
-        return redirect()->route('admin.social-accounts.edit', $socialAccount);
+        return redirect()->route('admin.social-accounts.edit', $social_account);
     }
 
     /**

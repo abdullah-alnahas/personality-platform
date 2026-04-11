@@ -29,7 +29,7 @@ class AboutPageController extends Controller
         });
 
         if ($page) {
-            $resolver = new BlockDataResolver();
+            $resolver = app(BlockDataResolver::class);
             $blocks = Cache::remember("about_page_blocks_{$page->id}", 3600, function () use ($page, $resolver) {
                 return $page->blocks()
                     ->where('status', 'published')
@@ -51,8 +51,11 @@ class AboutPageController extends Controller
                     'id'    => $page->id,
                     'title' => $page->getTranslations('title'),
                     'slug'  => $page->slug,
+                    'layout' => $page->layout,
+                    'meta_fields' => $page->meta_fields,
                 ],
                 'blocks' => $blocks,
+                'settings' => $this->getSettings(),
             ]);
         }
 
@@ -71,5 +74,17 @@ class AboutPageController extends Controller
             'aboutContent' => $aboutContent,
             'siteName'     => $siteName,
         ]);
+    }
+
+    protected function getSettings(): mixed
+    {
+        return Cache::remember('site_settings_all', 3600, function () {
+            return Setting::all()->keyBy('key')->map(function ($setting) {
+                return [
+                    'value' => $setting->value,
+                    'type'  => $setting->type,
+                ];
+            });
+        });
     }
 }

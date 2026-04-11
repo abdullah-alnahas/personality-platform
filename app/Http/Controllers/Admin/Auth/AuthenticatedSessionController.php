@@ -24,7 +24,7 @@ class AuthenticatedSessionController extends Controller
         // }
 
         return Inertia::render('Admin/Auth/Login', [
-            'canResetPassword' => Route::has('password.request'), // Adjust if using different password reset flow
+            'canResetPassword' => Route::has('admin.password.request'),
             'status' => session('status'),
         ]);
     }

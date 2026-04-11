@@ -36,13 +36,12 @@ class SubscriptionController extends Controller
             // return back()->with('success', 'Please check your email to confirm your subscription.');
         } elseif (!$subscriber) {
             // Create new subscriber (pending confirmation - implement confirmation later if needed)
-            Subscriber::create([
+            $newSubscriber = Subscriber::create([
                 'email' => $validated['email'],
-                'status' => 'confirmed', // For MVP, directly confirm
-                'confirmed_at' => now(), // For MVP
-                // 'status' => 'pending', // Use pending for double opt-in
-                // 'token' => Str::random(60), // Generate token for double opt-in
             ]);
+            $newSubscriber->status = 'confirmed';
+            $newSubscriber->confirmed_at = now();
+            $newSubscriber->save();
 
             // Optional: Send confirmation email for double opt-in
             // Mail::to($newSubscriber->email)->send(new ConfirmSubscription($newSubscriber));
@@ -50,8 +49,8 @@ class SubscriptionController extends Controller
 
             return back()->with('success', 'Thank you for subscribing!'); // MVP success message
         } else {
-            // Already subscribed and confirmed/pending - handled by unique validation rule mostly
-            return back()->with('error', 'This email is already subscribed or pending confirmation.');
+            // Generic response — do not confirm whether the email is already subscribed.
+            return back()->with('success', 'If this address is new, you will be subscribed shortly.');
         }
     }
 }

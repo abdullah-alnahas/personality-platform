@@ -33,14 +33,15 @@ class ContactPageController extends Controller
     {
         $validated = $request->validated();
 
-        ContactSubmission::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'message' => $validated['message'],
-            'status' => 'new', // Default status
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
+        $submission = ContactSubmission::create([
+            'name'       => $validated['name'],
+            'email'      => $validated['email'],
+            'message'    => $validated['message'],
+            'user_agent' => mb_substr((string) $request->userAgent(), 0, 500),
         ]);
+        $submission->status = 'new';
+        $submission->ip_address = hash('sha256', $request->ip() . config('app.key'));
+        $submission->save();
 
         // Optional: Send notification email to admin
         // Mail::to(config('mail.admin_address'))->send(new ContactFormSubmitted($validated));

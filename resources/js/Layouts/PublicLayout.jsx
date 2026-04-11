@@ -100,14 +100,15 @@ const NavLink = ({
             px: isMenuItem || isDrawerItem ? 2 : isDrawerItem ? 0 : 0.5,
             fontSize: "0.875rem",
             width: "100%",
-            textAlign: isDrawerItem ? "left" : "center",
+            textAlign: isDrawerItem ? "start" : "center",
         },
     };
+    const url = item.url || '';
     const isExternal =
-        item.url.startsWith("http://") || item.url.startsWith("https://");
+        url.startsWith("http://") || url.startsWith("https://");
     if (isExternal || item.target === "_blank") {
         return (
-            <MuiLink href={item.url} {...commonProps}>
+            <MuiLink href={url} {...commonProps}>
                 {label}
             </MuiLink>
         );
@@ -115,13 +116,14 @@ const NavLink = ({
         try {
             if (
                 typeof route !== "undefined" &&
-                !item.url.includes("/") &&
-                route().has(item.url)
+                url &&
+                !url.includes("/") &&
+                route().has(url)
             ) {
                 return (
                     <MuiLink
                         component={InertiaLink}
-                        href={route(item.url)}
+                        href={route(url)}
                         {...commonProps}
                     >
                         {label}
@@ -129,10 +131,10 @@ const NavLink = ({
                 );
             }
         } catch (e) {
-            console.warn(`Ziggy route() failed for NavLink name: ${item.url}.`);
+            console.warn(`Ziggy route() failed for NavLink name: ${url}.`);
         }
         return (
-            <MuiLink component={InertiaLink} href={item.url} {...commonProps}>
+            <MuiLink component={InertiaLink} href={url || '#'} {...commonProps}>
                 {label}
             </MuiLink>
         );
@@ -163,20 +165,21 @@ const HeaderNavLink = ({ item, currentLocale }) => {
             alignItems: "center",
         },
     };
+    const url = item.url || '';
     const isExternal =
-        item.url.startsWith("http://") || item.url.startsWith("https://");
-    let linkHref = item.url;
-    if (!hasChildren && !isExternal) {
+        url.startsWith("http://") || url.startsWith("https://");
+    let linkHref = url || '#';
+    if (!hasChildren && !isExternal && url) {
         try {
             if (
                 typeof route !== "undefined" &&
-                !item.url.includes("/") &&
-                route().has(item.url)
+                !url.includes("/") &&
+                route().has(url)
             )
-                linkHref = route(item.url);
+                linkHref = route(url);
         } catch (e) {
             console.warn(
-                `Ziggy route() failed for HeaderNavLink name: ${item.url}.`,
+                `Ziggy route() failed for HeaderNavLink name: ${url}.`,
             );
         }
     }

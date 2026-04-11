@@ -40,10 +40,10 @@ class UpdateContentCategoryRequest extends FormRequest
             'name.*' => ['required_without_all:'.implode(',', $this->getOtherLanguageKeys('name')), 'nullable', 'string', 'max:255'],
 
             'description' => ['nullable', 'array'],
-            'description.*' => ['nullable', 'string'],
+            'description.*' => ['nullable', 'string', 'max:65535'],
 
             'quote' => ['nullable', 'array'],
-            'quote.*' => ['nullable', 'string'],
+            'quote.*' => ['nullable', 'string', 'max:1000'],
 
             'meta_fields' => ['nullable', 'array'],
             'meta_fields.*' => ['nullable', 'array'],

@@ -13,9 +13,6 @@ use Inertia\Response;
 
 class NavigationItemController extends Controller
 {
-    // Cache key constant for consistency
-    private const NAVIGATION_CACHE_KEY = 'published_navigation_items';
-
     /**
      * Display a listing of the resource.
      */
@@ -60,7 +57,8 @@ class NavigationItemController extends Controller
         NavigationItem::create($request->validated());
 
         // --- Clear the navigation cache ---
-        Cache::forget(self::NAVIGATION_CACHE_KEY);
+        Cache::forget('published_navigation_items_structured');
+        Cache::forget('published_navigation_items_structured_shared');
         // --- End Cache Clear ---
 
         return redirect()->route('admin.navigation-items.index')
@@ -70,10 +68,10 @@ class NavigationItemController extends Controller
     /**
      * Display the specified resource. (Usually redirect to edit)
      */
-    public function show(NavigationItem $navigationItem): RedirectResponse
+    public function show(NavigationItem $navigation_item): RedirectResponse
     {
         $this->authorize('manage navigation');
-        return redirect()->route('admin.navigation-items.edit', $navigationItem);
+        return redirect()->route('admin.navigation-items.edit', $navigation_item);
     }
 
     /**
@@ -100,7 +98,8 @@ class NavigationItemController extends Controller
         $navigation_item->update($request->validated());
 
         // --- Clear the navigation cache ---
-        Cache::forget(self::NAVIGATION_CACHE_KEY);
+        Cache::forget('published_navigation_items_structured');
+        Cache::forget('published_navigation_items_structured_shared');
         // --- End Cache Clear ---
 
         return redirect()->route('admin.navigation-items.index')
@@ -116,7 +115,8 @@ class NavigationItemController extends Controller
         $navigation_item->delete();
 
         // --- Clear the navigation cache ---
-        Cache::forget(self::NAVIGATION_CACHE_KEY);
+        Cache::forget('published_navigation_items_structured');
+        Cache::forget('published_navigation_items_structured_shared');
         // --- End Cache Clear ---
 
         return redirect()->route('admin.navigation-items.index')

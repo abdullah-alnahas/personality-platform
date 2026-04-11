@@ -39,10 +39,10 @@ class StoreContentCategoryRequest extends FormRequest
             'name.*' => ['required_without_all:'.implode(',', $this->getOtherLanguageKeys('name')), 'nullable', 'string', 'max:255'],
 
             'description' => ['nullable', 'array'],
-            'description.*' => ['nullable', 'string'], // Add max length if needed
+            'description.*' => ['nullable', 'string', 'max:65535'],
 
             'quote' => ['nullable', 'array'],
-            'quote.*' => ['nullable', 'string'],
+            'quote.*' => ['nullable', 'string', 'max:1000'],
 
             'meta_fields' => ['nullable', 'array'], // For SEO etc.
             'meta_fields.*' => ['nullable', 'array'], // Assumes meta fields are nested {en: {title: '...', desc: '...'}, ...}

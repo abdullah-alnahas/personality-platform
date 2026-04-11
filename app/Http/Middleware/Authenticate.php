@@ -17,8 +17,8 @@ class Authenticate extends Middleware
             if ($request->routeIs('admin.*')) {
                 return route('admin.login');
             }
-            // Otherwise, redirect to the default public login route
-            return route('login'); // Assumes a public login route named 'login' exists
+            // No public login route exists; always redirect to admin login
+            return route('admin.login');
         }
         return null; // Return null for JSON requests (API)
     }

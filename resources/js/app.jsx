@@ -1,13 +1,11 @@
 import "./bootstrap";
 import "../css/app.css";
 
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import "react-quill/dist/quill.snow.css";
 
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { createInertiaApp } from "@inertiajs/react";
+import { createInertiaApp, usePage } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -117,21 +115,19 @@ createInertiaApp({
             });
         };
 
-        // DynamicThemeProvider re-creates theme when relevant props change.
-        const DynamicThemeProvider = ({ children, pageProps }) => {
-            // Use React.useMemo to recreate the theme only when locale-related props change.
-            // The key for re-rendering is now explicitly tied to current_locale and available_locales from pageProps.
+        // DynamicThemeProvider uses live Inertia props so theme direction
+        // updates when the user switches language without a full page reload.
+        const DynamicThemeProvider = ({ children }) => {
+            const { props: liveProps } = usePage();
             const theme = React.useMemo(
-                () => createAppTheme(pageProps),
-                [pageProps?.current_locale, pageProps?.available_locales], // Ensure these are stable references or correctly updated
+                () => createAppTheme(liveProps),
+                [liveProps?.current_locale, liveProps?.available_locales],
             );
             return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
         };
 
-        // props.initialPage.props contains the props for the first page.
-        // The App component will receive updated props for subsequent pages.
         root.render(
-            <DynamicThemeProvider pageProps={props.initialPage.props}>
+            <DynamicThemeProvider>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <CssBaseline />
                     <App {...props} />

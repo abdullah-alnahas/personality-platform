@@ -13,8 +13,6 @@ class ContactSubmission extends Model
         'name',
         'email',
         'message',
-        'status',
-        'ip_address',
         'user_agent',
     ];
 

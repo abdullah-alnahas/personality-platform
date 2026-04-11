@@ -92,6 +92,7 @@ class PageBlockController extends Controller
 
     public function update(UpdatePageBlockRequest $request, Page $page, PageBlock $block): RedirectResponse
     {
+        Gate::authorize('manage pages');
         abort_if($block->page_id !== $page->id, 404);
         $data = $request->validated();
 
