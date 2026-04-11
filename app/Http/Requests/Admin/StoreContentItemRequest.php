@@ -41,7 +41,7 @@ class StoreContentItemRequest extends FormRequest
             ],
 
             "content" => ["nullable", "array"],
-            "content.*" => ["nullable", "string"], // Consider max length if needed
+            "content.*" => ["nullable", "string", "max:500000"],
 
             "excerpt" => ["nullable", "array"],
             "excerpt.*" => ["nullable", "string", "max:1000"], // Example max length for excerpt

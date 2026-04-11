@@ -11,7 +11,8 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import HomeIcon from "@mui/icons-material/Home";
-import { useLocale } from "@/Hooks/useLocale"; // Import the hook
+import { useLocale } from "@/Hooks/useLocale";
+import { sanitizeHtml } from "@/utils/sanitize";
 
 const StyledPictureElement = styled("picture")({
     width: "100%",
@@ -234,7 +235,7 @@ export default function ShowItem({ item }) {
                             fontFamily: "monospace",
                         },
                     }}
-                    dangerouslySetInnerHTML={{ __html: content }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }} /* DOMPurify sanitized */
                 />
             </Paper>
         </>

@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\NewPasswordController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\ContentCategoryController;
@@ -50,8 +52,8 @@ Route::middleware(['page.cache', 'csp'])->group(function () {
         ->name("page.show");
 });
 
-// Non-cacheable POST routes (still get CSP)
-Route::middleware(['csp'])->group(function () {
+// Non-cacheable POST routes (still get CSP + rate limiting)
+Route::middleware(['csp', 'throttle:5,1'])->group(function () {
     Route::post("/contact", [ContactPageController::class, "store"])->name(
         "contact.store"
     );
@@ -59,7 +61,7 @@ Route::middleware(['csp'])->group(function () {
 });
 
 // Admin Routes
-Route::prefix("admin")
+Route::prefix(config('admin.path', 'admin'))
     ->name("admin.")
     ->group(function () {
         // Authentication Routes (Guest Only)
@@ -69,14 +71,33 @@ Route::prefix("admin")
                 "create",
             ])->name("login");
 
+            // throttle:5,1 = 5 attempts per minute (defense-in-depth on top of LoginRequest limiter)
             Route::post("login", [
                 AuthenticatedSessionController::class,
                 "store",
-            ]);
+            ])->middleware("throttle:5,1");
+
+            // Password reset — kept under admin prefix so the URLs aren't easily enumerable
+            Route::get("forgot-password", [PasswordResetLinkController::class, "create"])
+                ->middleware("throttle:5,1")
+                ->name("password.request");
+
+            Route::post("forgot-password", [PasswordResetLinkController::class, "store"])
+                ->middleware("throttle:5,1")
+                ->name("password.email");
+
+            Route::get("reset-password/{token}", [NewPasswordController::class, "create"])
+                ->name("password.reset");
+
+            Route::post("reset-password", [NewPasswordController::class, "store"])
+                ->middleware("throttle:5,1")
+                ->name("password.store");
         });
 
         // Authenticated Admin Routes
-        Route::middleware(["auth" /* , 'verified' */])->group(function () {
+        // 'verified' middleware is intentionally omitted — email verification is not
+        // required for this admin-only platform (accounts are seeded, not self-registered).
+        Route::middleware(["auth"])->group(function () {
             // Logout
             Route::post("logout", [
                 AuthenticatedSessionController::class,

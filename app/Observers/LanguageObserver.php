@@ -20,5 +20,6 @@ class LanguageObserver
     protected function clearCaches(): void
     {
         Cache::forget('available_locales_shared');
+        Cache::forget('active_language_codes_for_middleware');
     }
 }

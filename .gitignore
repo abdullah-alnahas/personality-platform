@@ -1,6 +1,5 @@
 # ── Laravel (PHP) ─────────────────────────────────
 /vendor
-/composer.lock
 /.env
 /.env.*
 /bootstrap/cache/*.php
@@ -19,7 +18,6 @@
 # ── Node / React / Vite ────────────────────────────
 /node_modules
 /yarn.lock
-/package-lock.json
 /public/hot
 /public/build
 /bootstrap/ssr
@@ -35,3 +33,7 @@ npm-debug.log*
 yarn-error.log*
 
 digest.txt
+
+# Generated files
+/public/sitemap.xml
+/public/sitemap*.xml

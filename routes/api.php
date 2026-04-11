@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,9 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// /user route removed — Sanctum stateful middleware is not configured for this project
+// and the endpoint returned 401 for all unauthenticated requests.
 
 Route::post('/engage', [App\Http\Controllers\Api\EngagementController::class, 'store'])
     ->middleware('throttle:60,1')

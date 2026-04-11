@@ -28,7 +28,14 @@ class UpdateNavigationItemRequest extends FormRequest
             'menu_location' => ['sometimes', 'required', 'string', 'max:100'],
             'label' => ['sometimes', 'required', 'array'],
             'label.*' => ['required_without_all:'.implode(',', $this->getOtherLanguageKeys('label')), 'nullable', 'string', 'max:255'],
-            'url' => ['sometimes', 'required', 'string', 'max:2048'],
+            'url' => ['sometimes', 'required', 'string', 'max:2048', function ($attribute, $value, $fail) {
+                $lower = strtolower(ltrim($value));
+                foreach (['javascript:', 'data:', 'vbscript:'] as $dangerous) {
+                    if (str_starts_with($lower, $dangerous)) {
+                        $fail("The {$attribute} must not use a dangerous URI scheme.");
+                    }
+                }
+            }],
             'target' => ['sometimes', 'required', 'string', Rule::in(['_self', '_blank'])],
             'order' => ['nullable', 'integer', 'min:0'],
             // Prevent setting item as its own parent or child's parent

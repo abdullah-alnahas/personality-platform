@@ -27,6 +27,15 @@ class CacheFullPage
             return $next($request);
         }
 
+        // Don't cache pages that render forms — a cached CSRF token would be stale
+        // for subsequent visitors and cause 419 CSRF mismatch on submission.
+        $formRoutes = ['contact.show', 'subscribe'];
+        foreach ($formRoutes as $routeName) {
+            if ($request->routeIs($routeName)) {
+                return $next($request);
+            }
+        }
+
         // Don't cache responses with flash data (they're one-time messages)
         if ($request->session()->has('_flash')) {
             $flashData = $request->session()->get('_flash.new', []);
@@ -36,7 +45,10 @@ class CacheFullPage
         }
 
         $locale = app()->getLocale();
-        $cacheKey = 'full_page_' . md5($request->fullUrl() . $locale);
+        // Include X-Inertia header in key so SPA navigations (which expect JSON)
+        // never receive a cached full HTML page response.
+        $isInertia = $request->header('X-Inertia') ? '1' : '0';
+        $cacheKey = 'full_page_' . md5($request->fullUrl() . $locale . $isInertia);
 
         $cached = Cache::get($cacheKey);
 
@@ -53,13 +65,24 @@ class CacheFullPage
         $response = $next($request);
 
         if ($response->getStatusCode() === 200) {
+            // Strip session/auth headers before caching — never cache Set-Cookie,
+            // X-CSRF-TOKEN, or similar headers that are user-specific.
+            $sensitiveHeaders = ['set-cookie', 'x-csrf-token', 'x-xsrf-token'];
+            $headers = array_map(
+                fn (array $values): string => $values[0] ?? '',
+                array_diff_key(
+                    $response->headers->all(),
+                    array_flip($sensitiveHeaders)
+                )
+            );
+
+            // Tell proxies/CDNs that HTML vs JSON responses differ for same URL.
+            $response->headers->set('Vary', 'X-Inertia');
+
             Cache::put($cacheKey, [
-                'body' => $response->getContent(),
-                'status' => $response->getStatusCode(),
-                'headers' => array_map(
-                    fn (array $values): string => $values[0] ?? '',
-                    $response->headers->all()
-                ),
+                'body'    => $response->getContent(),
+                'status'  => $response->getStatusCode(),
+                'headers' => $headers,
             ], self::TTL);
 
             $response->headers->set('X-Cache', 'MISS');

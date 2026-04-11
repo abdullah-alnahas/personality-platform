@@ -325,7 +325,10 @@ export default function QuranVerse({ block }) {
     const layout = config.layout || 'overlay';
     const bgColor = config.background_color || '#1a237e';
     const paddingY = config.padding_y || '4rem';
-    const bgImage = content.background_image_url;
+    // Sanitise the URL: only allow http/https/relative paths to prevent CSS injection
+    // via crafted values like `url(x) } body { ... }`.
+    const rawBgImage = content.background_image_url;
+    const bgImage = rawBgImage && /^(https?:\/\/|\/)/.test(rawBgImage) ? rawBgImage : null;
 
     const LayoutComponent = layout === 'card' ? CardLayout : OverlayLayout;
 

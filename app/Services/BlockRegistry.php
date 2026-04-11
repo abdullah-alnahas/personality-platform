@@ -318,10 +318,21 @@ class BlockRegistry
                     $rules["{$prefix}.*"] = 'nullable|string';
                     break;
                 case 'text':
-                    $rules[$prefix] = ($isRequired ? 'required' : 'nullable') . '|string|max:2048';
+                    // Apply URL validation to fields conventionally named as links.
+                    if (str_ends_with($field, '_link') || str_ends_with($field, '_url')) {
+                        $rules[$prefix] = ($isRequired ? 'required' : 'nullable')
+                            . '|string|max:2048|regex:/^(https?:\/\/|\/)/';
+                    } else {
+                        $rules[$prefix] = ($isRequired ? 'required' : 'nullable') . '|string|max:2048';
+                    }
                     break;
                 case 'number':
-                    $rules[$prefix] = ($isRequired ? 'required' : 'nullable') . '|numeric|min:0';
+                    // max_items is clamped to 50 to prevent unbounded DB queries.
+                    if ($field === 'max_items') {
+                        $rules[$prefix] = ($isRequired ? 'required' : 'nullable') . '|integer|min:1|max:50';
+                    } else {
+                        $rules[$prefix] = ($isRequired ? 'required' : 'nullable') . '|numeric|min:0';
+                    }
                     break;
                 case 'boolean':
                     $rules[$prefix] = 'boolean';
@@ -337,8 +348,22 @@ class BlockRegistry
                     $rules[$prefix] = 'nullable|array';
                     break;
                 case 'card_list':
+                    $rules[$prefix] = ($isRequired ? 'required' : 'nullable') . '|array';
+                    // Validate each card item's key fields to prevent injection via nested data.
+                    $rules["{$prefix}.*.heading"]   = 'nullable|array';
+                    $rules["{$prefix}.*.heading.*"] = 'nullable|string|max:500';
+                    $rules["{$prefix}.*.text"]      = 'nullable|array';
+                    $rules["{$prefix}.*.text.*"]    = 'nullable|string|max:500';
+                    $rules["{$prefix}.*.image_url"] = ['nullable', 'string', 'max:2048', 'regex:/^(https?:\/\/|\/)/'];
+                    $rules["{$prefix}.*.link"]      = ['nullable', 'string', 'max:2048', 'regex:/^(https?:\/\/|\/)/'];
+                    break;
                 case 'stat_list':
                     $rules[$prefix] = ($isRequired ? 'required' : 'nullable') . '|array';
+                    $rules["{$prefix}.*.value"]    = 'nullable|string|max:100';
+                    $rules["{$prefix}.*.label"]    = 'nullable|array';
+                    $rules["{$prefix}.*.label.*"]  = 'nullable|string|max:200';
+                    $rules["{$prefix}.*.suffix"]   = 'nullable|array';
+                    $rules["{$prefix}.*.suffix.*"] = 'nullable|string|max:50';
                     break;
             }
         }

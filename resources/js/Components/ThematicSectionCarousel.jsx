@@ -1,74 +1,15 @@
-import React from "react";
-import Slider from "react-slick";
+import React, { useCallback, useEffect, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import {
     Box,
     Typography,
     IconButton,
     useTheme,
-    useMediaQuery,
 } from "@mui/material";
-import ContentCard from "@/Components/ContentCard"; // Assuming ContentCard will be used for items
+import ContentCard from "@/Components/ContentCard";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-
-// Custom Arrow components for react-slick to integrate with MUI
-function NextArrow(props) {
-    const { className, style, onClick } = props;
-    const theme = useTheme();
-    return (
-        <IconButton
-            className={className}
-            sx={{
-                ...style,
-                display: "block",
-                color: theme.palette.primary.main, // Use theme color
-                backgroundColor: theme.palette.background.paper + "aa", // Semi-transparent background
-                "&:hover": {
-                    backgroundColor: theme.palette.background.paper, // Solid on hover
-                },
-                position: "absolute",
-                top: "50%",
-                right: { xs: -10, sm: -15, md: -25 }, // Adjust position
-                transform: "translateY(-50%)",
-                zIndex: 2,
-                boxShadow: theme.shadows[2],
-            }}
-            onClick={onClick}
-            size="medium" // Adjust size as needed
-        >
-            <ArrowForwardIosIcon fontSize="inherit" />
-        </IconButton>
-    );
-}
-
-function PrevArrow(props) {
-    const { className, style, onClick } = props;
-    const theme = useTheme();
-    return (
-        <IconButton
-            className={className}
-            sx={{
-                ...style,
-                display: "block",
-                color: theme.palette.primary.main,
-                backgroundColor: theme.palette.background.paper + "aa",
-                "&:hover": {
-                    backgroundColor: theme.palette.background.paper,
-                },
-                position: "absolute",
-                top: "50%",
-                left: { xs: -10, sm: -15, md: -25 }, // Adjust position
-                transform: "translateY(-50%)",
-                zIndex: 2,
-                boxShadow: theme.shadows[2],
-            }}
-            onClick={onClick}
-            size="medium"
-        >
-            <ArrowBackIosNewIcon fontSize="inherit" />
-        </IconButton>
-    );
-}
 
 export default function ThematicSectionCarousel({
     title,
@@ -76,74 +17,46 @@ export default function ThematicSectionCarousel({
     sectionQuote = null,
 }) {
     const theme = useTheme();
-    // Breakpoints for responsive settings
-    const isXs = useMediaQuery(theme.breakpoints.down("xs")); // Extra small, less than 600px
-    const isSm = useMediaQuery(theme.breakpoints.between("sm", "md")); // Small, 600px - 900px
-    const isMd = useMediaQuery(theme.breakpoints.between("md", "lg")); // Medium, 900px - 1200px
-    const isLg = useMediaQuery(theme.breakpoints.up("lg")); // Large, 1200px and up
+    const isRtl = theme.direction === "rtl";
 
-    if (!items || items.length === 0) {
-        return null; // Don't render if no items
-    }
+    const [emblaRef, emblaApi] = useEmblaCarousel(
+        { loop: items.length > 1, direction: isRtl ? "rtl" : "ltr" },
+        [Autoplay({ delay: 5000, stopOnInteraction: false })]
+    );
 
-    // Determine number of slides to show based on current active breakpoint
-    let slidesToShow = 1;
-    if (isLg)
-        slidesToShow = 4; // Large screens
-    else if (isMd)
-        slidesToShow = 3; // Medium screens
-    else if (isSm) slidesToShow = 2; // Small screens
-    // isXs remains 1 slide
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [scrollSnaps, setScrollSnaps] = useState([]);
 
-    const settings = {
-        dots: true,
-        infinite: items.length > slidesToShow, // Only infinite if more items than slides displayed
-        speed: 500,
-        slidesToShow: slidesToShow,
-        slidesToScroll: 1, // Scroll one item at a time
-        autoplay: true,
-        autoplaySpeed: 5000, // 5 seconds
-        pauseOnHover: true,
-        nextArrow: <NextArrow />,
-        prevArrow: <PrevArrow />,
-        rtl: theme.direction === "rtl", // Support RTL based on MUI theme
-        responsive: [
-            // More granular control for react-slick's own breakpoints
-            {
-                breakpoint: 1536, // Corresponds to MUI 'xl'
-                settings: {
-                    slidesToShow: Math.min(items.length, 4),
-                    infinite: items.length > 4,
-                },
-            },
-            {
-                breakpoint: 1200, // Corresponds to MUI 'lg'
-                settings: {
-                    slidesToShow: Math.min(items.length, 3),
-                    infinite: items.length > 3,
-                },
-            },
-            {
-                breakpoint: 900, // Corresponds to MUI 'md'
-                settings: {
-                    slidesToShow: Math.min(items.length, 2),
-                    infinite: items.length > 2,
-                },
-            },
-            {
-                breakpoint: 600, // Corresponds to MUI 'sm'
-                settings: {
-                    slidesToShow: Math.min(items.length, 1),
-                    infinite: items.length > 1,
-                },
-            },
-        ],
-    };
+    const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+    const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+    const scrollTo = useCallback((index) => emblaApi?.scrollTo(index), [emblaApi]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+
+        const onInit = () => setScrollSnaps(emblaApi.scrollSnapList());
+        const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+
+        emblaApi.on("init", onInit);
+        emblaApi.on("reInit", onInit);
+        emblaApi.on("select", onSelect);
+        onInit();
+        onSelect();
+
+        return () => {
+            emblaApi.off("init", onInit);
+            emblaApi.off("reInit", onInit);
+            emblaApi.off("select", onSelect);
+        };
+    }, [emblaApi]);
+
+    if (!items || items.length === 0) return null;
+
+    const stopAutoplay = () => emblaApi?.plugins()?.autoplay?.stop();
+    const startAutoplay = () => emblaApi?.plugins()?.autoplay?.play();
 
     return (
-        <Box sx={{ my: 4, py: 2, px: { xs: 2, sm: 3, md: 4 } }}>
-            {" "}
-            {/* Add horizontal padding for arrows */}
+        <Box sx={{ my: 4, py: 2 }}>
             <Typography
                 variant="h4"
                 component="h2"
@@ -152,6 +65,7 @@ export default function ThematicSectionCarousel({
             >
                 {title}
             </Typography>
+
             {sectionQuote && (
                 <Typography
                     variant="subtitle1"
@@ -167,29 +81,112 @@ export default function ThematicSectionCarousel({
                     "{sectionQuote}"
                 </Typography>
             )}
-            {/* Add a check for items length to avoid errors with slider if not enough items */}
-            {items.length > 0 ? (
-                <Slider {...settings}>
-                    {items.map((item) => (
+
+            <Box sx={{ position: "relative", px: { xs: 2, sm: 3, md: 4 } }}>
+                {/* Viewport */}
+                <Box
+                    ref={emblaRef}
+                    sx={{ overflow: "hidden" }}
+                    onMouseEnter={stopAutoplay}
+                    onMouseLeave={startAutoplay}
+                >
+                    <Box sx={{ display: "flex" }}>
+                        {items.map((item) => (
+                            <Box
+                                key={item.id || item.slug}
+                                sx={{
+                                    /* Responsive slide width via CSS flex basis */
+                                    flex: {
+                                        xs: "0 0 100%",
+                                        sm: "0 0 50%",
+                                        md: "0 0 33.333%",
+                                        lg: "0 0 25%",
+                                    },
+                                    minWidth: 0,
+                                    px: 1.5,
+                                }}
+                            >
+                                <ContentCard item={item} />
+                            </Box>
+                        ))}
+                    </Box>
+                </Box>
+
+                {/* Previous arrow */}
+                <IconButton
+                    onClick={scrollPrev}
+                    aria-label="Previous slide"
+                    size="medium"
+                    sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: { xs: -10, sm: -15, md: -25 },
+                        transform: "translateY(-50%)",
+                        zIndex: 2,
+                        color: "primary.main",
+                        backgroundColor: "background.paper",
+                        opacity: 0.85,
+                        boxShadow: 2,
+                        "&:hover": { opacity: 1 },
+                    }}
+                >
+                    <ArrowBackIosNewIcon fontSize="inherit" />
+                </IconButton>
+
+                {/* Next arrow */}
+                <IconButton
+                    onClick={scrollNext}
+                    aria-label="Next slide"
+                    size="medium"
+                    sx={{
+                        position: "absolute",
+                        top: "50%",
+                        right: { xs: -10, sm: -15, md: -25 },
+                        transform: "translateY(-50%)",
+                        zIndex: 2,
+                        color: "primary.main",
+                        backgroundColor: "background.paper",
+                        opacity: 0.85,
+                        boxShadow: 2,
+                        "&:hover": { opacity: 1 },
+                    }}
+                >
+                    <ArrowForwardIosIcon fontSize="inherit" />
+                </IconButton>
+            </Box>
+
+            {/* Dot indicators */}
+            {scrollSnaps.length > 1 && (
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        gap: 1,
+                        mt: 2,
+                    }}
+                >
+                    {scrollSnaps.map((_, index) => (
                         <Box
-                            key={item.id || item.slug}
+                            key={index}
+                            component="button"
+                            onClick={() => scrollTo(index)}
+                            aria-label={`Go to slide ${index + 1}`}
                             sx={{
-                                px: 1.5,
-                                height: "100%",
-                                display: "flex",
-                                flexDirection: "column",
+                                width: 8,
+                                height: 8,
+                                borderRadius: "50%",
+                                border: "none",
+                                cursor: "pointer",
+                                p: 0,
+                                backgroundColor:
+                                    index === selectedIndex
+                                        ? "primary.main"
+                                        : "grey.400",
+                                transition: "background-color 0.2s",
                             }}
-                        >
-                            {" "}
-                            {/* Padding between cards */}
-                            <ContentCard item={item} />
-                        </Box>
+                        />
                     ))}
-                </Slider>
-            ) : (
-                <Typography sx={{ textAlign: "center", mt: 2 }}>
-                    No items to display in this section.
-                </Typography>
+                </Box>
             )}
         </Box>
     );

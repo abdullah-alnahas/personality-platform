@@ -27,7 +27,14 @@ class StoreNavigationItemRequest extends FormRequest
             'label' => ['required', 'array'],
             // Validate at least one language has a label provided
             'label.*' => ['required_without_all:'.implode(',', $this->getOtherLanguageKeys('label')), 'nullable', 'string', 'max:255'],
-            'url' => ['required', 'string', 'max:2048'], // Increased max length for URLs
+            'url' => ['required', 'string', 'max:2048', function ($attribute, $value, $fail) {
+                $lower = strtolower(ltrim($value));
+                foreach (['javascript:', 'data:', 'vbscript:'] as $dangerous) {
+                    if (str_starts_with($lower, $dangerous)) {
+                        $fail("The {$attribute} must not use a dangerous URI scheme.");
+                    }
+                }
+            }],
             'target' => ['required', 'string', Rule::in(['_self', '_blank'])],
             'order' => ['nullable', 'integer', 'min:0'],
             'parent_id' => ['nullable', 'integer', 'exists:navigation_items,id'],

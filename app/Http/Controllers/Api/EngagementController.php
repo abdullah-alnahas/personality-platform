@@ -31,11 +31,13 @@ class EngagementController extends Controller
             return response()->json(['message' => 'Content not found.'], 404);
         }
 
-        $ip = $request->ip();
+        // Hash the IP to avoid storing cleartext PII (GDPR-friendly).
+        $ipHash = hash('sha256', $request->ip() . config('app.key'));
+
         $isDuplicate = ContentEngagement::where('content_type', $validated['content_type'])
             ->where('content_id', $validated['content_id'])
             ->where('engagement_type', $validated['type'])
-            ->where('ip_address', $ip)
+            ->where('ip_address', $ipHash)
             ->where('created_at', '>=', now()->subMinutes(5))
             ->exists();
 
@@ -45,10 +47,10 @@ class EngagementController extends Controller
 
         ContentEngagement::create([
             'content_type' => $validated['content_type'],
-            'content_id' => $validated['content_id'],
+            'content_id'   => $validated['content_id'],
             'engagement_type' => $validated['type'],
-            'ip_address' => $ip,
-            'user_agent' => $request->userAgent(),
+            'ip_address'   => $ipHash,
+            'user_agent'   => mb_substr((string) $request->userAgent(), 0, 500),
         ]);
 
         return response()->json([

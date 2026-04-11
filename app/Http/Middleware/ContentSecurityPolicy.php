@@ -6,18 +6,15 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Sets Content-Security-Policy and all other standard security headers.
+ *
+ * CSP notes:
+ * - style-src requires 'unsafe-inline' because MUI injects inline styles.
+ * - script-src allows 'unsafe-inline' only in local env (Vite HMR requirement).
+ */
 class ContentSecurityPolicy
 {
-    /**
-     * Add Content-Security-Policy headers to the response.
-     *
-     * Policy:
-     * - default-src 'self'
-     * - script-src  'self'
-     * - style-src   'self' 'unsafe-inline' (needed for MUI inline styles)
-     * - img-src     'self' data: https:
-     * - font-src    'self' https:
-     */
     public function handle(Request $request, Closure $next): Response
     {
         /** @var Response $response */
@@ -33,12 +30,38 @@ class ContentSecurityPolicy
             "img-src 'self' data: https:",
             "font-src 'self' {$fonts} https:",
             "connect-src 'self' {$vite}",
+            "frame-ancestors 'none'",
+            "object-src 'none'",
+            "base-uri 'self'",
         ];
 
         $response->headers->set(
             'Content-Security-Policy',
             implode('; ', $directives)
         );
+
+        // Prevent clickjacking
+        $response->headers->set('X-Frame-Options', 'DENY');
+
+        // Prevent MIME-type sniffing
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+
+        // Limit referrer information leakage
+        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+        // Disable unnecessary browser features
+        $response->headers->set(
+            'Permissions-Policy',
+            'camera=(), microphone=(), geolocation=(), payment=()'
+        );
+
+        // HSTS: only set on HTTPS to avoid breaking HTTP dev environments
+        if ($request->isSecure()) {
+            $response->headers->set(
+                'Strict-Transport-Security',
+                'max-age=31536000; includeSubDomains'
+            );
+        }
 
         return $response;
     }

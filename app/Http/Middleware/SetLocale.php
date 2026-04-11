@@ -16,8 +16,9 @@ class SetLocale
         $fallbackLocale = config("app.fallback_locale", "en"); // Provide a hardcoded default
         $sessionKey = "locale";
 
-        $activeLanguageCodes = Cache::rememberForever(
+        $activeLanguageCodes = Cache::remember(
             "active_language_codes_for_middleware",
+            3600,
             function () {
                 return Language::where("is_active", true)
                     ->pluck("code")
@@ -44,7 +45,7 @@ class SetLocale
             $langParam = $request->query("lang");
             if (in_array($langParam, $activeLanguageCodes)) {
                 $requestedLocale = $langParam;
-                Log::info(
+                Log::debug(
                     "[SetLocale] Locale '{$requestedLocale}' found in query parameter and is active."
                 );
             } else {
@@ -59,7 +60,7 @@ class SetLocale
             $sessionLocale = Session::get($sessionKey);
             if (in_array($sessionLocale, $activeLanguageCodes)) {
                 $requestedLocale = $sessionLocale;
-                Log::info(
+                Log::debug(
                     "[SetLocale] Locale '{$requestedLocale}' found in session and is active."
                 );
             } else {
@@ -85,11 +86,11 @@ class SetLocale
                 }
             }
             if ($requestedLocale) {
-                Log::info(
+                Log::debug(
                     "[SetLocale] Locale '{$requestedLocale}' detected from browser and is active."
                 );
             } else {
-                Log::info(
+                Log::debug(
                     "[SetLocale] No browser locale matched active languages. Browser locales: " .
                         implode(", ", $browserLocales) .
                         ". Active: " .
@@ -128,7 +129,7 @@ class SetLocale
             \Illuminate\Support\Carbon::setLocale($finalLocale);
         }
 
-        Log::info(
+        Log::debug(
             "[SetLocale] Final application locale set to: {$finalLocale}"
         );
 

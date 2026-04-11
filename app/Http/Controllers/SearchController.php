@@ -79,16 +79,24 @@ class SearchController extends Controller
     public function __invoke(Request $request): Response
     {
         $query = $request->input("q", "");
-        $locale = app()->getLocale();
-        $itemsCollection = collect(); // Use Laravel Collection for Paginator
+        $rawLocale = app()->getLocale();
+
+        // Whitelist locale against configured locales to prevent column-name injection.
+        $allowedLocales = config('translatable.locales', ['ar', 'en', 'tr']);
+        $locale = in_array($rawLocale, $allowedLocales, true) ? $rawLocale : 'ar';
+
+        $itemsCollection = collect();
 
         if (!empty($query)) {
+            // Escape LIKE wildcards to prevent denial-of-service via expensive scan patterns.
+            $safeTerm = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $query) . '%';
+
             $paginator = ContentItem::published()
-                ->where(function ($eloquentQuery) use ($query, $locale) {
+                ->where(function ($eloquentQuery) use ($safeTerm, $locale) {
                     $eloquentQuery
-                        ->where("title->{$locale}", "LIKE", "%{$query}%")
-                        ->orWhere("excerpt->{$locale}", "LIKE", "%{$query}%")
-                        ->orWhere("content->{$locale}", "LIKE", "%{$query}%");
+                        ->where("title->{$locale}", "LIKE", $safeTerm)
+                        ->orWhere("excerpt->{$locale}", "LIKE", $safeTerm)
+                        ->orWhere("content->{$locale}", "LIKE", $safeTerm);
                 })
                 ->with(["category:id,name,slug", "media"])
                 ->latest("publish_date")

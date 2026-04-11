@@ -28,7 +28,7 @@ class StorePageBlockRequest extends FormRequest
             'config.text_color' => 'nullable|string|max:50',
             'config.padding_y' => 'nullable|string|in:none,sm,md,lg,xl',
             'config.full_width' => 'nullable|boolean',
-            'config.css_class' => 'nullable|string|max:255',
+            'config.css_class' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_\- ]*$/'],
         ];
 
         if ($blockType) {

@@ -31,7 +31,7 @@ class BlockDataResolver
     protected function resolveCategoryGrid(array $block, array $content): array
     {
         $categoryId = $content['category_id'] ?? null;
-        $maxItems = $content['max_items'] ?? 6;
+        $maxItems = min((int) ($content['max_items'] ?? 6), 50);
 
         if (!$categoryId) {
             $block['resolved_data'] = ['category' => null, 'items' => []];
@@ -76,7 +76,7 @@ class BlockDataResolver
     protected function resolveLatestNews(array $block, array $content): array
     {
         $categoryId = $content['category_id'] ?? null;
-        $maxItems = $content['max_items'] ?? 6;
+        $maxItems = min((int) ($content['max_items'] ?? 6), 50);
 
         $cacheKey = "block_latest_news_{$categoryId}_{$maxItems}";
         $block['resolved_data'] = Cache::remember($cacheKey, 3600, function () use ($categoryId, $maxItems) {
@@ -132,7 +132,7 @@ class BlockDataResolver
 
     protected function resolveSocialMediaFeed(array $block, array $content): array
     {
-        $maxItems = $content['max_items'] ?? 6;
+        $maxItems = min((int) ($content['max_items'] ?? 6), 50);
 
         $block['resolved_data'] = Cache::remember("block_social_media_feed_{$maxItems}", 3600, function () use ($maxItems) {
             return SocialAccount::active()
@@ -147,7 +147,7 @@ class BlockDataResolver
 
     protected function resolveBooksGrid(array $block, array $content): array
     {
-        $maxItems = $content['max_items'] ?? 8;
+        $maxItems = min((int) ($content['max_items'] ?? 8), 50);
         $cacheKey = "block_books_grid_{$maxItems}";
 
         $block['resolved_data'] = Cache::remember($cacheKey, 3600, function () use ($maxItems) {

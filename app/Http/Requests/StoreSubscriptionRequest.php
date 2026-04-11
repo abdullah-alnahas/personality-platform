@@ -47,8 +47,9 @@ class StoreSubscriptionRequest extends FormRequest
      */
     public function messages(): array
     {
+        // Generic message prevents email enumeration via unique validation error.
         return [
-            'email.unique' => 'This email address is already subscribed.',
+            'email.unique' => 'If this address is new, you will be subscribed shortly.',
         ];
     }
 }

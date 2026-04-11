@@ -8,10 +8,10 @@ Allow: /search
 
 Disallow: /admin
 Disallow: /login
-Disallow: /register
 Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /confirm-password
 Disallow: /email/verify
 
-Sitemap: http://localhost/sitemap.xml
+# Update this URL to your production domain before deploying.
+Sitemap: /sitemap.xml

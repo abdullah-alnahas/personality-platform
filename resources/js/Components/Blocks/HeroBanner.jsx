@@ -3,6 +3,7 @@ import { Box, Typography, Button, Container, Grid } from '@mui/material';
 import { Link as InertiaLink } from '@inertiajs/react';
 import { useLocale } from '@/Hooks/useLocale';
 import ScatteredStars from '@/Components/Decorative/ScatteredStars';
+import { sanitizeHtml } from '@/utils/sanitize';
 
 export default function HeroBanner({ block }) {
     const { getTranslatedField, currentLocale, isRTL } = useLocale();
@@ -138,7 +139,7 @@ export default function HeroBanner({ block }) {
                     {subtitle && (
                         <Box
                             component="div"
-                            dangerouslySetInnerHTML={{ __html: subtitle }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(subtitle) }}
                             sx={{
                                 color: textColor,
                                 opacity: 0.9,
@@ -304,7 +305,7 @@ export default function HeroBanner({ block }) {
                 {subtitle && (
                     <Box
                         component="div"
-                        dangerouslySetInnerHTML={{ __html: subtitle }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(subtitle) }}
                         sx={{
                             color: textColor,
                             opacity: 0.9,
