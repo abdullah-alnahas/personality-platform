@@ -25,7 +25,7 @@ class StoreLanguageRequest extends FormRequest
             "name" => ["required", "string", "max:255"],
             "native_name" => ["required", "string", "max:255"],
             "is_active" => ["required", "boolean"],
-            // 'is_rtl' => ['required', 'boolean'], // Removed
+            "is_rtl" => ["required", "boolean"],
         ];
     }
 
@@ -33,7 +33,7 @@ class StoreLanguageRequest extends FormRequest
     {
         $this->merge([
             "is_active" => $this->boolean("is_active"),
-            // 'is_rtl' => $this->boolean('is_rtl'), // Removed
+            "is_rtl" => $this->boolean("is_rtl"),
         ]);
     }
 }

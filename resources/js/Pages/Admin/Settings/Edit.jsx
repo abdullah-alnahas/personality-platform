@@ -25,10 +25,10 @@ export default function Edit({
     activeLanguages: propActiveLanguages,
 }) {
     const { props: pageProps } = usePage(); // Use pageProps for consistency
-    const defaultLocale = pageProps.locale || "en";
+    const defaultLocale = pageProps.current_locale || "en";
     const activeLanguages = Array.isArray(propActiveLanguages)
         ? propActiveLanguages
-        : pageProps.activeLanguages || ["en", "ar", "tr"];
+        : (pageProps.available_locales || []).map(l => l.code || l) || ["en", "ar", "tr"];
     const initialFormData = {};
     Object.values(settings || {}).forEach((setting) => {
         const key = setting.key;
@@ -68,16 +68,7 @@ export default function Edit({
     const { data, setData, put, processing, errors } = useForm(initialFormData);
     const handleSubmit = (e) => {
         e.preventDefault();
-        const dataToSubmit = { ...data };
-        Object.values(settings || {}).forEach((setting) => {
-            if (setting.type === "boolean") {
-                dataToSubmit[setting.key] = {
-                    [defaultLocale]: data[setting.key] ? "1" : "0",
-                };
-            }
-        });
         put(route("admin.settings.update"), {
-            data: dataToSubmit,
             preserveScroll: true,
         });
     };

@@ -15,6 +15,15 @@ class CacheFullPage
     protected const TTL = 3600;
 
     /**
+     * Flush all full-page cache entries by incrementing the version prefix.
+     * Called from observers when public-facing content changes.
+     */
+    public static function flush(): void
+    {
+        Cache::increment('full_page_version');
+    }
+
+    /**
      * Handle an incoming request.
      *
      * Only caches GET requests for guest (unauthenticated) users.
@@ -48,7 +57,8 @@ class CacheFullPage
         // Include X-Inertia header in key so SPA navigations (which expect JSON)
         // never receive a cached full HTML page response.
         $isInertia = $request->header('X-Inertia') ? '1' : '0';
-        $cacheKey = 'full_page_' . md5($request->fullUrl() . $locale . $isInertia);
+        $version = Cache::get('full_page_version', 0);
+        $cacheKey = "full_page_v{$version}_" . md5($request->fullUrl() . $locale . $isInertia);
 
         $cached = Cache::get($cacheKey);
 

@@ -30,7 +30,7 @@ class DashboardController extends Controller
             'social_accounts' => SocialAccount::count(),
         ];
 
-        $recentItems = ContentItem::with('category:id,name,slug')
+        $recentItems = ContentItem::with(['category:id,name,slug', 'media'])
             ->latest()
             ->take(5)
             ->get()

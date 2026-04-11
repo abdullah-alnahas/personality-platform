@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Http\Middleware\CacheFullPage;
 use App\Models\PageBlock;
 use Illuminate\Support\Facades\Cache;
 
@@ -19,13 +20,14 @@ class PageBlockObserver
 
     protected function clearBlockCaches(PageBlock $block): void
     {
+        CacheFullPage::flush();
+
         $page = $block->page;
         if ($page) {
             Cache::forget("page_data_{$page->slug}");
 
             if ($page->is_homepage) {
                 Cache::forget('homepage_data');
-                Cache::forget('homepage_sections_data_v2');
             }
 
             if ($page->slug === 'about') {

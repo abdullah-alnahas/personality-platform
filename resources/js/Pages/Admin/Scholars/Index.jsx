@@ -27,7 +27,7 @@ const getT = (field, locale = "ar") => {
 
 export default function Index({ scholars, can }) {
     const { props } = usePage();
-    const locale = props.locale || "ar";
+    const locale = props.current_locale || "ar";
     const { data, current_page, per_page, total } = scholars;
 
     const [deleteId, setDeleteId] = useState(null);

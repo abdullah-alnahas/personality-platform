@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Services\BlockDataResolver;
+use App\Services\SWRCache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -21,7 +22,7 @@ class PageDisplayController extends Controller
 
     public function homepage(Request $request): Response
     {
-        $page = Cache::remember('homepage_data', 3600, function () {
+        $page = SWRCache::remember('homepage_data', 300, function () {
             return Page::published()
                 ->homepage()
                 ->with(['publishedBlocks'])
@@ -42,7 +43,7 @@ class PageDisplayController extends Controller
 
     public function show(string $slug): Response
     {
-        $page = Cache::remember("page_data_{$slug}", 3600, function () use ($slug) {
+        $page = SWRCache::remember("page_data_{$slug}", 300, function () use ($slug) {
             return Page::published()
                 ->where('slug', $slug)
                 ->with(['publishedBlocks'])
@@ -85,7 +86,7 @@ class PageDisplayController extends Controller
 
     protected function getSettings(): mixed
     {
-        return Cache::remember('site_settings_all', 3600, function () {
+        return SWRCache::remember('site_settings_all', 300, function () {
             return Setting::all()->keyBy('key')->map(function ($setting) {
                 return [
                     'value' => $setting->value,

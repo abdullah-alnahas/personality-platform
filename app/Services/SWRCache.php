@@ -33,8 +33,9 @@ class SWRCache
         $staleTtl = $freshTtl * 12; // stale copy lives 12× longer (default ≈1 h)
 
         // 1. Fresh data — return immediately, no work needed
-        if (Cache::has($key)) {
-            return Cache::get($key);
+        $fresh = Cache::get($key);
+        if ($fresh !== null) {
+            return $fresh;
         }
 
         // 2. Stale data exists — serve it and schedule a background refresh

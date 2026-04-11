@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Services\BlockDataResolver;
+use App\Services\SWRCache;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\Cache;
 
 class AboutPageController extends Controller
 {
@@ -22,7 +22,7 @@ class AboutPageController extends Controller
      */
     public function __invoke(Request $request): Response
     {
-        $page = Cache::remember('about_page_builder', 3600, function () {
+        $page = SWRCache::remember('about_page_builder', 300, function () {
             return Page::where('slug', 'about')
                 ->where('status', 'published')
                 ->first();
@@ -30,7 +30,7 @@ class AboutPageController extends Controller
 
         if ($page) {
             $resolver = app(BlockDataResolver::class);
-            $blocks = Cache::remember("about_page_blocks_{$page->id}", 3600, function () use ($page, $resolver) {
+            $blocks = SWRCache::remember("about_page_blocks_{$page->id}", 300, function () use ($page, $resolver) {
                 return $page->blocks()
                     ->where('status', 'published')
                     ->orderBy('display_order')
@@ -60,12 +60,12 @@ class AboutPageController extends Controller
         }
 
         // Legacy fallback: render static about content from settings
-        $aboutContent = Cache::remember('setting_about_page_content', 3600, function () {
+        $aboutContent = SWRCache::remember('setting_about_page_content', 300, function () {
             $setting = Setting::where('key', 'about_page_content')->first();
             return $setting?->value;
         });
 
-        $siteName = Cache::remember('setting_site_name', 3600, function () {
+        $siteName = SWRCache::remember('setting_site_name', 300, function () {
             $setting = Setting::where('key', 'site_name')->first();
             return $setting?->value;
         });
@@ -78,7 +78,7 @@ class AboutPageController extends Controller
 
     protected function getSettings(): mixed
     {
-        return Cache::remember('site_settings_all', 3600, function () {
+        return SWRCache::remember('site_settings_all', 300, function () {
             return Setting::all()->keyBy('key')->map(function ($setting) {
                 return [
                     'value' => $setting->value,

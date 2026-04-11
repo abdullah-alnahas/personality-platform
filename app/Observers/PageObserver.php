@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Http\Middleware\CacheFullPage;
 use App\Models\Page;
 use Illuminate\Support\Facades\Cache;
 
@@ -20,10 +21,10 @@ class PageObserver
     protected function clearPageCaches(Page $page): void
     {
         Cache::forget("page_data_{$page->slug}");
+        CacheFullPage::flush();
 
         if ($page->wasChanged('is_homepage') || $page->is_homepage || $page->wasRecentlyCreated) {
             Cache::forget('homepage_data');
-            Cache::forget('homepage_sections_data_v2');
         }
 
         if ($page->slug === 'about') {

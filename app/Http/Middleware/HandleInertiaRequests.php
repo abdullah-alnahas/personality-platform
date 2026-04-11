@@ -88,32 +88,21 @@ class HandleInertiaRequests extends Middleware
                 "published_navigation_items_structured_shared",
                 300,
                 function () {
-                    // ... (same logic as before)
-                    $locations = NavigationItem::published()
-                        ->distinct()
-                        ->pluck("menu_location");
-                    $structuredNav = [];
-                    foreach ($locations as $location) {
-                        $structuredNav[$location] = NavigationItem::published()
-                            ->where("menu_location", $location)
-                            ->whereNull("parent_id")
-                            ->with([
-                                "children" => fn($query) => $query
-                                    ->published()
-                                    ->orderBy("order"),
-                            ])
-                            ->orderBy("order")
-                            ->get([
-                                "id",
-                                "menu_location",
-                                "label",
-                                "url",
-                                "target",
-                                "parent_id",
-                            ])
-                            ->toArray();
-                    }
-                    return $structuredNav;
+                    // Single query: fetch all published nav items with children eager-loaded
+                    $allItems = NavigationItem::published()
+                        ->whereNull("parent_id")
+                        ->with([
+                            "children" => fn($query) => $query
+                                ->published()
+                                ->orderBy("order"),
+                        ])
+                        ->orderBy("order")
+                        ->get(["id", "menu_location", "label", "url", "target", "parent_id"]);
+
+                    // Group in-memory by menu_location (avoids N+1 per location)
+                    return $allItems->groupBy("menu_location")
+                        ->map(fn($items) => $items->toArray())
+                        ->toArray();
                 }
             ),
             "settings" => SWRCache::remember(

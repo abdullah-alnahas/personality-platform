@@ -800,7 +800,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                         >
                                             {getTranslatedField(
                                                 col.items[0]?.label,
-                                                { current_locale: currentLocale },
+                                                currentLocale,
                                                 '',
                                             )}
                                         </Typography>
@@ -831,7 +831,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                         >
                                             {getTranslatedField(
                                                 item.label,
-                                                { current_locale: currentLocale },
+                                                currentLocale,
                                             )}
                                         </MuiLink>
                                     ))}

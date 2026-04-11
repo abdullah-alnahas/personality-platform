@@ -18,7 +18,6 @@ class CacheDebug extends Command
 
         $staticKeys = [
             'homepage_data',
-            'homepage_sections_data_v2',
             'site_settings_all',
         ];
 

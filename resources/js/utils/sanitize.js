@@ -1,14 +1,14 @@
 /**
- * Client-side HTML sanitization utility (defense-in-depth).
+ * HTML sanitization utility — works in both SSR (Node.js) and browser.
  *
- * DOMPurify requires a browser DOM. For SSR (Node.js), we trust Laravel's
- * server-side HTMLPurifier and skip client-side sanitization.
- * In the browser, DOMPurify provides a second layer of defence.
+ * Uses isomorphic-dompurify which provides DOMPurify in all environments
+ * (uses jsdom under the hood for Node.js). This ensures HTML is sanitized
+ * even in the initial SSR render, preventing stored XSS from executing
+ * before React hydration.
  */
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 
 export function sanitizeHtml(html) {
     if (!html) return "";
-    if (typeof window === "undefined") return html;
     return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
 }

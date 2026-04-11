@@ -25,6 +25,7 @@
         "dompurify": "^3.3.3",
         "embla-carousel-autoplay": "^8.6.0",
         "embla-carousel-react": "^8.6.0",
+        "isomorphic-dompurify": "^3.8.0",
         "react-quill-new": "^3.8.3"
     }
 }

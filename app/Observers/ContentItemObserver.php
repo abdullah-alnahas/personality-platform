@@ -19,7 +19,6 @@ class ContentItemObserver
 
     protected function clearCaches(ContentItem $contentItem): void
     {
-        Cache::forget("homepage_sections_data_v2");
 
         $categoryId = $contentItem->content_category_id;
         if ($categoryId) {

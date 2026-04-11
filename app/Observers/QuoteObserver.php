@@ -19,7 +19,6 @@ class QuoteObserver
 
     protected function clearCaches(Quote $quote): void
     {
-        Cache::forget("homepage_sections_data_v2");
 
         // Clear block-specific featured_quote caches
         Cache::forget("block_featured_quote_{$quote->id}");

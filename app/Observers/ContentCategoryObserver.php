@@ -20,8 +20,6 @@ class ContentCategoryObserver
 
     protected function clearCaches(ContentCategory $contentCategory): void
     {
-        Cache::forget("homepage_sections_data_v2");
-        Cache::forget("published_navigation_items_structured");
         SWRCache::forget("published_navigation_items_structured_shared");
 
         // Clear block caches that show this category's content

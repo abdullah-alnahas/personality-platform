@@ -78,11 +78,8 @@ export default function ShowCategory({ category, items }) {
                         page={current_page}
                         onChange={(event, page) => {
                             router.get(
-                                route("content.show-category", category.slug, {
-                                    page,
-                                    lang: currentLocale,
-                                }),
-                                {},
+                                route("content.show-category", { slug: category.slug }),
+                                { page, lang: currentLocale },
                                 { preserveState: true, preserveScroll: true },
                             );
                         }}
