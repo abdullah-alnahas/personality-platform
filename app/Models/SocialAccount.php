@@ -22,9 +22,7 @@ class SocialAccount extends Model
         'account_name', // Make the name translatable
     ];
 
-     protected $casts = [
-        'account_name' => 'array', // Cast for easier access if needed
-    ];
+    protected $casts = [];
 
     public function scopeActive($query)
     {

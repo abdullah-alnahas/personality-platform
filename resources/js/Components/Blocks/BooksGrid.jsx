@@ -9,7 +9,6 @@ import {
     CardContent,
     CardActions,
     Button,
-    Chip,
 } from "@mui/material";
 import { useLocale } from "@/Hooks/useLocale";
 
@@ -25,7 +24,7 @@ const BooksGrid = ({ block }) => {
     const columns = config.columns || 4;
     const mdCols = Math.max(1, Math.min(12, Math.floor(12 / columns)));
 
-    const noCoverLabel = currentLocale === 'ar' ? 'لا يوجد غلاف' : currentLocale === 'tr' ? 'Kapak Yok' : '';
+    const noCoverLabel = currentLocale === 'ar' ? 'لا يوجد غلاف' : currentLocale === 'tr' ? 'Kapak Yok' : 'No Cover';
     const noBooksLabel = currentLocale === 'ar' ? 'لا توجد كتب.' : currentLocale === 'tr' ? 'Kitap bulunamadı.' : 'No books found.';
 
     return (

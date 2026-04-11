@@ -21,10 +21,7 @@ class Quote extends Model
     // Define translatable fields
     public array $translatable = ["text", "source"];
 
-    // Define casts, especially for translatable JSON and boolean
     protected $casts = [
-        "text" => "array",
-        "source" => "array",
         "is_featured" => "boolean",
     ];
 

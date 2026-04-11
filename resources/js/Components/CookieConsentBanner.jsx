@@ -3,11 +3,9 @@ import {
     Snackbar,
     Button,
     Typography,
-    Link as MuiLink,
     Box,
     Paper,
 } from "@mui/material";
-import { Link as InertiaLink } from "@inertiajs/react"; // If you have a Cookie Policy page route
 
 export default function CookieConsentBanner() {
     const [open, setOpen] = useState(false);

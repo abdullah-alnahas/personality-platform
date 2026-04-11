@@ -37,3 +37,6 @@ digest.txt
 # Generated files
 /public/sitemap.xml
 /public/sitemap*.xml
+codebase.xml
+graph-*.md
+graph-*.txt

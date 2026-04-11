@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
-import { Link as InertiaLink, usePage } from "@inertiajs/react";
+import { Link as InertiaLink, usePage, router } from "@inertiajs/react";
 import {
     AppBar,
     Box,
@@ -69,17 +69,15 @@ export default function AuthenticatedLayout({ user, header, children }) {
 
     const navLinks = [
         {
-            href: route("dashboard"),
+            href: route("admin.dashboard"),
             label: "Dashboard",
             icon: <DashboardIcon />,
         },
-        // Add other authenticated non-admin links here if needed
     ];
 
     const userMenuItems = [
-        { href: route("profile.edit"), label: "Profile", icon: <PersonIcon /> },
         {
-            action: () => router.post(route("logout")),
+            action: () => router.post(route("admin.logout")),
             label: "Log Out",
             icon: <ExitToAppIcon />,
             isLogout: true,

@@ -17,24 +17,12 @@ import {
 import { useLocale } from "@/Hooks/useLocale";
 
 const ScholarCards = ({ block }) => {
-    const { currentLocale, isRTL } = useLocale();
+    const { currentLocale, isRTL, getTranslatedField: t } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
     const groups = block?.resolved_data || [];
     const [activeTab, setActiveTab] = useState(0);
     const noScholarsLabel = currentLocale === 'ar' ? 'لا يوجد علماء.' : currentLocale === 'tr' ? 'Alim bulunamadı.' : 'No scholars found.';
-
-    const t = (field) => {
-        if (!field) return "";
-        if (typeof field === "string") return field;
-        return (
-            field[currentLocale] ||
-            field.ar ||
-            field.en ||
-            Object.values(field)[0] ||
-            ""
-        );
-    };
 
     const bgColor = config.background_color || "#F5F0E8";
     const textColor = config.text_color || "#2B3D2F";

@@ -25,7 +25,6 @@ class NavigationItem extends Model
     ];
 
     protected $casts = [
-        'label' => 'array',
         'order' => 'integer',
     ];
 

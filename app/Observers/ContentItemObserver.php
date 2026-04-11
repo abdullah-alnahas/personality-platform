@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\ContentItem;
-use App\Services\BlockDataResolver;
 use Illuminate\Support\Facades\Cache;
 
 class ContentItemObserver
@@ -20,7 +19,6 @@ class ContentItemObserver
 
     protected function clearCaches(ContentItem $contentItem): void
     {
-        Cache::forget("homepage_sections_data");
         Cache::forget("homepage_sections_data_v2");
 
         $categoryId = $contentItem->content_category_id;

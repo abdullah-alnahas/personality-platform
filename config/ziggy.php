@@ -10,7 +10,6 @@ return [
     | exposing the full admin surface to unauthenticated visitors.
     */
     'except' => [
-        'admin.*',
         'password.*',
         'verification.*',
         'api.*',

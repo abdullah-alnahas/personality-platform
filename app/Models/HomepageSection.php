@@ -27,8 +27,6 @@ class HomepageSection extends Model
     ];
 
     protected $casts = [
-        'title' => 'array',
-        'subtitle_or_quote' => 'array',
         'max_items' => 'integer',
         'display_order' => 'integer',
         'config' => 'array',

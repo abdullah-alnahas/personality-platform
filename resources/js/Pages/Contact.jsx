@@ -27,6 +27,7 @@ export default function Contact() {
         name: "",
         email: "",
         message: "",
+        _confirm_email: "", // honeypot — must be present but empty
     });
     React.useEffect(() => {
         if (recentlySuccessful) {

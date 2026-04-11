@@ -22,11 +22,7 @@ class Scholar extends Model
 
     public array $translatable = ['name', 'group_name', 'bio'];
 
-    protected $casts = [
-        'name'       => 'array',
-        'group_name' => 'array',
-        'bio'        => 'array',
-    ];
+    protected $casts = [];
 
     public function scopePublished($query)
     {

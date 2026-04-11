@@ -114,7 +114,7 @@ class ContentCategoryController extends Controller
     {
         Gate::authorize('manage categories');
 
-        if ($content_category->contentItems()->exists()) {
+        if ($content_category->items()->exists()) {
             return redirect()->route('admin.content-categories.index')
                 ->with('error', 'Cannot delete this category: it still has content items. Reassign or delete the items first.');
         }

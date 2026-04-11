@@ -1,9 +1,8 @@
 <?php namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
-// Remove Illuminate\Support\Facades\URL; // Not strictly needed if using route() helper and Route facade
-use Illuminate\Support\Facades\Route; // <-- IMPORT THIS
+use Illuminate\Support\Facades\Route;
+
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url as SitemapUrl;
 use App\Models\ContentItem;

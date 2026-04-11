@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\ContentCategory;
+use App\Services\SWRCache;
 use Illuminate\Support\Facades\Cache;
 
 class ContentCategoryObserver
@@ -19,10 +20,9 @@ class ContentCategoryObserver
 
     protected function clearCaches(ContentCategory $contentCategory): void
     {
-        Cache::forget("homepage_sections_data");
         Cache::forget("homepage_sections_data_v2");
         Cache::forget("published_navigation_items_structured");
-        Cache::forget("published_navigation_items_structured_shared");
+        SWRCache::forget("published_navigation_items_structured_shared");
 
         // Clear block caches that show this category's content
         $categoryId = $contentCategory->id;

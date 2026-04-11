@@ -25,9 +25,6 @@ class Book extends Model
     public array $translatable = ['title', 'subtitle', 'description'];
 
     protected $casts = [
-        'title'       => 'array',
-        'subtitle'    => 'array',
-        'description' => 'array',
         'is_featured' => 'boolean',
     ];
 

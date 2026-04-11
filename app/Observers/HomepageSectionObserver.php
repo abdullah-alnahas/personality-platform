@@ -19,7 +19,6 @@ class HomepageSectionObserver
 
     protected function clearCaches(): void
     {
-        Cache::forget("homepage_sections_data");
         Cache::forget("homepage_sections_data_v2");
         Cache::forget("homepage_data");
     }
