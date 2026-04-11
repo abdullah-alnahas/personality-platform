@@ -14,16 +14,10 @@ import {
 import { useLocale } from "@/Hooks/useLocale";
 
 const BooksGrid = ({ block }) => {
-    const { currentLocale, isRTL } = useLocale();
+    const { currentLocale, isRTL, getTranslatedField: t } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
     const books = block?.resolved_data || [];
-
-    const t = (field) => {
-        if (!field) return "";
-        if (typeof field === "string") return field;
-        return field[currentLocale] || field.ar || field.en || Object.values(field)[0] || "";
-    };
 
     const bgColor = config.background_color || "#1E2A22";
     const textColor = config.text_color || "#ffffff";

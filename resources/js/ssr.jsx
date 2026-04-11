@@ -3,6 +3,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import createServer from '@inertiajs/react/server';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { route } from '../../vendor/tightenco/ziggy';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -19,7 +20,31 @@ createServer((page) =>
                     location: new URL(page.props.ziggy.location),
                 });
 
-            return <App {...props} />;
+            const currentLocale = page.props.current_locale || 'en';
+            const availableLocales = page.props.available_locales || [];
+            const currentLang = availableLocales.find((l) => l.code === currentLocale);
+            const direction = currentLang?.is_rtl ? 'rtl' : 'ltr';
+
+            const theme = createTheme({
+                direction,
+                palette: {
+                    primary: { main: '#2B3D2F' },
+                    secondary: { main: '#C9A94E' },
+                    background: { default: '#F5F0E8', paper: '#FFFFFF' },
+                },
+                typography: {
+                    fontFamily: direction === 'rtl'
+                        ? "'Tajawal', 'Cairo', 'Roboto', sans-serif"
+                        : "'Cairo', 'Roboto', sans-serif",
+                },
+            });
+
+            return (
+                <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    <App {...props} />
+                </ThemeProvider>
+            );
         },
     })
 );

@@ -14,10 +14,6 @@ class PrototypeBooksAndScholarsSeeder extends Seeder
 {
     public function run(): void
     {
-        // ── Clear existing ────────────────────────────────────────────
-        Book::truncate();
-        Scholar::truncate();
-
         // ── Books ─────────────────────────────────────────────────────
         $books = [
             [
@@ -59,7 +55,10 @@ class PrototypeBooksAndScholarsSeeder extends Seeder
         ];
 
         foreach ($books as $book) {
-            Book::create($book);
+            Book::firstOrCreate(
+                ['title->ar' => $book['title']['ar']],
+                $book
+            );
         }
 
         // ── Scholars — الأردن ─────────────────────────────────────────
@@ -77,13 +76,16 @@ class PrototypeBooksAndScholarsSeeder extends Seeder
         ];
 
         foreach ($jordan as $i => $name) {
-            Scholar::create([
-                'name'          => ['ar' => $name, 'en' => $name, 'tr' => $name],
-                'group_name'    => ['ar' => 'الأردن', 'en' => 'Jordan', 'tr' => 'Ürdün'],
-                'group_key'     => 'jordan',
-                'display_order' => $i,
-                'status'        => 'published',
-            ]);
+            Scholar::firstOrCreate(
+                ['name->ar' => $name, 'group_key' => 'jordan'],
+                [
+                    'name'          => ['ar' => $name, 'en' => $name, 'tr' => $name],
+                    'group_name'    => ['ar' => 'الأردن', 'en' => 'Jordan', 'tr' => 'Ürdün'],
+                    'group_key'     => 'jordan',
+                    'display_order' => $i,
+                    'status'        => 'published',
+                ]
+            );
         }
 
         // ── Scholars — اليمن ─────────────────────────────────────────
@@ -102,13 +104,16 @@ class PrototypeBooksAndScholarsSeeder extends Seeder
         ];
 
         foreach ($yemen as $i => $name) {
-            Scholar::create([
-                'name'          => ['ar' => $name, 'en' => $name, 'tr' => $name],
-                'group_name'    => ['ar' => 'اليمن', 'en' => 'Yemen', 'tr' => 'Yemen'],
-                'group_key'     => 'yemen',
-                'display_order' => $i,
-                'status'        => 'published',
-            ]);
+            Scholar::firstOrCreate(
+                ['name->ar' => $name, 'group_key' => 'yemen'],
+                [
+                    'name'          => ['ar' => $name, 'en' => $name, 'tr' => $name],
+                    'group_name'    => ['ar' => 'اليمن', 'en' => 'Yemen', 'tr' => 'Yemen'],
+                    'group_key'     => 'yemen',
+                    'display_order' => $i,
+                    'status'        => 'published',
+                ]
+            );
         }
 
         // ── Scholars — الحجاز ────────────────────────────────────────
@@ -123,13 +128,16 @@ class PrototypeBooksAndScholarsSeeder extends Seeder
         ];
 
         foreach ($hejaz as $i => $name) {
-            Scholar::create([
-                'name'          => ['ar' => $name, 'en' => $name, 'tr' => $name],
-                'group_name'    => ['ar' => 'الحجاز', 'en' => 'Hejaz', 'tr' => 'Hicaz'],
-                'group_key'     => 'hejaz',
-                'display_order' => $i,
-                'status'        => 'published',
-            ]);
+            Scholar::firstOrCreate(
+                ['name->ar' => $name, 'group_key' => 'hejaz'],
+                [
+                    'name'          => ['ar' => $name, 'en' => $name, 'tr' => $name],
+                    'group_name'    => ['ar' => 'الحجاز', 'en' => 'Hejaz', 'tr' => 'Hicaz'],
+                    'group_key'     => 'hejaz',
+                    'display_order' => $i,
+                    'status'        => 'published',
+                ]
+            );
         }
     }
 }

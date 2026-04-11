@@ -35,8 +35,10 @@ class PrototypeNavigationSeeder extends Seeder
             ],
         ]);
 
-        // ── Clear existing nav items ───────────────────────────────────
-        NavigationItem::truncate();
+        // Only seed if no navigation items exist (idempotent)
+        if (NavigationItem::count() > 0) {
+            return;
+        }
 
         // ── Header nav ────────────────────────────────────────────────
         $header = 'header';

@@ -3,15 +3,9 @@ import { Box, Container, Typography, Grid } from "@mui/material";
 import { useLocale } from "@/Hooks/useLocale";
 
 const StatsCounter = ({ block }) => {
-    const { currentLocale, isRTL } = useLocale();
+    const { currentLocale, isRTL, getTranslatedField: t } = useLocale();
     const content = block?.content || {};
     const config = block?.config || {};
-
-    const t = (field) => {
-        if (!field) return "";
-        if (typeof field === "string") return field;
-        return field[currentLocale] || field.ar || field.en || Object.values(field)[0] || "";
-    };
 
     const stats = content.stats || [];
     const columns = config.columns || 3;
