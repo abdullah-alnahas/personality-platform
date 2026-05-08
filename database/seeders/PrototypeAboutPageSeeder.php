@@ -61,8 +61,8 @@ class PrototypeAboutPageSeeder extends Seeder
                 'text_color' => '#ffffff',
                 'layout' => 'centered',
                 'show_decorations' => true,
-                'decoration_color' => 'rgba(201, 169, 78, 0.15)',
-                'background_color' => '#2B3D2F',
+                'decoration_color' => 'rgba(181, 210, 107, 0.15)',
+                'background_color' => '#4A6741',
             ],
         ]);
 
@@ -111,11 +111,11 @@ class PrototypeAboutPageSeeder extends Seeder
             ],
             'config' => [
                 'text_color' => '#ffffff',
-                'background_color' => '#1E2A22',
+                'background_color' => '#2D4128',
                 'ornamental_frame' => true,
                 'padding_y' => 'xl',
                 'layout' => 'card',
-                'accent_color' => '#C9A94E',
+                'accent_color' => '#B5D26B',
             ],
         ]);
 
@@ -157,8 +157,8 @@ class PrototypeAboutPageSeeder extends Seeder
                 ],
             ],
             'config' => [
-                'background_color' => '#F5F0E8',
-                'text_color' => '#2B3D2F',
+                'background_color' => '#F7F4ED',
+                'text_color' => '#4A6741',
                 'full_width' => true,
             ],
         ]);
@@ -190,7 +190,7 @@ class PrototypeAboutPageSeeder extends Seeder
                 'cta_link' => '',
             ],
             'config' => [
-                'background_color' => '#1E2A22',
+                'background_color' => '#2D4128',
                 'text_color' => '#ffffff',
                 'grayscale' => false,
                 'columns' => 4,
@@ -227,7 +227,7 @@ class PrototypeAboutPageSeeder extends Seeder
                 ],
             ],
             'config' => [
-                'background_color' => '#2B3D2F',
+                'background_color' => '#4A6741',
                 'text_color' => '#ffffff',
                 'full_width' => true,
             ],

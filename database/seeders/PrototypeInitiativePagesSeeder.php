@@ -82,10 +82,10 @@ class PrototypeInitiativePagesSeeder extends Seeder
                     'full_width' => true,
                     'min_height' => '500px',
                     'text_color' => '#ffffff',
-                    'background_color' => '#2B3D2F',
+                    'background_color' => '#4A6741',
                     'layout' => 'centered',
                     'show_decorations' => true,
-                    'decoration_color' => 'rgba(201,169,78,0.2)',
+                    'decoration_color' => 'rgba(181,210,107,0.2)',
                 ],
             ]);
 
@@ -110,7 +110,7 @@ class PrototypeInitiativePagesSeeder extends Seeder
                 'config' => [
                     'columns' => 3,
                     'card_style' => 'rounded',
-                    'background_color' => '#F5F0E8',
+                    'background_color' => '#F7F4ED',
                     'card_variant' => 'light',
                     'show_decorations' => false,
                 ],
@@ -129,7 +129,7 @@ class PrototypeInitiativePagesSeeder extends Seeder
                     'button_text' => ['en' => 'Subscribe', 'ar' => 'اشترك', 'tr' => 'Abone Ol'],
                 ],
                 'config' => [
-                    'background_color' => '#2B3D2F',
+                    'background_color' => '#4A6741',
                     'text_color' => '#ffffff',
                     'full_width' => true,
                 ],

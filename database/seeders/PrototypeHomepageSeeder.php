@@ -197,6 +197,7 @@ class PrototypeHomepageSeeder extends Seeder
                 'title' => ['ar' => 'فقه التحولات', 'en' => 'Jurisprudence of Change', 'tr' => 'Değişim Fıkhı'],
                 'excerpt' => ['ar' => 'فهم التحولات الكبرى في ضوء أحاديث آخر الزمان', 'en' => 'Understanding major shifts in light of end-times prophecies', 'tr' => 'Ahir zaman hadisleri ışığında büyük dönüşümleri anlamak'],
                 'slug' => 'jurisprudence-of-change',
+                'featured_image_url' => '/images/prototype/news-lesson.jpg',
             ],
             [
                 'category_slug' => 'signs-of-the-hour',
@@ -210,6 +211,29 @@ class PrototypeHomepageSeeder extends Seeder
                 'excerpt' => ['ar' => 'البشائر والعلامات الدالة على نصر الأمة', 'en' => 'Signs and glad tidings indicating the victory of the Ummah', 'tr' => 'Ümmetin zaferini müjdeleyen işaretler ve alametler'],
                 'slug' => 'divine-glad-tidings',
             ],
+            // ── أخبار / News (homepage latest_news block) ──
+            [
+                'category_slug' => 'islam',
+                'title' => ['ar' => 'زيارة مسجد السيدة زينب', 'en' => 'Visit to Sayyida Zaynab Mosque', 'tr' => 'Seyyide Zeyneb Camii Ziyareti'],
+                'excerpt' => ['ar' => 'زيارة شيخنا للمسجد ولقاء أهل العلم في دمشق', 'en' => 'Sheikh\'s visit to the mosque and meeting scholars in Damascus', 'tr' => 'Şeyhin camiyi ziyareti ve Şam\'daki alimlerle buluşması'],
+                'slug' => 'visit-sayyida-zaynab-mosque',
+                'featured_image_url' => '/images/prototype/news-visit.jpg',
+            ],
+            [
+                'category_slug' => 'islam',
+                'title' => ['ar' => 'مختتم دورة فقه التحولات', 'en' => 'Closing of the Jurisprudence of Transformations Course', 'tr' => 'Dönüşümler Fıkhı Dersi Kapanışı'],
+                'excerpt' => ['ar' => 'ختام الدورة العلمية في فقه التحولات والفتن', 'en' => 'Conclusion of the scholarly course in the jurisprudence of transformations', 'tr' => 'Dönüşümler ve fitneler fıkhı dersinin sonu'],
+                'slug' => 'fiqh-tahawwulat-course-closing',
+                'featured_image_url' => '/images/prototype/news-lesson.jpg',
+            ],
+        ];
+
+        // Default featured images per category for items missing an explicit one
+        $defaultFeaturedImage = [
+            'islam' => '/images/prototype/quran-image.jpg',
+            'iman' => '/images/prototype/faith-bg.jpg',
+            'ihsan' => '/images/prototype/ihsan-mosque-bg.jpg',
+            'signs-of-the-hour' => '/images/prototype/mosque-bg.jpg',
         ];
 
         foreach ($items as $itemData) {
@@ -224,6 +248,8 @@ class PrototypeHomepageSeeder extends Seeder
                     'content_category_id' => $category->id,
                     'title' => $itemData['title'],
                     'excerpt' => $itemData['excerpt'],
+                    'featured_image_url' => $itemData['featured_image_url']
+                        ?? $defaultFeaturedImage[$itemData['category_slug']] ?? null,
                     'status' => 'published',
                     'publish_date' => now()->subDays(rand(1, 60)),
                 ]
@@ -302,14 +328,14 @@ class PrototypeHomepageSeeder extends Seeder
     {
         $sheikhName = ['ar' => 'الشيخ عون القدومي', 'en' => 'Sheikh Awn al-Qaddoumi', 'tr' => 'Şeyh Avn el-Kaddumi'];
         $accounts = [
-            ['platform' => 'youtube',   'url' => 'https://www.youtube.com/@AounalKaddoumi',                                  'account_name' => $sheikhName,                                                                              'display_order' => 10],
-            ['platform' => 'facebook',  'url' => 'https://www.facebook.com/profile.php?id=100044365216438&mibextid=LQQJ4d',  'account_name' => $sheikhName,                                                                              'display_order' => 20],
-            ['platform' => 'instagram', 'url' => 'https://www.instagram.com/awnqaddoumi',                                    'account_name' => ['ar' => '@awnqaddoumi', 'en' => '@awnqaddoumi', 'tr' => '@awnqaddoumi'],                  'display_order' => 30],
-            ['platform' => 'x',         'url' => 'https://x.com/awn_qaddoumi',                                               'account_name' => ['ar' => '@awn_qaddoumi', 'en' => '@awn_qaddoumi', 'tr' => '@awn_qaddoumi'],               'display_order' => 40],
-            ['platform' => 'telegram',  'url' => 'https://t.me/AounalKaddoumi',                                              'account_name' => $sheikhName,                                                                              'display_order' => 50],
-            ['platform' => 'whatsapp',  'url' => 'https://chat.whatsapp.com/Gwc8uWpq20c2DQ43TpTu0Y',                         'account_name' => ['ar' => 'قناة واتساب', 'en' => 'WhatsApp Channel', 'tr' => 'WhatsApp Kanalı'],            'display_order' => 60],
-            ['platform' => 'tiktok',    'url' => 'https://www.tiktok.com/@awn.kaddumi',                                      'account_name' => ['ar' => '@awn.kaddumi', 'en' => '@awn.kaddumi', 'tr' => '@awn.kaddumi'],                  'display_order' => 70],
-            ['platform' => 'linktree',  'url' => 'https://linktr.ee/Awnqaddoumi',                                            'account_name' => ['ar' => 'كل الروابط', 'en' => 'All Links', 'tr' => 'Tüm Bağlantılar'],                    'display_order' => 80],
+            ['platform' => 'youtube',   'url' => 'https://www.youtube.com/@AounalKaddoumi',                                  'account_name' => $sheikhName,                                                                              'display_order' => 10, 'preview_image_url' => '/images/prototype/social-post-1.jpg'],
+            ['platform' => 'facebook',  'url' => 'https://www.facebook.com/profile.php?id=100044365216438&mibextid=LQQJ4d',  'account_name' => $sheikhName,                                                                              'display_order' => 20, 'preview_image_url' => '/images/prototype/social-post-2.jpg'],
+            ['platform' => 'instagram', 'url' => 'https://www.instagram.com/awnqaddoumi',                                    'account_name' => ['ar' => '@awnqaddoumi', 'en' => '@awnqaddoumi', 'tr' => '@awnqaddoumi'],                  'display_order' => 30, 'preview_image_url' => '/images/prototype/social-post-3.jpg'],
+            ['platform' => 'x',         'url' => 'https://x.com/awn_qaddoumi',                                               'account_name' => ['ar' => '@awn_qaddoumi', 'en' => '@awn_qaddoumi', 'tr' => '@awn_qaddoumi'],               'display_order' => 40, 'preview_image_url' => '/images/prototype/social-post-4.jpg'],
+            ['platform' => 'telegram',  'url' => 'https://t.me/AounalKaddoumi',                                              'account_name' => $sheikhName,                                                                              'display_order' => 50, 'preview_image_url' => null],
+            ['platform' => 'whatsapp',  'url' => 'https://chat.whatsapp.com/Gwc8uWpq20c2DQ43TpTu0Y',                         'account_name' => ['ar' => 'قناة واتساب', 'en' => 'WhatsApp Channel', 'tr' => 'WhatsApp Kanalı'],            'display_order' => 60, 'preview_image_url' => null],
+            ['platform' => 'tiktok',    'url' => 'https://www.tiktok.com/@awn.kaddumi',                                      'account_name' => ['ar' => '@awn.kaddumi', 'en' => '@awn.kaddumi', 'tr' => '@awn.kaddumi'],                  'display_order' => 70, 'preview_image_url' => null],
+            ['platform' => 'linktree',  'url' => 'https://linktr.ee/Awnqaddoumi',                                            'account_name' => ['ar' => 'كل الروابط', 'en' => 'All Links', 'tr' => 'Tüm Bağlantılar'],                    'display_order' => 80, 'preview_image_url' => null],
         ];
 
         foreach ($accounts as $acc) {
@@ -320,6 +346,7 @@ class PrototypeHomepageSeeder extends Seeder
                     'account_name' => $acc['account_name'],
                     'display_order' => $acc['display_order'],
                     'status' => 'active',
+                    'preview_image_url' => $acc['preview_image_url'] ?? null,
                 ]
             );
         }
@@ -392,8 +419,8 @@ class PrototypeHomepageSeeder extends Seeder
                 'text_color' => '#ffffff',
                 'layout' => 'centered',
                 'show_decorations' => true,
-                'decoration_color' => 'rgba(201, 169, 78, 0.15)',
-                'background_color' => '#1E2A22',
+                'decoration_color' => 'rgba(181, 210, 107, 0.15)',
+                'background_color' => '#2D4128',
             ],
         ]);
 
@@ -424,9 +451,9 @@ class PrototypeHomepageSeeder extends Seeder
             ],
             'config' => [
                 'style' => 'light',
-                'background_color' => '#F5F0E8',
-                'text_color' => '#2B3D2F',
-                'accent_color' => '#C9A94E',
+                'background_color' => '#F7F4ED',
+                'text_color' => '#4A6741',
+                'accent_color' => '#B5D26B',
                 'padding_y' => 'lg',
             ],
         ]);
@@ -455,7 +482,7 @@ class PrototypeHomepageSeeder extends Seeder
             ],
             'config' => [
                 'columns' => 4,
-                'background_color' => '#F5F0E8',
+                'background_color' => '#F7F4ED',
             ],
         ]);
 
@@ -483,13 +510,15 @@ class PrototypeHomepageSeeder extends Seeder
                     'en' => 'Prophetic Hadith - Sahih al-Bukhari',
                     'tr' => 'Hadis-i Şerif - Sahih-i Buhari',
                 ],
+                'background_image_url' => '/images/prototype/faith-bg.jpg',
             ],
             'config' => [
                 'style' => 'dark',
-                'background_color' => '#2B3D2F',
+                'background_color' => '#4A6741',
                 'text_color' => '#ffffff',
-                'accent_color' => '#C9A94E',
+                'accent_color' => '#B5D26B',
                 'padding_y' => 'lg',
+                'overlay_opacity' => 0.55,
             ],
         ]);
 
@@ -517,7 +546,7 @@ class PrototypeHomepageSeeder extends Seeder
             ],
             'config' => [
                 'columns' => 4,
-                'background_color' => '#2B3D2F',
+                'background_color' => '#4A6741',
                 'text_color' => '#ffffff',
             ],
         ]);
@@ -553,7 +582,7 @@ class PrototypeHomepageSeeder extends Seeder
                     'tr' => '',
                 ],
                 'secondary_source' => ['ar' => '', 'en' => '', 'tr' => ''],
-                'background_image_url' => '',
+                'background_image_url' => '/images/prototype/ihsan-mosque-bg.jpg',
                 'cta_text' => ['ar' => '', 'en' => '', 'tr' => ''],
                 'cta_link' => '',
                 'bottom_items' => [
@@ -564,11 +593,12 @@ class PrototypeHomepageSeeder extends Seeder
             ],
             'config' => [
                 'text_color' => '#ffffff',
-                'background_color' => '#F5F0E8',
+                'background_color' => '#2D4128',
                 'ornamental_frame' => true,
                 'padding_y' => 'xl',
                 'layout' => 'card',
-                'accent_color' => '#C9A94E',
+                'accent_color' => '#B5D26B',
+                'overlay_opacity' => 0.65,
             ],
         ]);
 
@@ -596,7 +626,7 @@ class PrototypeHomepageSeeder extends Seeder
             ],
             'config' => [
                 'columns' => 4,
-                'background_color' => '#F5F0E8',
+                'background_color' => '#F7F4ED',
             ],
         ]);
 
@@ -624,13 +654,15 @@ class PrototypeHomepageSeeder extends Seeder
                     'en' => 'Prophetic Hadith - Sahih Muslim',
                     'tr' => 'Hadis-i Şerif - Sahih-i Müslim',
                 ],
+                'background_image_url' => '/images/prototype/mosque-bg.jpg',
             ],
             'config' => [
                 'style' => 'dark',
-                'background_color' => '#1E2A22',
+                'background_color' => '#2D4128',
                 'text_color' => '#ffffff',
-                'accent_color' => '#C9A94E',
+                'accent_color' => '#B5D26B',
                 'padding_y' => 'lg',
+                'overlay_opacity' => 0.7,
             ],
         ]);
 
@@ -658,7 +690,7 @@ class PrototypeHomepageSeeder extends Seeder
             ],
             'config' => [
                 'columns' => 4,
-                'background_color' => '#1E2A22',
+                'background_color' => '#2D4128',
                 'text_color' => '#ffffff',
             ],
         ]);
@@ -704,7 +736,7 @@ class PrototypeHomepageSeeder extends Seeder
                 'max_items' => 6,
             ],
             'config' => [
-                'background_color' => '#1E2A22',
+                'background_color' => '#2D4128',
                 'text_color' => '#ffffff',
                 'show_icons' => true,
             ],
@@ -724,14 +756,16 @@ class PrototypeHomepageSeeder extends Seeder
                     'en' => '',
                     'tr' => '',
                 ],
+                'background_image_url' => '/images/prototype/mountain-bg.jpg',
                 // No quote_id → resolves to random published quote
             ],
             'config' => [
                 'style' => 'dark',
-                'background_color' => '#2B3D2F',
+                'background_color' => '#4A6741',
                 'text_color' => '#ffffff',
-                'accent_color' => '#C9A94E',
+                'accent_color' => '#B5D26B',
                 'padding_y' => 'xl',
+                'overlay_opacity' => 0.5,
             ],
         ]);
 
@@ -766,7 +800,7 @@ class PrototypeHomepageSeeder extends Seeder
                 ],
             ],
             'config' => [
-                'background_color' => '#2B3D2F',
+                'background_color' => '#4A6741',
                 'text_color' => '#ffffff',
                 'full_width' => true,
             ],

@@ -62,10 +62,10 @@ class PrototypeIslamCategorySeeder extends Seeder
                 'full_width' => true,
                 'min_height' => '500px',
                 'text_color' => '#ffffff',
-                'background_color' => '#2B3D2F',
+                'background_color' => '#4A6741',
                 'layout' => 'centered',
                 'show_decorations' => true,
-                'decoration_color' => 'rgba(201,169,78,0.2)',
+                'decoration_color' => 'rgba(181,210,107,0.2)',
             ],
         ]);
 
@@ -110,9 +110,9 @@ class PrototypeIslamCategorySeeder extends Seeder
                 ],
             ],
             'config' => [
-                'background_color' => '#2B3D2F',
+                'background_color' => '#4A6741',
                 'text_color' => '#ffffff',
-                'accent_color' => '#C9A94E',
+                'accent_color' => '#B5D26B',
                 'columns' => 4,
                 'full_width' => true,
             ],
@@ -170,7 +170,7 @@ class PrototypeIslamCategorySeeder extends Seeder
                 'max_items' => 8,
             ],
             'config' => [
-                'background_color' => '#1E2A22',
+                'background_color' => '#2D4128',
                 'text_color' => '#ffffff',
                 'columns' => 4,
                 'full_width' => true,
@@ -198,7 +198,7 @@ class PrototypeIslamCategorySeeder extends Seeder
                 'button_text' => ['en' => 'Subscribe', 'ar' => 'اشترك', 'tr' => 'Abone Ol'],
             ],
             'config' => [
-                'background_color' => '#2B3D2F',
+                'background_color' => '#4A6741',
                 'text_color' => '#ffffff',
                 'full_width' => true,
             ],

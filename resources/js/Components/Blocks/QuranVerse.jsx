@@ -327,6 +327,13 @@ export default function QuranVerse({ block }) {
     const bgColor = config.background_color || '#1a237e';
     const paddingY = config.padding_y || '4rem';
     const bgImage = safeBackgroundUrl(content.background_image_url);
+    const overlayOpacity = typeof config.overlay_opacity === 'number'
+        ? Math.max(0, Math.min(1, config.overlay_opacity))
+        : 0.9;
+    const overlayAlpha = Math.round(overlayOpacity * 255)
+        .toString(16)
+        .padStart(2, '0')
+        .toUpperCase();
 
     const LayoutComponent = layout === 'card' ? CardLayout : OverlayLayout;
 
@@ -348,7 +355,7 @@ export default function QuranVerse({ block }) {
                     sx={{
                         position: 'absolute',
                         inset: 0,
-                        backgroundColor: `${bgColor}E6`,
+                        backgroundColor: `${bgColor}${overlayAlpha}`,
                         zIndex: 0,
                     }}
                 />
