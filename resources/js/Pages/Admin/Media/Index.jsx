@@ -35,24 +35,35 @@ const formatFileSize = (bytes) => {
 export default function Index({ mediaItems, can }) {
     const { data, links, current_page, last_page, total } = mediaItems;
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [selectedMediaId, setSelectedMediaId] = useState(null);
+    const [selectedMedia, setSelectedMedia] = useState(null);
 
-    const handleDeleteClick = (id) => {
-        setSelectedMediaId(id);
+    const handleDeleteClick = (media) => {
+        setSelectedMedia(media);
         setDialogOpen(true);
     };
     const handleConfirmDelete = () => {
-        if (selectedMediaId) {
-            router.delete(route("admin.media.destroy", selectedMediaId), {
+        if (!selectedMedia) return;
+        const idStr = String(selectedMedia.id);
+        const isUpload = idStr.startsWith("upload:");
+        const onFinish = () => setDialogOpen(false);
+        if (isUpload && selectedMedia.path) {
+            router.delete(route("admin.media.destroy"), {
+                data: { path: selectedMedia.path },
                 preserveScroll: true,
-                onSuccess: () => setDialogOpen(false),
-                onError: () => setDialogOpen(false),
+                onSuccess: onFinish,
+                onError: onFinish,
+            });
+        } else {
+            router.delete(route("admin.media.destroy", selectedMedia.id), {
+                preserveScroll: true,
+                onSuccess: onFinish,
+                onError: onFinish,
             });
         }
     };
     const handleCloseDialog = () => {
         setDialogOpen(false);
-        setSelectedMediaId(null);
+        setSelectedMedia(null);
     };
     const handleMuiPageChange = (event, value) => {
         if (current_page !== value) {
@@ -166,9 +177,7 @@ export default function Index({ mediaItems, can }) {
                                                     size="small"
                                                     color="error"
                                                     onClick={() =>
-                                                        handleDeleteClick(
-                                                            media.id,
-                                                        )
+                                                        handleDeleteClick(media)
                                                     }
                                                 >
                                                     <DeleteIcon />

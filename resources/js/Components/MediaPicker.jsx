@@ -16,6 +16,7 @@ import {
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ClearIcon from '@mui/icons-material/Clear';
+import { safeUrl } from '@/utils/sanitize';
 
 /**
  * Image picker that combines URL paste, file upload, and a grid of
@@ -141,10 +142,10 @@ export default function MediaPicker({
                     Library
                 </Button>
             </Box>
-            {value && (
+            {value && safeUrl(value) !== '#' && (
                 <Box
                     component="img"
-                    src={value}
+                    src={safeUrl(value)}
                     alt=""
                     sx={{
                         mt: 1,
@@ -180,7 +181,7 @@ export default function MediaPicker({
                         </Button>
                         <input
                             type="file"
-                            accept="image/*"
+                            accept="image/jpeg,image/png,image/gif,image/webp"
                             ref={fileInputRef}
                             onChange={(e) => {
                                 const file = e.target.files?.[0];
@@ -190,7 +191,7 @@ export default function MediaPicker({
                             style={{ display: 'none' }}
                         />
                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            JPEG, PNG, GIF, WebP, or SVG · max 10 MB
+                            JPEG, PNG, GIF, or WebP · max 10 MB
                         </Typography>
                     </Box>
 

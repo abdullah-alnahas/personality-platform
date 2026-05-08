@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -15,14 +16,27 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class MediaController extends Controller
 {
     /**
-     * Allowed image MIME types for the picker uploader.
+     * Allowed image MIME types for the picker uploader. SVG is intentionally
+     * omitted — SVG can carry inline scripts and serving raw SVG from the
+     * public disk would create a stored-XSS sink.
      */
     private const ALLOWED_MIME_TYPES = [
         'image/jpeg',
         'image/png',
         'image/gif',
         'image/webp',
-        'image/svg+xml',
+    ];
+
+    /**
+     * Map of accepted MIME → canonical extension. The stored extension is
+     * derived from the validated content type, never from the client-supplied
+     * filename, to defeat polyglot uploads (e.g. JPEG header + .phtml ext).
+     */
+    private const MIME_TO_EXTENSION = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/gif'  => 'gif',
+        'image/webp' => 'webp',
     ];
 
     /**
@@ -89,7 +103,14 @@ class MediaController extends Controller
         ]);
 
         $file = $validated['file'];
-        $extension = strtolower($file->getClientOriginalExtension() ?: 'bin');
+
+        $mime = (string) $file->getMimeType();
+        $extension = self::MIME_TO_EXTENSION[$mime] ?? null;
+        if ($extension === null) {
+            // Defence in depth — the validator should have rejected this already.
+            return response()->json(['message' => 'Unsupported image type.'], 422);
+        }
+
         $safeBase = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'image';
         $filename = sprintf(
             '%s-%s.%s',
@@ -109,32 +130,87 @@ class MediaController extends Controller
             'path' => $path,
             'name' => $file->getClientOriginalName(),
             'size' => $file->getSize(),
-            'mime_type' => $file->getMimeType(),
+            'mime_type' => $mime,
         ], 201);
     }
 
     /**
      * Remove the specified media item from storage.
      *
-     * Accepts either a Spatie Media model id (numeric route binding) or a
-     * picker upload path supplied via ?path=uploads/... in the request.
+     * Two delete vectors are supported:
+     *   1. Spatie Media model bound via {medium} (numeric route binding).
+     *   2. Picker-upload deletion via signed POST body containing a path that
+     *      MUST: live under the configured uploads/ prefix, contain no
+     *      traversal segments, and resolve to an existing file on the public
+     *      disk. The previous query-string `?path=` form has been removed
+     *      because it lacked CSRF and audit-logging guardrails.
      */
     public function destroy(Request $request, ?Media $medium = null): RedirectResponse
     {
         $this->authorize("manage media");
 
         if ($medium && $medium->exists) {
+            $modelType = $medium->model_type;
+            $modelId   = $medium->model_id;
             $medium->delete();
-        } elseif ($path = $request->query('path')) {
-            // Only allow deleting paths under the uploads/ prefix to prevent escaping.
-            if (str_starts_with($path, self::UPLOAD_PATH . '/') && Storage::disk('public')->exists($path)) {
-                Storage::disk('public')->delete($path);
-            }
+            Log::info('media.delete.spatie', [
+                'media_id' => $medium->id,
+                'model_type' => $modelType,
+                'model_id' => $modelId,
+                'user_id' => $request->user()?->id,
+            ]);
+
+            return redirect()
+                ->route("admin.media.index")
+                ->with("success", __("Media item deleted successfully."));
+        }
+
+        $rawPath = (string) $request->input('path', '');
+        $sanitised = $this->sanitiseUploadPath($rawPath);
+
+        if ($sanitised !== null && Storage::disk('public')->exists($sanitised)) {
+            Storage::disk('public')->delete($sanitised);
+            Log::info('media.delete.picker', [
+                'path' => $sanitised,
+                'user_id' => $request->user()?->id,
+            ]);
         }
 
         return redirect()
             ->route("admin.media.index")
             ->with("success", __("Media item deleted successfully."));
+    }
+
+    /**
+     * Validate a picker upload path. Returns the canonical path or null when
+     * the input violates any constraint (wrong prefix, traversal, absolute,
+     * NUL byte, or extension not on the allow list).
+     */
+    private function sanitiseUploadPath(string $rawPath): ?string
+    {
+        if ($rawPath === '') {
+            return null;
+        }
+        if (str_contains($rawPath, "\0")) {
+            return null;
+        }
+        // Reject absolute paths, scheme prefixes, and traversal sequences.
+        if (
+            str_starts_with($rawPath, '/') ||
+            preg_match('#(^|/)\.\.(/|$)#', $rawPath) === 1 ||
+            preg_match('#^[a-z][a-z0-9+.-]*://#i', $rawPath) === 1
+        ) {
+            return null;
+        }
+        $expectedPrefix = self::UPLOAD_PATH . '/';
+        if (! str_starts_with($rawPath, $expectedPrefix)) {
+            return null;
+        }
+        $extension = strtolower(pathinfo($rawPath, PATHINFO_EXTENSION));
+        if (! in_array($extension, self::MIME_TO_EXTENSION, true)) {
+            return null;
+        }
+        return $rawPath;
     }
 
     /**
