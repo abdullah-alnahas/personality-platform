@@ -3,8 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use App\Models\Subscriber;
 
 class StoreSubscriptionRequest extends FormRequest
 {
@@ -23,33 +21,17 @@ class StoreSubscriptionRequest extends FormRequest
      */
     public function rules(): array
     {
+        // No `unique` rule: a unique-violation produces a 422 with errors bag
+        // while a fresh insert produces a 200 with success flash, which leaks
+        // whether an email is on the list. Dedup is handled in the controller
+        // via a constant-response code path; here we only validate format.
         return [
-            // Ensure email is unique in the subscribers table, ignoring unsubscribed ones
             'email' => [
                 'required',
                 'string',
                 'email',
                 'max:255',
-                Rule::unique('subscribers')->where(function ($query) {
-                    // Allow re-subscription if previously unsubscribed or pending for a long time
-                    // For MVP, simple unique check is okay. Refine later if needed.
-                    return $query->whereIn('status', ['pending', 'confirmed']);
-                })
-                // More complex logic for re-subscribing unsubscribed users can be added later
             ],
-        ];
-    }
-
-    /**
-     * Get the error messages for the defined validation rules.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        // Generic message prevents email enumeration via unique validation error.
-        return [
-            'email.unique' => 'If this address is new, you will be subscribed shortly.',
         ];
     }
 }
