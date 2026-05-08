@@ -55,7 +55,7 @@ Most shared hosts enable these by default. Check in cPanel > Select PHP Version 
 2. Go to **MySQL Databases**
 3. Under "Create New Database", enter a name (e.g., `youraccount_personality`) and click **Create Database**
 4. Under "MySQL Users", create a new user with a **strong, random password** (20+ characters). Write this down.
-5. Under "Add User To Database", select the user and database, click **Add**, then grant **ALL PRIVILEGES** and click **Make Changes**
+5. Under "Add User To Database", select the user and database, click **Add**, then grant **only the privileges the application needs** — `SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP, REFERENCES` — and click **Make Changes**. Never grant `ALL PRIVILEGES`; the app does not need `GRANT`, `RELOAD`, `FILE`, or `SUPER`, and granting them turns a code-execution bug into a database-server takeover.
 6. Open **phpMyAdmin** from cPanel
 7. Select your new database in the left sidebar
 8. Click the **Operations** tab
@@ -126,6 +126,7 @@ Upload the project using cPanel File Manager or an FTP client (FileZilla, WinSCP
 | `public/.htaccess` | `public_html/.htaccess` |
 | `public/index.php` | `public_html/index.php` (will be modified) |
 | `public/robots.txt` | `public_html/robots.txt` |
+| `storage/app/public/.htaccess` | `~/personality-platform/storage/app/public/.htaccess` (security hardening — disables PHP execution & forces `Content-Disposition: attachment` for HTML/SVG inside `/storage/`) |
 | Everything else | `~/personality-platform/` |
 
 > **Do NOT upload** `node_modules/`, `.git/`, or `tests/` to the server.
@@ -348,9 +349,9 @@ If your site uses HTTPS but assets load via HTTP:
    ```bash
    php artisan config:cache
    ```
-4. If behind a reverse proxy or Cloudflare, add to `app/Http/Middleware/TrustProxies.php`:
-   ```php
-   protected $proxies = '*';
+4. If behind a reverse proxy or Cloudflare, set `TRUSTED_PROXIES` in `.env`. Use the **published Cloudflare IP ranges** (https://www.cloudflare.com/ips/) — never `*`, which lets any client spoof `X-Forwarded-For` and bypass the rate limiter:
+   ```
+   TRUSTED_PROXIES=173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22
    ```
 
 ### Admin Login Not Working
