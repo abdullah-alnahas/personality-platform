@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback } from "react";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { Box, Typography } from "@mui/material";
+import { sanitizeHtml } from "@/utils/sanitize";
 
 // Optional: Add support for text direction to the default Quill formats
 // This allows the toolbar to have a direction button if needed,
@@ -71,10 +72,14 @@ const RichTextEditor = ({
     // Only propagate changes triggered by the user, not programmatic value-prop updates.
     // ReactQuill fires onChange on init/value-prop changes with source='api',
     // which causes an infinite setState loop when used in controlled forms.
+    // Sanitise client-side as defence in depth — backend (mews/purifier)
+    // is still the authoritative scrubber, but cleaning here means the value
+    // already in component state can never carry a script payload to other
+    // consumers (preview, draft autosave, etc.).
     const handleChange = useCallback(
         (content, _delta, source) => {
             if (source === 'user') {
-                onChange(content);
+                onChange(sanitizeHtml(content));
             }
         },
         [onChange],

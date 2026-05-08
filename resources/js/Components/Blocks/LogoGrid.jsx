@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, Grid, Container, Button } from '@mui/material';
 import { Link as InertiaLink } from '@inertiajs/react';
 import { useLocale } from '@/Hooks/useLocale';
+import { safeUrl } from '@/utils/sanitize';
 
 export default function LogoGrid({ block }) {
     const { getTranslatedField, currentLocale } = useLocale();
@@ -108,7 +109,7 @@ export default function LogoGrid({ block }) {
                                 {link ? (
                                     <Box
                                         component="a"
-                                        href={link}
+                                        href={safeUrl(link)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         sx={{
@@ -131,7 +132,7 @@ export default function LogoGrid({ block }) {
                     <Box sx={{ textAlign: 'center', mt: 4 }}>
                         <Button
                             component={InertiaLink}
-                            href={ctaLink}
+                            href={safeUrl(ctaLink)}
                             variant="contained"
                             sx={{
                                 color: bgColor,

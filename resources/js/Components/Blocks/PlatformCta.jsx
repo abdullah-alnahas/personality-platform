@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Container, Typography, Button } from '@mui/material';
 import { Link as InertiaLink } from '@inertiajs/react';
 import { useLocale } from '@/Hooks/useLocale';
-import { sanitizeHtml } from '@/utils/sanitize';
+import { sanitizeHtml, safeUrl, safeBackgroundUrl } from '@/utils/sanitize';
 
 /**
  * Platform CTA block — designed for sections like the prototype's
@@ -20,7 +20,7 @@ export default function PlatformCta({ block }) {
     const ctaText = getTranslatedField(content.cta_text, currentLocale);
     const ctaLink = content.cta_link || '';
     const iconUrl = content.icon_url || '';
-    const patternUrl = content.pattern_image_url || '';
+    const patternUrl = safeBackgroundUrl(content.pattern_image_url);
 
     const bg = config.background_color || '#F5F0E8';
     const fg = config.text_color || '#2B3D2F';
@@ -31,9 +31,9 @@ export default function PlatformCta({ block }) {
 
     const ctaButton = ctaText && (
         <Button
-            {...(ctaLink && (ctaLink.startsWith('http')
-                ? { component: 'a', href: ctaLink, target: '_blank', rel: 'noopener noreferrer' }
-                : { component: InertiaLink, href: ctaLink }))}
+            {...(ctaLink && (/^https?:\/\//i.test(ctaLink)
+                ? { component: 'a', href: safeUrl(ctaLink), target: '_blank', rel: 'noopener noreferrer' }
+                : { component: InertiaLink, href: safeUrl(ctaLink) }))}
             variant="contained"
             sx={{
                 mt: 3,

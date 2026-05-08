@@ -40,6 +40,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CookieConsentBanner from "@/Components/CookieConsentBanner";
 import SocialIcon from "@/Components/SocialIcon";
+import { safeUrl } from "@/utils/sanitize";
 const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
     if (fieldObject == null) return fallback;
     if (typeof fieldObject !== "object") return String(fieldObject) || fallback;
@@ -61,7 +62,9 @@ const NavLink = ({
         color: isMenuItem || isDrawerItem ? "inherit" : "text.secondary",
         underline: "hover",
         target: item.target,
-        rel: item.target === "_blank" ? "noopener noreferrer" : undefined,
+        rel: (item.target === "_blank" || /^https?:\/\//i.test(item.url || ""))
+            ? "noopener noreferrer"
+            : undefined,
         sx: {
             display: "block",
             py: isMenuItem ? 1 : isDrawerItem ? 1.5 : 0.5,
@@ -76,7 +79,7 @@ const NavLink = ({
         url.startsWith("http://") || url.startsWith("https://");
     if (isExternal || item.target === "_blank") {
         return (
-            <MuiLink href={url} {...commonProps}>
+            <MuiLink href={safeUrl(url)} {...commonProps}>
                 {label}
             </MuiLink>
         );
@@ -102,7 +105,7 @@ const NavLink = ({
             console.warn(`Ziggy route() failed for NavLink name: ${url}.`);
         }
         return (
-            <MuiLink component={InertiaLink} href={url || '#'} {...commonProps}>
+            <MuiLink component={InertiaLink} href={safeUrl(url || '#')} {...commonProps}>
                 {label}
             </MuiLink>
         );
@@ -122,7 +125,9 @@ const HeaderNavLink = ({ item, currentLocale }) => {
         color: "inherit",
         underline: "hover",
         target: item.target,
-        rel: item.target === "_blank" ? "noopener noreferrer" : undefined,
+        rel: (item.target === "_blank" || /^https?:\/\//i.test(item.url || ""))
+            ? "noopener noreferrer"
+            : undefined,
         sx: {
             p: 1,
             textTransform: "none",
@@ -323,8 +328,8 @@ export default function PublicLayout({ children, title: pageTitle }) {
         }
     };
     const getDrawerLinkHref = (url) => {
-        /* ... (same as before) ... */ if (!url) return "#";
-        if (url.startsWith("http://") || url.startsWith("https://")) return url;
+        if (!url) return "#";
+        if (url.startsWith("http://") || url.startsWith("https://")) return safeUrl(url);
         if (
             typeof route !== "undefined" &&
             !url.includes("/") &&
@@ -338,7 +343,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                 );
             }
         }
-        return url;
+        return safeUrl(url);
     };
     const getDrawerLinkComponent = (url) => {
         /* ... (same as before) ... */ if (
@@ -674,11 +679,11 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             {headerCtaText && (
                                 <Button
                                     component={
-                                        (headerCtaUrl || '').startsWith('http')
+                                        /^https?:\/\//i.test(headerCtaUrl || '')
                                             ? 'a'
                                             : InertiaLink
                                     }
-                                    href={headerCtaUrl || '#'}
+                                    href={safeUrl(headerCtaUrl || '#')}
                                     variant="contained"
                                     size="small"
                                     sx={{
@@ -784,7 +789,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                             <span>
                                                 <IconButton
                                                     component="a"
-                                                    href={acc.url}
+                                                    href={safeUrl(acc.url)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     aria-label={
@@ -841,11 +846,11 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                         <MuiLink
                                             key={`${col.key}-${item.id}`}
                                             component={
-                                                (item.url || '').startsWith('http')
+                                                /^https?:\/\//i.test(item.url || '')
                                                     ? 'a'
                                                     : InertiaLink
                                             }
-                                            href={item.url || '#'}
+                                            href={safeUrl(item.url || '#')}
                                             target={item.target}
                                             rel={
                                                 item.target === '_blank'

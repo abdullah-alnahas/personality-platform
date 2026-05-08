@@ -104,6 +104,7 @@ export default function Form({ page, activeLanguages: controllerActiveLanguages 
 
         fetch(route('admin.pages.blocks.reorder', page.id), {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),

@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import SocialIcon from "@/Components/SocialIcon";
 import { useLocale } from "@/Hooks/useLocale";
+import { safeUrl } from "@/utils/sanitize";
 
 const platformColors = {
     facebook: "#1877F2",
@@ -78,7 +79,7 @@ export default function SocialMediaFeed({ block }) {
                             >
                                 <CardActionArea
                                     component="a"
-                                    href={acc.url}
+                                    href={safeUrl(acc.url)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >

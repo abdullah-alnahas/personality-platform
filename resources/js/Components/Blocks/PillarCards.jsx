@@ -1,4 +1,5 @@
 import React from "react";
+import { safeUrl } from "@/utils/sanitize";
 import {
     Box,
     Typography,
@@ -186,7 +187,7 @@ export default function PillarCards({ block }) {
                                         <Box sx={{ mt: "auto", pt: 2 }}>
                                             <Button
                                                 component={InertiaLink}
-                                                href={cardLink}
+                                                href={safeUrl(cardLink)}
                                                 size="small"
                                                 sx={{
                                                     textTransform: "none",

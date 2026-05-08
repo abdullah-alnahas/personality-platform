@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Container, Typography, Grid } from "@mui/material";
 import { useLocale } from "@/Hooks/useLocale";
-import { sanitizeHtml } from "@/utils/sanitize";
+import { sanitizeHtml, safeBackgroundUrl } from "@/utils/sanitize";
 
 const StatsCounter = ({ block }) => {
     const { currentLocale, isRTL, getTranslatedField: t } = useLocale();
@@ -13,7 +13,7 @@ const StatsCounter = ({ block }) => {
     const bgColor = config.background_color || "#2B3D2F";
     const textColor = config.text_color || "#ffffff";
     const accentColor = config.accent_color || "#C9A94E";
-    const bgImage = content.background_image_url || "";
+    const bgImage = safeBackgroundUrl(content.background_image_url);
     const overlayOpacity = config.overlay_opacity ?? 0.6;
     const bodyHtml = t(content.body) || "";
 

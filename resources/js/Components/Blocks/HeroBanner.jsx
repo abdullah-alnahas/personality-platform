@@ -3,7 +3,7 @@ import { Box, Typography, Button, Container, Grid } from '@mui/material';
 import { Link as InertiaLink } from '@inertiajs/react';
 import { useLocale } from '@/Hooks/useLocale';
 import ScatteredStars from '@/Components/Decorative/ScatteredStars';
-import { sanitizeHtml } from '@/utils/sanitize';
+import { sanitizeHtml, safeUrl } from '@/utils/sanitize';
 
 export default function HeroBanner({ block }) {
     const { getTranslatedField, currentLocale, isRTL } = useLocale();
@@ -86,7 +86,7 @@ export default function HeroBanner({ block }) {
     const ctaButton = ctaText && ctaLink && (
         <Button
             component={InertiaLink}
-            href={ctaLink}
+            href={safeUrl(ctaLink)}
             variant="contained"
             size="large"
             sx={{
@@ -370,9 +370,9 @@ export default function HeroBanner({ block }) {
                         )}
                         {secondaryCtaText && (
                             <Button
-                                {...(secondaryCtaLink && (secondaryCtaLink.startsWith('http')
-                                    ? { component: 'a', href: secondaryCtaLink, target: '_blank', rel: 'noopener noreferrer' }
-                                    : { component: InertiaLink, href: secondaryCtaLink }))}
+                                {...(secondaryCtaLink && (/^https?:\/\//i.test(secondaryCtaLink)
+                                    ? { component: 'a', href: safeUrl(secondaryCtaLink), target: '_blank', rel: 'noopener noreferrer' }
+                                    : { component: InertiaLink, href: safeUrl(secondaryCtaLink) }))}
                                 variant="contained"
                                 sx={{
                                     mt: 2,

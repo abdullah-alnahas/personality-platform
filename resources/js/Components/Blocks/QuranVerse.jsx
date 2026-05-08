@@ -3,6 +3,7 @@ import { Box, Typography, Container, Paper, Button, Chip } from '@mui/material';
 import { Link as InertiaLink } from '@inertiajs/react';
 import { useLocale } from '@/Hooks/useLocale';
 import OrnamentalDivider from '@/Components/Decorative/OrnamentalDivider';
+import { safeUrl, safeBackgroundUrl } from '@/utils/sanitize';
 
 const QURAN_FONT_FAMILY = "'KFGQPC Hafs Uthmanic Script', 'Amiri', 'Traditional Arabic', serif";
 const SECONDARY_FONT_FAMILY = "'Amiri', 'Traditional Arabic', serif";
@@ -124,7 +125,7 @@ function CtaButton({ text, link, accentColor }) {
         <Box sx={{ mt: 4, textAlign: 'center' }}>
             <Button
                 component={InertiaLink}
-                href={link}
+                href={safeUrl(link)}
                 variant="contained"
                 sx={{
                     backgroundColor: accentColor,
@@ -325,10 +326,7 @@ export default function QuranVerse({ block }) {
     const layout = config.layout || 'overlay';
     const bgColor = config.background_color || '#1a237e';
     const paddingY = config.padding_y || '4rem';
-    // Sanitise the URL: only allow http/https/relative paths to prevent CSS injection
-    // via crafted values like `url(x) } body { ... }`.
-    const rawBgImage = content.background_image_url;
-    const bgImage = rawBgImage && /^(https?:\/\/|\/)/.test(rawBgImage) ? rawBgImage : null;
+    const bgImage = safeBackgroundUrl(content.background_image_url);
 
     const LayoutComponent = layout === 'card' ? CardLayout : OverlayLayout;
 

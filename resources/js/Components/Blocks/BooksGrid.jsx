@@ -11,6 +11,7 @@ import {
     Button,
 } from "@mui/material";
 import { useLocale } from "@/Hooks/useLocale";
+import { safeUrl } from "@/utils/sanitize";
 
 const BooksGrid = ({ block }) => {
     const { currentLocale, isRTL, getTranslatedField: t } = useLocale();
@@ -141,7 +142,7 @@ const BooksGrid = ({ block }) => {
                                         <CardActions sx={{ px: 0, pt: 1 }}>
                                             <Button
                                                 size="small"
-                                                href={book.buy_link}
+                                                href={safeUrl(book.buy_link)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 variant="outlined"
