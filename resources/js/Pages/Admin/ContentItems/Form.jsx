@@ -191,8 +191,11 @@ export default function Form({
                     <Grid container spacing={3}>
                         {activeLanguages.map((lang) => (
                             <Grid
-                                xs={12}
-                                md={activeLanguages.length > 1 ? 4 : 12}
+                                
+                                size={{ xs: 12 }}
+
+                                
+                                md={activeLanguages.length> 1 ? 4 : 12}
                                 key={`title-${lang}`}
                             >
                                 <TextField
@@ -216,13 +219,16 @@ export default function Form({
                                 />
                             </Grid>
                         ))}
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider>Content & Details</Divider>
                         </Grid>
                         {activeLanguages.map((lang) => (
                             <Grid
-                                xs={12}
-                                md={activeLanguages.length > 1 ? 4 : 12}
+                                
+                                size={{ xs: 12 }}
+
+                                
+                                md={activeLanguages.length> 1 ? 4 : 12}
                                 key={`excerpt-${lang}`}
                             >
                                 <TextField
@@ -245,7 +251,7 @@ export default function Form({
                                 />
                             </Grid>
                         ))}
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Typography
                                 variant="subtitle1"
                                 gutterBottom
@@ -256,8 +262,11 @@ export default function Form({
                         </Grid>
                         {activeLanguages.map((lang) => (
                             <Grid
-                                xs={12}
-                                md={activeLanguages.length > 1 ? 4 : 12}
+                                
+                                size={{ xs: 12 }}
+
+                                
+                                md={activeLanguages.length> 1 ? 4 : 12}
                                 key={`content-${lang}`}
                             >
                                 <Typography
@@ -281,10 +290,10 @@ export default function Form({
                                 />
                             </Grid>
                         ))}
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider>Configuration</Divider>
                         </Grid>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl
                                 fullWidth
                                 error={!!errors.content_category_id}
@@ -325,7 +334,7 @@ export default function Form({
                                 )}
                             </FormControl>
                         </Grid>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors.status}>
                                 <InputLabel id="status-label">
                                     Status
@@ -354,7 +363,7 @@ export default function Form({
                                 )}
                             </FormControl>
                         </Grid>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <DateTimePicker
                                 label="Publish Date/Time"
                                 value={data.publish_date}
@@ -372,7 +381,7 @@ export default function Form({
                                 }}
                             />
                         </Grid>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -394,10 +403,10 @@ export default function Form({
                                 </FormHelperText>
                             )}
                         </Grid>
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider>Featured Image</Divider>
                         </Grid>
-                        <Grid xs={12} md={6}>
+                        <Grid  size={{ xs: 12, md: 6 }}>
                             <FormControl
                                 fullWidth
                                 error={!!errors.featured_image}
@@ -444,7 +453,7 @@ export default function Form({
                                 )}
                             </FormControl>
                         </Grid>
-                        <Grid xs={12} md={6}>
+                        <Grid  size={{ xs: 12, md: 6 }}>
                             {imagePreview && (
                                 <Card
                                     sx={{ maxWidth: 300, position: "relative" }}
@@ -482,8 +491,11 @@ export default function Form({
                             )}
                         </Grid>
                         <Grid
-                            xs={12}
-                            sx={{ mt: activeLanguages.length > 1 ? 0 : 2 }}
+                            
+                            size={{ xs: 12 }}
+
+                            
+                            sx={{ mt: activeLanguages.length> 1 ? 0 : 2 }}
                         >
                             <Typography variant="subtitle2" gutterBottom>
                                 Featured Image Alt Text (Recommended for
@@ -492,8 +504,11 @@ export default function Form({
                         </Grid>
                         {activeLanguages.map((lang) => (
                             <Grid
-                                xs={12}
-                                md={activeLanguages.length > 1 ? 4 : 12}
+                                
+                                size={{ xs: 12 }}
+
+                                
+                                md={activeLanguages.length> 1 ? 4 : 12}
                                 key={`alt-text-${lang}`}
                             >
                                 <TextField
@@ -526,14 +541,16 @@ export default function Form({
                             </Grid>
                         ))}
                         <Grid
-                            xs={12}
+                            
+                            size={{ xs: 12 }}
+
+                            
                             sx={{
                                 display: "flex",
                                 justifyContent: "flex-end",
                                 gap: 2,
                                 mt: 2,
-                            }}
-                        >
+                            }}>
                             <Button
                                 component={InertiaLink}
                                 href={route("admin.content-items.index")}

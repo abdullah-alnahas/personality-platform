@@ -82,8 +82,9 @@ export default function Contact() {
                                 sx={{
                                     position: "absolute",
                                     left: "-9999px",
-                                    width: 1,
-                                    height: 1,
+                                    top: "-9999px",
+                                    width: "1px",
+                                    height: "1px",
                                     opacity: 0,
                                     overflow: "hidden",
                                     pointerEvents: "none",

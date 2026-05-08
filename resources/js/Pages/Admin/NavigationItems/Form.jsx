@@ -107,7 +107,8 @@ export default function Form({
                 >
                     <Grid container spacing={3}>
                         {currentActiveLanguages.map((lang) => (
-                            <Grid xs={12} md={4} key={`label-${lang.code}`}>
+                            <Grid   size={{ xs: 12, md: 4 }}
+   key={`label-${lang.code}`}>
                                 <TextField
                                     required
                                     fullWidth
@@ -127,10 +128,10 @@ export default function Form({
                                 />
                             </Grid>
                         ))}
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider>Details</Divider>
                         </Grid>
-                        <Grid xs={12} md={6}>
+                        <Grid  size={{ xs: 12, md: 6 }}>
                             <TextField
                                 required
                                 fullWidth
@@ -143,7 +144,7 @@ export default function Form({
                                 helperText={errors.url}
                             />
                         </Grid>
-                        <Grid xs={12} sm={6} md={3}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 3 }}>
                             <FormControl
                                 fullWidth
                                 error={!!errors.menu_location}
@@ -183,7 +184,7 @@ export default function Form({
                                 )}
                             </FormControl>
                         </Grid>
-                        <Grid xs={12} sm={6} md={3}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 3 }}>
                             <FormControl fullWidth error={!!errors.target}>
                                 <InputLabel id="target-label">
                                     Target
@@ -213,7 +214,7 @@ export default function Form({
                                 )}
                             </FormControl>
                         </Grid>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors.parent_id}>
                                 <InputLabel id="parent-label">
                                     Parent Item (Optional)
@@ -251,7 +252,7 @@ export default function Form({
                                 )}
                             </FormControl>
                         </Grid>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <TextField
                                 fullWidth
                                 id="order"
@@ -270,7 +271,7 @@ export default function Form({
                                 }
                             />
                         </Grid>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors.status}>
                                 <InputLabel id="status-label">
                                     Status
@@ -299,14 +300,16 @@ export default function Form({
                             </FormControl>
                         </Grid>
                         <Grid
-                            xs={12}
+                            
+                            size={{ xs: 12 }}
+
+                            
                             sx={{
                                 display: "flex",
                                 justifyContent: "flex-end",
                                 gap: 2,
                                 mt: 2,
-                            }}
-                        >
+                            }}>
                             <Button
                                 component={InertiaLink}
                                 href={route("admin.navigation-items.index")}

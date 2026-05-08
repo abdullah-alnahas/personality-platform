@@ -16,6 +16,7 @@ import StatsCounter from "@/Components/Blocks/StatsCounter";
 import BooksGrid from "@/Components/Blocks/BooksGrid";
 import ScholarCards from "@/Components/Blocks/ScholarCards";
 import PlatformCta from "@/Components/Blocks/PlatformCta";
+import ContactForm from "@/Components/Blocks/ContactForm";
 
 const blockComponents = {
     hero_banner: HeroBanner,
@@ -34,6 +35,7 @@ const blockComponents = {
     books_grid: BooksGrid,
     scholar_cards: ScholarCards,
     platform_cta: PlatformCta,
+    contact_form: ContactForm,
 };
 
 export default function BlockRenderer({ block }) {
@@ -66,7 +68,8 @@ export default function BlockRenderer({ block }) {
         block.block_type === "stats_counter" ||
         block.block_type === "books_grid" ||
         block.block_type === "scholar_cards" ||
-        block.block_type === "platform_cta";
+        block.block_type === "platform_cta" ||
+        block.block_type === "contact_form";
 
     return (
         <Box

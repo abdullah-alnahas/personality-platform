@@ -64,12 +64,19 @@ export default function SocialMediaFeed({ block }) {
                               acc.platform.slice(1)
                             : "Social");
 
+                    const previewImage = acc.preview_image_url;
+                    const previewCaption = getTranslatedField(
+                        acc.preview_caption,
+                        currentLocale,
+                    );
+
                     return (
                         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={acc.id}>
                             <Card
                                 variant="outlined"
                                 sx={{
                                     borderRadius: 3,
+                                    overflow: "hidden",
                                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
                                     "&:hover": {
                                         transform: "translateY(-2px)",
@@ -83,6 +90,41 @@ export default function SocialMediaFeed({ block }) {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
+                                    {previewImage && (
+                                        <Box
+                                            sx={{
+                                                width: "100%",
+                                                paddingTop: "100%",
+                                                position: "relative",
+                                                bgcolor: "grey.100",
+                                            }}
+                                        >
+                                            <Box
+                                                component="img"
+                                                src={previewImage}
+                                                alt={displayName}
+                                                sx={{
+                                                    position: "absolute",
+                                                    inset: 0,
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "cover",
+                                                }}
+                                            />
+                                            <Avatar
+                                                sx={{
+                                                    position: "absolute",
+                                                    top: 12,
+                                                    [isRTL ? "left" : "right"]: 12,
+                                                    bgcolor: bgColor,
+                                                    width: 36,
+                                                    height: 36,
+                                                }}
+                                            >
+                                                <SocialIcon platform={acc.platform} />
+                                            </Avatar>
+                                        </Box>
+                                    )}
                                     <CardContent
                                         sx={{
                                             display: "flex",
@@ -91,23 +133,38 @@ export default function SocialMediaFeed({ block }) {
                                             p: 2.5,
                                         }}
                                     >
-                                        <Avatar
-                                            sx={{
-                                                bgcolor: bgColor,
-                                                width: 48,
-                                                height: 48,
-                                            }}
-                                        >
-                                            <SocialIcon platform={acc.platform} />
-                                        </Avatar>
-                                        <Box>
+                                        {!previewImage && (
+                                            <Avatar
+                                                sx={{
+                                                    bgcolor: bgColor,
+                                                    width: 48,
+                                                    height: 48,
+                                                }}
+                                            >
+                                                <SocialIcon platform={acc.platform} />
+                                            </Avatar>
+                                        )}
+                                        <Box sx={{ flex: 1 }}>
                                             <Typography
                                                 variant="body1"
                                                 fontWeight={600}
                                             >
                                                 {displayName}
                                             </Typography>
-                                            {accountName && (
+                                            {previewCaption ? (
+                                                <Typography
+                                                    variant="caption"
+                                                    color="text.secondary"
+                                                    sx={{
+                                                        display: "-webkit-box",
+                                                        WebkitLineClamp: 2,
+                                                        WebkitBoxOrient: "vertical",
+                                                        overflow: "hidden",
+                                                    }}
+                                                >
+                                                    {previewCaption}
+                                                </Typography>
+                                            ) : (
                                                 <Typography
                                                     variant="caption"
                                                     color="text.secondary"

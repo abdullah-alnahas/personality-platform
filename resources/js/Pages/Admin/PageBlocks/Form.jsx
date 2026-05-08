@@ -175,6 +175,9 @@ export default function Form({
                 case 'card_list':
                     content[key] = [];
                     break;
+                case 'stat_list':
+                    content[key] = [];
+                    break;
                 default:
                     content[key] = '';
             }

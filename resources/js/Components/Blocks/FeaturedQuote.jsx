@@ -20,6 +20,8 @@ export default function FeaturedQuote({ block }) {
     const bgColor = config.background_color || (isDark ? "#1a1a2e" : "#f8f6f3");
     const textColor = config.text_color || (isDark ? "#ffffff" : "text.primary");
     const accentColor = config.accent_color || "primary.main";
+    const bgImage = content.background_image_url;
+    const overlayOpacity = config.overlay_opacity ?? 0.55;
 
     if (!quoteText) return null;
 
@@ -27,6 +29,9 @@ export default function FeaturedQuote({ block }) {
         <Box
             sx={{
                 bgcolor: bgColor,
+                backgroundImage: bgImage ? `linear-gradient(rgba(0,0,0,${overlayOpacity}), rgba(0,0,0,${overlayOpacity})), url(${bgImage})` : undefined,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
                 py: { xs: 6, md: 10 },
             }}
         >

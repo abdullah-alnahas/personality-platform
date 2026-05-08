@@ -69,6 +69,7 @@ class ContentItem extends Model implements HasMedia
         "publish_date",
         "meta_fields",
         "is_featured_home",
+        "featured_image_url",
     ];
 
     /**

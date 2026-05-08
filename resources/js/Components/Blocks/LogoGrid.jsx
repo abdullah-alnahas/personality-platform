@@ -95,17 +95,14 @@ export default function LogoGrid({ block }) {
 
                         return (
                             <Grid
-                                item
-                                xs={6}
-                                sm={Math.max(Math.floor(12 / columns), 2)}
-                                md={Math.max(Math.floor(12 / columns), 1)}
+                                size={{ xs: 6, sm: Math.max(Math.floor(12 / columns), 2), md: Math.max(Math.floor(12 / columns), 1) }}
+
                                 key={index}
                                 sx={{
                                     display: 'flex',
                                     justifyContent: 'center',
                                     alignItems: 'center',
-                                }}
-                            >
+                                }}>
                                 {link ? (
                                     <Box
                                         component="a"

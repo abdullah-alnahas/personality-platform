@@ -100,7 +100,8 @@ export default function Edit({
         switch (type) {
             case "boolean":
                 return (
-                    <Grid xs={12} key={key} sx={{ mb: 2 }}>
+                    <Grid  size={{ xs: 12 }}
+  key={key} sx={{ mb: 2 }}>
                         <FormControlLabel
                             control={
                                 <Switch
@@ -127,12 +128,37 @@ export default function Edit({
                         )}
                     </Grid>
                 );
+            case "color": {
+                const lang = defaultLocale;
+                const colorVal = data[key]?.[lang] ?? "";
+                return (
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={`${key}-${lang}`}>
+                        <TextField
+                            fullWidth
+                            type="color"
+                            id={`${key}-${lang}`}
+                            label={labelBase}
+                            value={colorVal || "#000000"}
+                            onChange={(e) =>
+                                handleFieldChange(key, lang, e, "text")
+                            }
+                            error={!!errors[`${key}.${lang}`]}
+                            helperText={
+                                errors[`${key}.${lang}`] || colorVal
+                            }
+                            sx={{ mb: 2 }}
+                            InputLabelProps={{ shrink: true }}
+                        />
+                    </Grid>
+                );
+            }
             case "text":
             case "email":
             case "number":
                 if (type === "text" && SETTING_IMAGE_KEYS.has(key)) {
                     return (
-                        <Grid xs={12} md={6} key={`${key}-${defaultLocale}`}>
+                        <Grid   size={{ xs: 12, md: 6 }}
+   key={`${key}-${defaultLocale}`}>
                             <MediaPicker
                                 label={labelBase}
                                 value={data[key]?.[defaultLocale] ?? ""}
@@ -150,8 +176,11 @@ export default function Edit({
                 }
                 return activeLanguages.map((lang) => (
                     <Grid
-                        xs={12}
-                        md={activeLanguages.length > 1 ? 4 : 12}
+                        
+                        size={{ xs: 12 }}
+
+                        
+                        md={activeLanguages.length> 1 ? 4 : 12}
                         key={`${key}-${lang}`}
                     >
                         <TextField
@@ -178,8 +207,11 @@ export default function Edit({
             case "textarea":
                 return activeLanguages.map((lang) => (
                     <Grid
-                        xs={12}
-                        md={activeLanguages.length > 1 ? 4 : 12}
+                        
+                        size={{ xs: 12 }}
+
+                        
+                        md={activeLanguages.length> 1 ? 4 : 12}
                         key={`${key}-${lang}`}
                     >
                         <TextField
@@ -201,8 +233,11 @@ export default function Edit({
             case "richtext":
                 return activeLanguages.map((lang) => (
                     <Grid
-                        xs={12}
-                        md={activeLanguages.length > 1 ? 4 : 12}
+                        
+                        size={{ xs: 12 }}
+
+                        
+                        md={activeLanguages.length> 1 ? 4 : 12}
                         key={`${key}-${lang}`}
                     >
                         <Typography
@@ -225,7 +260,8 @@ export default function Edit({
                 ));
             default:
                 return (
-                    <Grid xs={12} key={key}>
+                    <Grid  size={{ xs: 12 }}
+  key={key}>
                         <Typography color="error">
                             Unknown setting type: {type} for key: {key}
                         </Typography>
@@ -286,14 +322,16 @@ export default function Edit({
                     ),
                 )}
                 <Grid
-                    xs={12}
+                    
+                    size={{ xs: 12 }}
+
+                    
                     sx={{
                         mt: 3,
                         display: "flex",
                         justifyContent: "flex-end",
                         gap: 2,
-                    }}
-                >
+                    }}>
                     <Button
                         type="submit"
                         variant="contained"

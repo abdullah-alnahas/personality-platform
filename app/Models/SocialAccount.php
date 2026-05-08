@@ -13,13 +13,16 @@ class SocialAccount extends Model
     protected $fillable = [
         'platform',
         'url',
-        'account_name', // Added
+        'account_name',
+        'preview_image_url',
+        'preview_caption',
         'display_order',
         'status',
     ];
 
     public array $translatable = [
-        'account_name', // Make the name translatable
+        'account_name',
+        'preview_caption',
     ];
 
     protected $casts = [];

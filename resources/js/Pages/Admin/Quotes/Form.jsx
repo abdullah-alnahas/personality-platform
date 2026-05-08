@@ -87,13 +87,16 @@ export default function Form({ quote, activeLanguages }) {
                     sx={{ mt: 1 }}
                 >
                     <Grid container spacing={3}>
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Typography variant="h6">Quote Text</Typography>
                         </Grid>
                         {languagesToIterate.map((lang) => (
                             <Grid
-                                xs={12}
-                                md={languagesToIterate.length > 1 ? 4 : 12}
+                                
+                                size={{ xs: 12 }}
+
+                                
+                                md={languagesToIterate.length> 1 ? 4 : 12}
                                 key={`text-${lang}`}
                             >
                                 <TextField
@@ -117,16 +120,19 @@ export default function Form({ quote, activeLanguages }) {
                                 />
                             </Grid>
                         ))}
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider sx={{ my: 1 }}>Optional Details</Divider>
                         </Grid>
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Typography variant="h6">Source</Typography>
                         </Grid>
                         {languagesToIterate.map((lang) => (
                             <Grid
-                                xs={12}
-                                md={languagesToIterate.length > 1 ? 4 : 12}
+                                
+                                size={{ xs: 12 }}
+
+                                
+                                md={languagesToIterate.length> 1 ? 4 : 12}
                                 key={`source-${lang}`}
                             >
                                 <TextField
@@ -147,10 +153,10 @@ export default function Form({ quote, activeLanguages }) {
                                 />
                             </Grid>
                         ))}
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider sx={{ my: 1 }}>Configuration</Divider>
                         </Grid>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors.status}>
                                 <InputLabel id="status-label">
                                     Status
@@ -179,7 +185,7 @@ export default function Form({ quote, activeLanguages }) {
                                 )}
                             </FormControl>
                         </Grid>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -202,14 +208,16 @@ export default function Form({ quote, activeLanguages }) {
                             )}
                         </Grid>
                         <Grid
-                            xs={12}
+                            
+                            size={{ xs: 12 }}
+
+                            
                             sx={{
                                 display: "flex",
                                 justifyContent: "flex-end",
                                 gap: 2,
                                 mt: 2,
-                            }}
-                        >
+                            }}>
                             <Button
                                 component={InertiaLink}
                                 href={route("admin.quotes.index")}

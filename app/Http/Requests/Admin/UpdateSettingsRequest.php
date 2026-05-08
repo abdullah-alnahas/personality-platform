@@ -71,6 +71,14 @@ class UpdateSettingsRequest extends FormRequest
                         // Booleans might be sent as true/false directly, not as an array
                         $rules[$key] = ["nullable", "boolean"];
                         break;
+                    case "color":
+                        $rules[$key] = ["nullable", "array"];
+                        $rules["{$key}." . config("app.locale")] = [
+                            "nullable",
+                            "string",
+                            "regex:/^#(?:[0-9a-fA-F]{3}){1,2}$/",
+                        ];
+                        break;
                     default:
                         // Default for unknown types: allow string or array (for translatable)
                         $rules[$key] = ["nullable"];

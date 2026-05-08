@@ -7,6 +7,7 @@ import { Box } from '@mui/material';
 export default function OrnamentalDivider({ color = '#C9A94E', width = 200, opacity = 0.6, sx = {} }) {
     return (
         <Box
+            data-decoration="ornamental-divider"
             sx={{
                 display: 'flex',
                 alignItems: 'center',

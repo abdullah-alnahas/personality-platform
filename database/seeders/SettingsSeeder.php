@@ -186,6 +186,84 @@ class SettingsSeeder extends Seeder
                 "type" => "text",
                 "group" => "footer",
             ],
+
+            // Newsletter / Subscribe Block Group
+            [
+                "key" => "newsletter_heading",
+                "value" => [
+                    "en" => "Subscribe",
+                    "ar" => "اشترك في النشرة",
+                    "tr" => "Abone Ol",
+                ],
+                "type" => "text",
+                "group" => "footer",
+            ],
+            [
+                "key" => "newsletter_description",
+                "value" => [
+                    "en" => "Get the latest updates delivered to your inbox.",
+                    "ar" => "احصل على آخر المستجدات في بريدك.",
+                    "tr" => "En son güncellemeleri gelen kutunuza alın.",
+                ],
+                "type" => "textarea",
+                "group" => "footer",
+            ],
+
+            // Theme / Site Design Group
+            [
+                "key" => "theme_primary_color",
+                "value" => ["en" => "#2B3D2F"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_primary_dark",
+                "value" => ["en" => "#1E2A22"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_secondary_color",
+                "value" => ["en" => "#C9A94E"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_background_color",
+                "value" => ["en" => "#F5F0E8"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_text_color",
+                "value" => ["en" => "#2C2C2C"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_heading_font",
+                "value" => ["en" => "'Amiri', 'Georgia', serif"],
+                "type" => "text",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_body_font",
+                "value" => ["en" => "'Cairo', 'Tajawal', 'Roboto', sans-serif"],
+                "type" => "text",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_border_radius",
+                "value" => ["en" => "8"],
+                "type" => "number",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_decorations_enabled",
+                "value" => ["en" => "1"],
+                "type" => "boolean",
+                "group" => "theme",
+            ],
         ];
 
         foreach ($settings as $setting) {

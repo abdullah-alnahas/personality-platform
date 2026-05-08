@@ -12,6 +12,7 @@ export default function IslamicStar({ size = 40, color = '#C9A94E', opacity = 0.
 
     return (
         <Box
+            data-decoration="islamic-star"
             sx={{
                 width: size,
                 height: size,

@@ -74,7 +74,8 @@ export default function Form({ category, pages = [] }) {
 
                         {/* Translatable Name Fields */}
                         {activeLanguages.map(lang => (
-                             <Grid xs={12} md={4} key={`name-${lang.code}`}>
+                             <Grid   size={{ xs: 12, md: 4 }}
+   key={`name-${lang.code}`}>
                                 <TextField
                                     required // Make default locale required implicitly by backend validation
                                     fullWidth
@@ -89,11 +90,12 @@ export default function Form({ category, pages = [] }) {
                             </Grid>
                         ))}
 
-                         <Grid xs={12}><Divider>Optional Details</Divider></Grid>
+                         <Grid size={{ xs: 12 }}><Divider>Optional Details</Divider></Grid>
 
                          {/* Translatable Description Fields */}
                         {activeLanguages.map(lang => (
-                             <Grid xs={12} md={4} key={`desc-${lang.code}`}>
+                             <Grid   size={{ xs: 12, md: 4 }}
+   key={`desc-${lang.code}`}>
                                 <TextField
                                     fullWidth
                                     multiline
@@ -111,7 +113,8 @@ export default function Form({ category, pages = [] }) {
 
                          {/* Translatable Quote Fields */}
                          {activeLanguages.map(lang => (
-                             <Grid xs={12} md={4} key={`quote-${lang.code}`}>
+                             <Grid   size={{ xs: 12, md: 4 }}
+   key={`quote-${lang.code}`}>
                                 <TextField
                                     fullWidth
                                     multiline
@@ -127,10 +130,10 @@ export default function Form({ category, pages = [] }) {
                             </Grid>
                         ))}
 
-                        <Grid xs={12}><Divider>Configuration</Divider></Grid>
+                        <Grid size={{ xs: 12 }}><Divider>Configuration</Divider></Grid>
 
                          {/* Icon Field */}
-                        <Grid xs={12} sm={4}>
+                        <Grid  size={{ xs: 12, sm: 4 }}>
                             <TextField
                                 fullWidth
                                 id="icon"
@@ -144,7 +147,7 @@ export default function Form({ category, pages = [] }) {
                         </Grid>
 
                         {/* Order Field */}
-                        <Grid xs={12} sm={4}>
+                        <Grid  size={{ xs: 12, sm: 4 }}>
                             <TextField
                                 fullWidth
                                 id="order"
@@ -160,7 +163,7 @@ export default function Form({ category, pages = [] }) {
                         </Grid>
 
                          {/* Status Field */}
-                         <Grid xs={12} sm={4}>
+                         <Grid  size={{ xs: 12, sm: 4 }}>
                              <FormControl fullWidth error={!!errors.status}>
                                 <InputLabel id="status-label">Status</InputLabel>
                                 <Select
@@ -179,10 +182,10 @@ export default function Form({ category, pages = [] }) {
                          </Grid>
 
                         {/* Linked Page (for rich category pages via page builder) */}
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider>Rich Category Page (optional)</Divider>
                         </Grid>
-                        <Grid xs={12} sm={8}>
+                        <Grid  size={{ xs: 12, sm: 8 }}>
                             <FormControl fullWidth>
                                 <InputLabel id="page-label">Link to Page Builder Page</InputLabel>
                                 <Select
@@ -205,7 +208,8 @@ export default function Form({ category, pages = [] }) {
                         </Grid>
 
                         {/* Action Buttons */}
-                        <Grid xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                        <Grid  size={{ xs: 12 }}
+  sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                              <Button
                                  component={InertiaLink}
                                  href={route('admin.content-categories.index')}

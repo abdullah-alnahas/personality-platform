@@ -39,6 +39,7 @@ export default function ScatteredStars({
 
     return (
         <Box
+            data-decoration="scattered-stars"
             sx={{
                 position: 'absolute',
                 top: 0,

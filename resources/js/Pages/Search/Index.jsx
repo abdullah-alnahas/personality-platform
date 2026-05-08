@@ -29,12 +29,9 @@ export default function Index({ query, items }) {
                 <Grid container spacing={3}>
                     {results.map((item) => (
                         <Grid
-                            item
-                            xs={12}
-                            sm={6}
-                            md={4}
-                            key={`search-item-${item.id}`}
-                        >
+                            size={{ xs: 12, sm: 6, md: 4 }}
+
+                            key={`search-item-${item.id}`}>
                             {" "}
                             {/* Grid v2 */}
                             <ContentCard item={item} />

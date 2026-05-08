@@ -35,6 +35,10 @@ import WebIcon from "@mui/icons-material/Web";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import SchoolIcon from "@mui/icons-material/School";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import EmailIcon from "@mui/icons-material/Email";
+import ContactMailIcon from "@mui/icons-material/ContactMail";
+import PeopleIcon from "@mui/icons-material/People";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import { useLocale } from "@/Hooks/useLocale"; // Import the hook
 
 const drawerWidth = 240;
@@ -253,8 +257,63 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                     variant="caption"
                     sx={{ pl: 2, color: "text.secondary" }}
                 >
+                    Audience
+                </Typography>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        component={InertiaLink}
+                        href={route("admin.contact-submissions.index")}
+                        selected={route().current("admin.contact-submissions.*")}
+                    >
+                        <ListItemIcon>
+                            <ContactMailIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Contact Submissions" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        component={InertiaLink}
+                        href={route("admin.subscribers.index")}
+                        selected={route().current("admin.subscribers.*")}
+                    >
+                        <ListItemIcon>
+                            <EmailIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Subscribers" />
+                    </ListItemButton>
+                </ListItem>
+                <Divider sx={{ my: 1 }} />
+                <Typography
+                    variant="caption"
+                    sx={{ pl: 2, color: "text.secondary" }}
+                >
                     Administration
                 </Typography>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        component={InertiaLink}
+                        href={route("admin.users.index")}
+                        selected={route().current("admin.users.*")}
+                    >
+                        <ListItemIcon>
+                            <PeopleIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Users" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        component={InertiaLink}
+                        href={route("admin.roles.index")}
+                        selected={route().current("admin.roles.*")}
+                    >
+                        <ListItemIcon>
+                            <VerifiedUserIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Roles" />
+                    </ListItemButton>
+                </ListItem>
                 <ListItem disablePadding>
                     <ListItemButton
                         component={InertiaLink}
@@ -295,7 +354,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
     );
 
     return (
-        <Box sx={{ display: "flex", direction: isRTL ? "rtl" : "ltr" }}>
+        <Box sx={{ display: "flex", direction: "ltr" }} dir="ltr">
             <CssBaseline />
             <AppBar
                 position="fixed"

@@ -118,7 +118,7 @@ export default function Form({
                     sx={{ mt: 1 }}
                 >
                     <Grid container spacing={3}>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors.platform}>
                                 <InputLabel id="platform-label">
                                     Platform
@@ -148,7 +148,7 @@ export default function Form({
                                 )}
                             </FormControl>
                         </Grid>
-                        <Grid xs={12} sm={6} md={8}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 8 }}>
                             <TextField
                                 required
                                 fullWidth
@@ -165,15 +165,18 @@ export default function Form({
                                 type="url"
                             />
                         </Grid>
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider>Optional Details</Divider>
                         </Grid>
                         {currentActiveLanguages.map((lang) => (
                             <Grid
-                                xs={12}
-                                md={4}
-                                key={`account_name-${lang.code}`}
-                            >
+                                
+                                
+                                size={{ xs: 12, md: 4 }}
+
+                                
+                                
+                                key={`account_name-${lang.code}`}>
                                 <TextField
                                     fullWidth
                                     id={`account_name-${lang.code}`}
@@ -197,7 +200,7 @@ export default function Form({
                                 />
                             </Grid>
                         ))}
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <TextField
                                 fullWidth
                                 id="display_order"
@@ -216,7 +219,7 @@ export default function Form({
                                 }
                             />
                         </Grid>
-                        <Grid xs={12} sm={6} md={4}>
+                        <Grid   size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors.status}>
                                 <InputLabel id="status-label">
                                     Status
@@ -245,14 +248,16 @@ export default function Form({
                             </FormControl>
                         </Grid>
                         <Grid
-                            xs={12}
+                            
+                            size={{ xs: 12 }}
+
+                            
                             sx={{
                                 display: "flex",
                                 justifyContent: "flex-end",
                                 gap: 2,
                                 mt: 2,
-                            }}
-                        >
+                            }}>
                             <Button
                                 component={InertiaLink}
                                 href={route("admin.social-accounts.index")}

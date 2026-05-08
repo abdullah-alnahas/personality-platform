@@ -129,12 +129,14 @@ class BlockRegistry
                 'quote_id' => ['type' => 'relation', 'model' => 'Quote', 'nullable' => true],
                 'custom_text' => ['type' => 'translatable_text'],
                 'custom_source' => ['type' => 'translatable_text'],
+                'background_image_url' => ['type' => 'text'],
             ],
             'config_defaults' => [
                 'style' => 'dark',
                 'background_color' => '#1a1a2e',
                 'text_color' => '#ffffff',
                 'padding_y' => 'xl',
+                'overlay_opacity' => 0.55,
             ],
         ],
         'social_media_feed' => [
@@ -147,6 +149,26 @@ class BlockRegistry
             'config_defaults' => [
                 'background_color' => '#ffffff',
                 'show_icons' => true,
+            ],
+        ],
+        'contact_form' => [
+            'label' => 'Contact Form',
+            'icon' => 'mail',
+            'fields' => [
+                'heading' => ['type' => 'translatable_text', 'required' => true],
+                'subtitle' => ['type' => 'translatable_text'],
+                'name_label' => ['type' => 'translatable_text'],
+                'email_label' => ['type' => 'translatable_text'],
+                'message_label' => ['type' => 'translatable_text'],
+                'submit_text' => ['type' => 'translatable_text'],
+                'background_image_url' => ['type' => 'text'],
+            ],
+            'config_defaults' => [
+                'background_color' => '#1E2A22',
+                'text_color' => '#ffffff',
+                'accent_color' => '#C9F050',
+                'padding_y' => 'xl',
+                'overlay_opacity' => 0.6,
             ],
         ],
         'newsletter_cta' => [

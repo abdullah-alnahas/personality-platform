@@ -300,12 +300,16 @@ class PrototypeHomepageSeeder extends Seeder
     // ─────────────────────────────────────────────
     protected function seedSocialAccounts(): void
     {
+        $sheikhName = ['ar' => 'الشيخ عون القدومي', 'en' => 'Sheikh Awn al-Qaddoumi', 'tr' => 'Şeyh Avn el-Kaddumi'];
         $accounts = [
-            ['platform' => 'youtube', 'url' => 'https://youtube.com/@sheikhawn', 'account_name' => ['ar' => 'الشيخ عون القدومي', 'en' => 'Sheikh Awn', 'tr' => 'Şeyh Avn'], 'display_order' => 1],
-            ['platform' => 'facebook', 'url' => 'https://facebook.com/sheikhawn', 'account_name' => ['ar' => 'الشيخ عون القدومي', 'en' => 'Sheikh Awn', 'tr' => 'Şeyh Avn'], 'display_order' => 2],
-            ['platform' => 'instagram', 'url' => 'https://instagram.com/sheikhawn', 'account_name' => ['ar' => 'الشيخ عون القدومي', 'en' => 'Sheikh Awn', 'tr' => 'Şeyh Avn'], 'display_order' => 3],
-            ['platform' => 'telegram', 'url' => 'https://t.me/sheikhawn', 'account_name' => ['ar' => 'الشيخ عون القدومي', 'en' => 'Sheikh Awn', 'tr' => 'Şeyh Avn'], 'display_order' => 4],
-            ['platform' => 'x', 'url' => 'https://x.com/sheikhawn', 'account_name' => ['ar' => 'الشيخ عون القدومي', 'en' => 'Sheikh Awn', 'tr' => 'Şeyh Avn'], 'display_order' => 5],
+            ['platform' => 'youtube',   'url' => 'https://www.youtube.com/@AounalKaddoumi',                                  'account_name' => $sheikhName,                                                                              'display_order' => 10],
+            ['platform' => 'facebook',  'url' => 'https://www.facebook.com/profile.php?id=100044365216438&mibextid=LQQJ4d',  'account_name' => $sheikhName,                                                                              'display_order' => 20],
+            ['platform' => 'instagram', 'url' => 'https://www.instagram.com/awnqaddoumi',                                    'account_name' => ['ar' => '@awnqaddoumi', 'en' => '@awnqaddoumi', 'tr' => '@awnqaddoumi'],                  'display_order' => 30],
+            ['platform' => 'x',         'url' => 'https://x.com/awn_qaddoumi',                                               'account_name' => ['ar' => '@awn_qaddoumi', 'en' => '@awn_qaddoumi', 'tr' => '@awn_qaddoumi'],               'display_order' => 40],
+            ['platform' => 'telegram',  'url' => 'https://t.me/AounalKaddoumi',                                              'account_name' => $sheikhName,                                                                              'display_order' => 50],
+            ['platform' => 'whatsapp',  'url' => 'https://chat.whatsapp.com/Gwc8uWpq20c2DQ43TpTu0Y',                         'account_name' => ['ar' => 'قناة واتساب', 'en' => 'WhatsApp Channel', 'tr' => 'WhatsApp Kanalı'],            'display_order' => 60],
+            ['platform' => 'tiktok',    'url' => 'https://www.tiktok.com/@awn.kaddumi',                                      'account_name' => ['ar' => '@awn.kaddumi', 'en' => '@awn.kaddumi', 'tr' => '@awn.kaddumi'],                  'display_order' => 70],
+            ['platform' => 'linktree',  'url' => 'https://linktr.ee/Awnqaddoumi',                                            'account_name' => ['ar' => 'كل الروابط', 'en' => 'All Links', 'tr' => 'Tüm Bağlantılar'],                    'display_order' => 80],
         ];
 
         foreach ($accounts as $acc) {
@@ -372,8 +376,8 @@ class PrototypeHomepageSeeder extends Seeder
                     'en' => '<p>A journey of knowledge, action, and calling to Allah the Almighty — reviving the religion in all the world</p>',
                     'tr' => '<p>Allah Teâlâ\'ya davet, ilim ve amel yolculuğu — tüm dünyada dini ihya etmek</p>',
                 ],
-                'background_image_url' => '/images/prototype/mosque-bg.jpg',
-                'portrait_image_url' => '',
+                'background_image_url' => '/images/prototype/hero-mosque-bg.jpg',
+                'portrait_image_url' => '/images/prototype/sheikh-portrait.png',
                 'cta_text' => [
                     'ar' => 'الشيخ عون القدومي',
                     'en' => 'Sheikh Awn Al-Qaddoumi',

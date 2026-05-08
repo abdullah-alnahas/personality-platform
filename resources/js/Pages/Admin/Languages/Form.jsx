@@ -81,7 +81,7 @@ export default function Form({ language, knownLanguages }) {
                 >
                     <Grid container spacing={3}>
                         {!isEditing && (
-                            <Grid xs={12}>
+                            <Grid size={{ xs: 12 }}>
                                 <Autocomplete
                                     options={knownLanguages}
                                     getOptionLabel={(option) =>
@@ -104,9 +104,9 @@ export default function Form({ language, knownLanguages }) {
                             </Grid>
                         )}
                         <Grid
-                            xs={12}
-                            sm={isEditing || !selectedKnownLanguage ? 6 : 12}
-                        >
+                            
+                            
+                        size={{ xs: 12, sm: isEditing || !selectedKnownLanguage ? 6 : 12 }}>
                             <TextField
                                 required
                                 fullWidth
@@ -135,7 +135,7 @@ export default function Form({ language, knownLanguages }) {
                                 }}
                             />
                         </Grid>
-                        <Grid xs={12} sm={6}>
+                        <Grid  size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 required
                                 fullWidth
@@ -163,7 +163,7 @@ export default function Form({ language, knownLanguages }) {
                                 }}
                             />
                         </Grid>
-                        <Grid xs={12} sm={6}>
+                        <Grid  size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 required
                                 fullWidth
@@ -191,7 +191,7 @@ export default function Form({ language, knownLanguages }) {
                                 }}
                             />
                         </Grid>
-                        <Grid xs={12} sm={6}>
+                        <Grid  size={{ xs: 12, sm: 6 }}>
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -215,14 +215,16 @@ export default function Form({ language, knownLanguages }) {
                             )}
                         </Grid>
                         <Grid
-                            xs={12}
+                            
+                            size={{ xs: 12 }}
+
+                            
                             sx={{
                                 display: "flex",
                                 justifyContent: "flex-end",
                                 gap: 2,
                                 mt: 2,
-                            }}
-                        >
+                            }}>
                             <Button
                                 component={InertiaLink}
                                 href={route("admin.languages.index")}

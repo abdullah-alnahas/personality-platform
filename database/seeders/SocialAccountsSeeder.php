@@ -13,31 +13,31 @@ class SocialAccountsSeeder extends Seeder
             [
                 'platform' => 'youtube',
                 'url' => 'https://www.youtube.com/@AounalKaddoumi',
-                'account_name' => ['en' => 'YouTube', 'ar' => 'يوتيوب', 'tr' => 'YouTube'],
+                'account_name' => ['en' => 'Sheikh Awn al-Qaddoumi', 'ar' => 'الشيخ عون القدومي', 'tr' => 'Şeyh Avn el-Kaddumi'],
                 'display_order' => 10,
             ],
             [
                 'platform' => 'facebook',
-                'url' => 'https://www.facebook.com/profile.php?id=100044365216438',
-                'account_name' => ['en' => 'Facebook', 'ar' => 'فيسبوك', 'tr' => 'Facebook'],
+                'url' => 'https://www.facebook.com/profile.php?id=100044365216438&mibextid=LQQJ4d',
+                'account_name' => ['en' => 'Sheikh Awn al-Qaddoumi', 'ar' => 'الشيخ عون القدومي', 'tr' => 'Şeyh Avn el-Kaddumi'],
                 'display_order' => 20,
             ],
             [
                 'platform' => 'instagram',
                 'url' => 'https://www.instagram.com/awnqaddoumi',
-                'account_name' => ['en' => 'Instagram', 'ar' => 'انستغرام', 'tr' => 'Instagram'],
+                'account_name' => ['en' => '@awnqaddoumi', 'ar' => '@awnqaddoumi', 'tr' => '@awnqaddoumi'],
                 'display_order' => 30,
             ],
             [
                 'platform' => 'x',
                 'url' => 'https://x.com/awn_qaddoumi',
-                'account_name' => ['en' => 'X (Twitter)', 'ar' => 'إكس', 'tr' => 'X'],
+                'account_name' => ['en' => '@awn_qaddoumi', 'ar' => '@awn_qaddoumi', 'tr' => '@awn_qaddoumi'],
                 'display_order' => 40,
             ],
             [
                 'platform' => 'telegram',
                 'url' => 'https://t.me/AounalKaddoumi',
-                'account_name' => ['en' => 'Telegram', 'ar' => 'تيليجرام', 'tr' => 'Telegram'],
+                'account_name' => ['en' => 'Sheikh Awn al-Qaddoumi', 'ar' => 'الشيخ عون القدومي', 'tr' => 'Şeyh Avn el-Kaddumi'],
                 'display_order' => 50,
             ],
             [
@@ -49,7 +49,7 @@ class SocialAccountsSeeder extends Seeder
             [
                 'platform' => 'tiktok',
                 'url' => 'https://www.tiktok.com/@awn.kaddumi',
-                'account_name' => ['en' => 'TikTok', 'ar' => 'تيك توك', 'tr' => 'TikTok'],
+                'account_name' => ['en' => '@awn.kaddumi', 'ar' => '@awn.kaddumi', 'tr' => '@awn.kaddumi'],
                 'display_order' => 70,
             ],
             [

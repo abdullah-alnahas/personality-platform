@@ -138,8 +138,16 @@ class BlockDataResolver
             return SocialAccount::active()
                 ->orderBy('display_order')
                 ->take($maxItems)
-                ->get(['id', 'platform', 'url', 'account_name'])
-                ->toArray();
+                ->get(['id', 'platform', 'url', 'account_name', 'preview_image_url', 'preview_caption'])
+                ->map(fn (SocialAccount $a) => [
+                    'id'                => $a->id,
+                    'platform'          => $a->platform,
+                    'url'               => $a->url,
+                    'account_name'      => $a->getTranslations('account_name'),
+                    'preview_image_url' => $a->preview_image_url,
+                    'preview_caption'   => $a->getTranslations('preview_caption'),
+                ])
+                ->all();
         });
 
         return $block;
@@ -211,6 +219,20 @@ class BlockDataResolver
 
     protected function transformContentItem(ContentItem $item): array
     {
+        $imageDetails = ResponsiveImageHelper::fromContentItem($item);
+        if (!$imageDetails) {
+            $fallback = $item->featured_image_url ?: null;
+            if ($fallback) {
+                $imageDetails = [
+                    'alt' => $item->getTranslation('title', app()->getLocale()) ?? '',
+                    'original_url' => $fallback,
+                    'thumbnail_jpg' => $fallback,
+                    'thumbnail_webp' => null,
+                    'webp_sources' => [],
+                    'jpg_sources' => [['url' => $fallback, 'width' => 800]],
+                ];
+            }
+        }
         return [
             'id' => $item->id,
             'title' => $item->getTranslations('title'),
@@ -220,7 +242,7 @@ class BlockDataResolver
             'category_name' => $item->category?->getTranslations('name'),
             'publish_date_formatted' => $item->publish_date?->isoFormat('LL'),
             'publish_date' => $item->publish_date?->toDateString(),
-            'image_details' => ResponsiveImageHelper::fromContentItem($item),
+            'image_details' => $imageDetails,
         ];
     }
 

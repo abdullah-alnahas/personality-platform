@@ -33,6 +33,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Decorations toggle — controlled by theme_decorations_enabled site setting */
+body.no-decorations [data-decoration] {
+    display: none !important;
+}
+
 /* Uthmani Quran text styling */
 .quran-text {
     font-family: 'KFGQPC Hafs Uthmanic Script', 'Amiri', 'Traditional Arabic', serif;

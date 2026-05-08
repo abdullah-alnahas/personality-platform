@@ -46,9 +46,7 @@ export default function TextWithImage({ block }) {
         <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
             <Grid container spacing={{ xs: 3, md: 6 }} alignItems="center">
                 <Grid
-                    item
-                    xs={12}
-                    md={6}
+                    size={{ xs: 12, md: 6 }}
                     sx={{ order: textOrder }}
                 >
                     {heading && (
@@ -115,9 +113,7 @@ export default function TextWithImage({ block }) {
                     )}
                 </Grid>
                 <Grid
-                    item
-                    xs={12}
-                    md={6}
+                    size={{ xs: 12, md: 6 }}
                     sx={{ order: imageOrder }}
                 >
                     {image && (

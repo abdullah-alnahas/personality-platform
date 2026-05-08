@@ -243,6 +243,8 @@ export default function PublicLayout({ children, title: pageTitle }) {
         footer_col3: getTranslatedField(settings?.footer_col3_title?.value, currentLocale, ""),
         footer_col4: getTranslatedField(settings?.footer_col4_title?.value, currentLocale, ""),
     };
+    const newsletterHeading = getTranslatedField(settings?.newsletter_heading?.value, currentLocale, "");
+    const newsletterDescription = getTranslatedField(settings?.newsletter_description?.value, currentLocale, "");
     const headerNavItems = navigationItems?.header ?? [];
     const footerCol1Items =
         navigationItems?.footer_col1?.filter((item) => !item.parent_id) ?? [];
@@ -895,8 +897,21 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                     mb: 1.5,
                                 }}
                             >
-                                {uiT.subscribe}
+                                {newsletterHeading || uiT.subscribe}
                             </Typography>
+                            {newsletterDescription && (
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: 'rgba(255,255,255,0.7)',
+                                        fontSize: '0.85rem',
+                                        mb: 1.5,
+                                        lineHeight: 1.6,
+                                    }}
+                                >
+                                    {newsletterDescription}
+                                </Typography>
+                            )}
                             <Box
                                 component="form"
                                 onSubmit={handleSubscribe}

@@ -23,6 +23,10 @@ use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PageBlockController;
 use App\Http\Controllers\Admin\ScholarController;
+use App\Http\Controllers\Admin\SubscriberController;
+use App\Http\Controllers\Admin\ContactSubmissionController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\PageDisplayController;
 
 // --- Public Routes ---
@@ -218,6 +222,44 @@ Route::prefix(config('admin.path', 'admin'))
             Route::resource("pages", PageController::class)
                 ->except(["show"])
                 ->middleware("can:manage pages");
+
+            // Subscribers (Requires 'manage subscribers' permission)
+            Route::get("subscribers", [SubscriberController::class, "index"])
+                ->middleware("can:manage subscribers")
+                ->name("subscribers.index");
+            Route::get("subscribers/export", [SubscriberController::class, "export"])
+                ->middleware("can:manage subscribers")
+                ->name("subscribers.export");
+            Route::delete("subscribers/{subscriber}", [SubscriberController::class, "destroy"])
+                ->middleware("can:manage subscribers")
+                ->name("subscribers.destroy");
+
+            // Contact Submissions (Requires 'manage contact submissions' permission)
+            Route::get("contact-submissions", [ContactSubmissionController::class, "index"])
+                ->middleware("can:manage contact submissions")
+                ->name("contact-submissions.index");
+            Route::get("contact-submissions/export", [ContactSubmissionController::class, "export"])
+                ->middleware("can:manage contact submissions")
+                ->name("contact-submissions.export");
+            Route::get("contact-submissions/{submission}", [ContactSubmissionController::class, "show"])
+                ->middleware("can:manage contact submissions")
+                ->name("contact-submissions.show");
+            Route::put("contact-submissions/{submission}", [ContactSubmissionController::class, "update"])
+                ->middleware("can:manage contact submissions")
+                ->name("contact-submissions.update");
+            Route::delete("contact-submissions/{submission}", [ContactSubmissionController::class, "destroy"])
+                ->middleware("can:manage contact submissions")
+                ->name("contact-submissions.destroy");
+
+            // Users (Requires 'manage users' permission)
+            Route::resource("users", UserController::class)
+                ->except(["show"])
+                ->middleware("can:manage users");
+
+            // Roles (Requires 'manage roles' permission)
+            Route::resource("roles", RoleController::class)
+                ->except(["show"])
+                ->middleware("can:manage roles");
 
             // Page Blocks (nested under pages)
             Route::prefix("pages/{page}/blocks")
