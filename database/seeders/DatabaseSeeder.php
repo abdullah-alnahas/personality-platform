@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
             SettingsSeeder::class,
+            SocialAccountsSeeder::class,
             PrototypeHomepageSeeder::class,
             PrototypeAboutPageSeeder::class,
             PrototypeIslamCategorySeeder::class,

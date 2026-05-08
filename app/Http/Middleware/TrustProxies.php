@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Middleware\TrustProxies as Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TrustProxies extends Middleware
 {
@@ -26,8 +27,15 @@ class TrustProxies extends Middleware
         if ($configured === null || $configured === '') {
             $this->proxies = null;
         } elseif ($configured === '*') {
-            // Discouraged but supported for single-host setups behind a known LB.
-            $this->proxies = '*';
+            // Refused in production: a wildcard lets any client forge
+            // X-Forwarded-For and bypass IP-based rate limiting / lockouts.
+            // Operator must supply explicit CIDR ranges (Cloudflare, AWS ELB).
+            if (app()->environment('production')) {
+                Log::critical('TRUSTED_PROXIES="*" rejected in production; treating as none. Configure explicit CIDR ranges.');
+                $this->proxies = null;
+            } else {
+                $this->proxies = '*';
+            }
         } else {
             $this->proxies = array_values(array_filter(array_map('trim', explode(',', $configured))));
         }

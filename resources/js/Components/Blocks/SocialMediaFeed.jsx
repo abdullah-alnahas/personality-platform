@@ -65,7 +65,7 @@ export default function SocialMediaFeed({ block }) {
                             : "Social");
 
                     return (
-                        <Grid item xs={12} sm={6} md={4} key={acc.id}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={acc.id}>
                             <Card
                                 variant="outlined"
                                 sx={{

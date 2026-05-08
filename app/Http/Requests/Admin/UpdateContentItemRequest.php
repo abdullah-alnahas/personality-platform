@@ -50,7 +50,7 @@ class UpdateContentItemRequest extends FormRequest
             'is_featured_home'      => ['sometimes', 'boolean'],
 
             // Add validation for updating/removing the featured image (used in Task 3)
-            'featured_image'        => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'], // Validate if new image uploaded
+            'featured_image'        => ['nullable', 'image', 'mimes:' . implode(',', config('media.image.allowed_mimes')), 'max:' . config('media.image.max_kb', 10240)],
             'remove_featured_image' => ['nullable', 'boolean'], // Add a field to signal removal
         ];
         // Note: Slug validation might be added here if manual slug editing is allowed.

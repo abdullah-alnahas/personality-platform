@@ -51,6 +51,10 @@ const platforms = [
     "twitter",
     "linkedin",
     "tiktok",
+    "whatsapp",
+    "linktree",
+    "phone",
+    "email",
     "other",
 ];
 

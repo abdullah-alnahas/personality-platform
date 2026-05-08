@@ -97,7 +97,7 @@ class MediaController extends Controller
             'file' => [
                 'required',
                 'file',
-                'max:10240', // 10 MB
+                'max:' . config('media.image.max_kb', 10240),
                 'mimetypes:' . implode(',', self::ALLOWED_MIME_TYPES),
             ],
         ]);
@@ -125,13 +125,81 @@ class MediaController extends Controller
             ['disk' => 'public']
         );
 
+        // Re-encode JPEG/PNG/WebP through GD to strip EXIF (GPS, camera, timestamps).
+        // GIF skipped — no EXIF, animation would be lost. Rotation pre-applied for
+        // JPEG so the visual orientation survives the metadata strip.
+        $absolute = Storage::disk('public')->path($path);
+        $this->stripImageMetadata($absolute, $mime);
+
         return response()->json([
             'url' => Storage::disk('public')->url($path),
             'path' => $path,
             'name' => $file->getClientOriginalName(),
-            'size' => $file->getSize(),
+            'size' => filesize($absolute) ?: $file->getSize(),
             'mime_type' => $mime,
         ], 201);
+    }
+
+    /**
+     * Re-encode the image at the given path to drop all metadata (EXIF, IPTC,
+     * XMP, color profiles). Pre-applies EXIF rotation for JPEGs so the picture
+     * does not flip after metadata is dropped. Silently no-ops on GIF and on
+     * GD failures (the original upload is still served — better than 500ing).
+     */
+    private function stripImageMetadata(string $absolute, string $mime): void
+    {
+        if (!is_file($absolute) || $mime === 'image/gif') {
+            return;
+        }
+
+        try {
+            $image = match ($mime) {
+                'image/jpeg' => @imagecreatefromjpeg($absolute),
+                'image/png'  => @imagecreatefrompng($absolute),
+                'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($absolute) : false,
+                default      => false,
+            };
+
+            if (!$image) {
+                return;
+            }
+
+            // Apply EXIF orientation only for JPEG (PNG/WebP rarely carry it).
+            if ($mime === 'image/jpeg' && function_exists('exif_read_data')) {
+                $exif = @exif_read_data($absolute);
+                $orientation = $exif['Orientation'] ?? 1;
+                $rotation = match ($orientation) {
+                    3 => 180,
+                    6 => -90,
+                    8 => 90,
+                    default => 0,
+                };
+                if ($rotation !== 0) {
+                    $rotated = @imagerotate($image, $rotation, 0);
+                    if ($rotated) {
+                        imagedestroy($image);
+                        $image = $rotated;
+                    }
+                }
+            }
+
+            if ($mime === 'image/png' || $mime === 'image/webp') {
+                imagealphablending($image, false);
+                imagesavealpha($image, true);
+            }
+
+            $ok = match ($mime) {
+                'image/jpeg' => imagejpeg($image, $absolute, 85),
+                'image/png'  => imagepng($image, $absolute, 6),
+                'image/webp' => function_exists('imagewebp') && imagewebp($image, $absolute, 85),
+                default      => false,
+            };
+            unset($ok);
+            imagedestroy($image);
+        } catch (\Throwable $e) {
+            // Don't fail the upload because the metadata strip blew up; log and move on.
+            Log::warning('Image metadata strip failed', ['path' => $absolute, 'error' => $e->getMessage()]);
+        }
     }
 
     /**

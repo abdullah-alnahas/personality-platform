@@ -137,7 +137,7 @@ export default function Form({ page, activeLanguages: controllerActiveLanguages 
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                     <Grid container spacing={3}>
                         {activeLanguages.map((lang) => (
-                            <Grid item xs={12} md={activeLanguages.length > 1 ? 4 : 12} key={`title-${lang}`}>
+                            <Grid size={{ xs: 12 }} md={activeLanguages.length> 1 ? 4 : 12} key={`title-${lang}`}>
                                 <TextField
                                     required={lang === (pageProps.locale || 'en')}
                                     fullWidth
@@ -152,7 +152,7 @@ export default function Form({ page, activeLanguages: controllerActiveLanguages 
                             </Grid>
                         ))}
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <TextField
                                 required
                                 fullWidth
@@ -166,11 +166,11 @@ export default function Form({ page, activeLanguages: controllerActiveLanguages 
                             />
                         </Grid>
 
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider>Configuration</Divider>
                         </Grid>
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors.status}>
                                 <InputLabel id="status-label">Status</InputLabel>
                                 <Select
@@ -189,7 +189,7 @@ export default function Form({ page, activeLanguages: controllerActiveLanguages 
                             </FormControl>
                         </Grid>
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors.layout}>
                                 <InputLabel id="layout-label">Layout</InputLabel>
                                 <Select
@@ -208,7 +208,7 @@ export default function Form({ page, activeLanguages: controllerActiveLanguages 
                             </FormControl>
                         </Grid>
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -222,7 +222,7 @@ export default function Form({ page, activeLanguages: controllerActiveLanguages 
                             {errors.is_homepage && <FormHelperText error>{errors.is_homepage}</FormHelperText>}
                         </Grid>
 
-                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+                        <Grid size={{ xs: 12 }} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                             <Button
                                 component={InertiaLink}
                                 href={route('admin.pages.index')}

@@ -29,10 +29,12 @@ class LoginRequest extends FormRequest
 
     public function rules(): array
     {
+        $honeypot = config('security.honeypot.field', '_confirm_email');
+
         return [
-            'email'          => ['required', 'string', 'email'],
-            'password'       => ['required', 'string'],
-            '_confirm_email' => ['present', 'max:0'], // honeypot — must remain empty
+            'email'    => ['required', 'string', 'email'],
+            'password' => ['required', 'string'],
+            $honeypot  => ['present', 'max:0'], // honeypot — must remain empty
         ];
     }
 
@@ -51,7 +53,7 @@ class LoginRequest extends FormRequest
         // Honeypot: a real browser never fills this field; bots usually do.
         // ConvertEmptyStringsToNull middleware converts '' → null, so check for both.
         // Return generic auth error so the rejection reason is not revealed.
-        if (!empty($this->input('_confirm_email'))) {
+        if (!empty($this->input(config('security.honeypot.field', '_confirm_email')))) {
             $this->recordFailedAttempt();
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),

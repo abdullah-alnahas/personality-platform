@@ -404,6 +404,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                     <ListItem
                         key={`drawer-${item.id}`}
                         disablePadding
+                        component="div"
                         sx={{ display: "block" }}
                     >
                         <ListItemButton
@@ -428,6 +429,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                     <ListItem
                                         key={`drawer-child-${child.id}`}
                                         disablePadding
+                                        component="div"
                                     >
                                         <ListItemButton
                                             dense
@@ -486,7 +488,10 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                 id="drawer-language-select"
                                 value={currentLocale || ""}
                                 onChange={handleLanguageChange}
-                                disableUnderline
+                                variant="standard"
+                                sx={{
+                                    "&:before, &:after": { borderBottom: "none !important" },
+                                }}
                             >
                                 {availableLocales.map((lang) => (
                                     <MenuItem
@@ -631,7 +636,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                     id="public-language-select-header"
                                     value={currentLocale || ""}
                                     onChange={handleLanguageChange}
-                                    disableUnderline
+                                    variant="standard"
                                     IconComponent={(props) => (
                                         <LanguageIcon
                                             {...props}
@@ -648,6 +653,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                     }
                                     sx={{
                                         color: "text.secondary",
+                                        "&:before, &:after": { borderBottom: "none !important" },
                                         "& .MuiSelect-icon": {
                                             color: "text.secondary",
                                         },
@@ -756,7 +762,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                     {/* Footer navigation columns */}
                     <Grid container spacing={4} justifyContent="space-between">
                         {/* About / description column */}
-                        <Grid item xs={12} md={3}>
+                        <Grid size={{ xs: 12, md: 3 }}>
                             <Typography
                                 variant="h6"
                                 gutterBottom
@@ -825,7 +831,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                         ]
                             .filter((col) => col.items.length > 0 || col.title)
                             .map((col) => (
-                                <Grid item xs={6} sm={3} md={2} key={col.key}>
+                                <Grid size={{ xs: 6, sm: 3, md: 2 }} key={col.key}>
                                     {col.title && (
                                         <Typography
                                             variant="subtitle2"
@@ -876,7 +882,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             ))}
 
                         {/* Subscribe column */}
-                        <Grid item xs={12} sm={6} md={3}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                             <Typography
                                 variant="subtitle2"
                                 gutterBottom

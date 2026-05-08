@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { usePage } from '@inertiajs/react';
 import {
     Box,
     Button,
@@ -38,6 +39,8 @@ export default function MediaPicker({
     helperText = '',
     required = false,
 }) {
+    const uploadCap = usePage().props.mediaUploadMax || { label: '10 MB', mimes: ['jpeg', 'png', 'gif', 'webp'] };
+    const mimeUpper = (uploadCap.mimes || []).map((m) => m.toUpperCase()).join(', ');
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -191,7 +194,7 @@ export default function MediaPicker({
                             style={{ display: 'none' }}
                         />
                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            JPEG, PNG, GIF, or WebP · max 10 MB
+                            {mimeUpper || 'JPEG, PNG, GIF, WebP'} · max {uploadCap.label}
                         </Typography>
                     </Box>
 
@@ -208,7 +211,7 @@ export default function MediaPicker({
                             {items
                                 .filter((it) => it.mime_type?.startsWith('image/'))
                                 .map((it) => (
-                                    <Grid item xs={6} sm={4} md={3} key={it.id}>
+                                    <Grid size={{ xs: 6, sm: 4, md: 3 }} key={it.id}>
                                         <Box
                                             onClick={() => handlePick(it.url)}
                                             sx={{

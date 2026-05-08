@@ -108,7 +108,7 @@ export default function HeroBanner({ block }) {
     /* ------------------------------------------------------------------ */
     if (layout === 'split') {
         const textColumn = (
-            <Grid item xs={12} md={6} key="text">
+            <Grid size={{ xs: 12, md: 6 }} key="text">
                 <Box
                     sx={{
                         position: 'relative',
@@ -164,7 +164,7 @@ export default function HeroBanner({ block }) {
         );
 
         const imageColumn = (
-            <Grid item xs={12} md={6} key="image">
+            <Grid size={{ xs: 12, md: 6 }} key="image">
                 <Box
                     sx={{
                         position: 'relative',

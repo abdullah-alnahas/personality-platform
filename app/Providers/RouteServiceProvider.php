@@ -36,6 +36,12 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        // Upload limiter — caps disk-write floods from a single authenticated
+        // editor or anonymous abuser. Per-user when logged in; per-IP otherwise.
+        RateLimiter::for('upload', function (Request $request) {
+            return Limit::perMinute(30)->by($request->user()?->id ?: $request->ip());
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

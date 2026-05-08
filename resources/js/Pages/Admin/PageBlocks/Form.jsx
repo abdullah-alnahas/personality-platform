@@ -358,11 +358,11 @@ export default function Form({
         switch (fieldDef.type) {
             case 'translatable_text':
                 return (
-                    <Grid item xs={12} key={fieldKey}>
+                    <Grid size={{ xs: 12 }} key={fieldKey}>
                         <Typography variant="subtitle2" gutterBottom>{label}</Typography>
                         <Grid container spacing={2}>
                             {activeLanguages.map((lang) => (
-                                <Grid item xs={12} md={activeLanguages.length > 1 ? 4 : 12} key={`${fieldKey}-${lang}`}>
+                                <Grid size={{ xs: 12 }} md={activeLanguages.length> 1 ? 4 : 12} key={`${fieldKey}-${lang}`}>
                                     <TextField
                                         required={isRequired && lang === (pageProps.locale || 'en')}
                                         fullWidth
@@ -383,11 +383,11 @@ export default function Form({
 
             case 'translatable_richtext':
                 return (
-                    <Grid item xs={12} key={fieldKey}>
+                    <Grid size={{ xs: 12 }} key={fieldKey}>
                         <Typography variant="subtitle2" gutterBottom>{label}</Typography>
                         <Grid container spacing={2}>
                             {activeLanguages.map((lang) => (
-                                <Grid item xs={12} md={activeLanguages.length > 1 ? 4 : 12} key={`${fieldKey}-${lang}`}>
+                                <Grid size={{ xs: 12 }} md={activeLanguages.length> 1 ? 4 : 12} key={`${fieldKey}-${lang}`}>
                                     <Typography variant="caption" display="block" gutterBottom>
                                         {`${label} (${lang.toUpperCase()})`}
                                     </Typography>
@@ -408,7 +408,7 @@ export default function Form({
             case 'text':
                 if (isImageField(fieldKey)) {
                     return (
-                        <Grid item xs={12} sm={6} md={6} key={fieldKey}>
+                        <Grid size={{ xs: 12, sm: 6, md: 6 }} key={fieldKey}>
                             <MediaPicker
                                 required={isRequired}
                                 label={label}
@@ -421,7 +421,7 @@ export default function Form({
                     );
                 }
                 return (
-                    <Grid item xs={12} sm={6} md={4} key={fieldKey}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={fieldKey}>
                         <TextField
                             required={isRequired}
                             fullWidth
@@ -437,7 +437,7 @@ export default function Form({
 
             case 'number':
                 return (
-                    <Grid item xs={12} sm={6} md={4} key={fieldKey}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={fieldKey}>
                         <TextField
                             required={isRequired}
                             fullWidth
@@ -454,7 +454,7 @@ export default function Form({
 
             case 'boolean':
                 return (
-                    <Grid item xs={12} sm={6} md={4} key={fieldKey}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={fieldKey}>
                         <FormControlLabel
                             control={
                                 <Switch
@@ -473,7 +473,7 @@ export default function Form({
 
             case 'select':
                 return (
-                    <Grid item xs={12} sm={6} md={4} key={fieldKey}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={fieldKey}>
                         <FormControl fullWidth error={!!errors[`content.${fieldKey}`]}>
                             <InputLabel id={`content-${fieldKey}-label`}>{label}</InputLabel>
                             <Select
@@ -510,7 +510,7 @@ export default function Form({
                     }));
                 }
                 return (
-                    <Grid item xs={12} sm={6} md={4} key={fieldKey}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={fieldKey}>
                         <FormControl fullWidth error={!!errors[`content.${fieldKey}`]}>
                             <InputLabel id={`content-${fieldKey}-label`}>{label}</InputLabel>
                             <Select
@@ -535,7 +535,7 @@ export default function Form({
             case 'translatable_list': {
                 const listItems = data.content[fieldKey] || [];
                 return (
-                    <Grid item xs={12} key={fieldKey}>
+                    <Grid size={{ xs: 12 }} key={fieldKey}>
                         <Box sx={{ mb: 2 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                                 <Typography variant="subtitle2">{label}</Typography>
@@ -557,7 +557,7 @@ export default function Form({
                                     </Box>
                                     <Grid container spacing={2}>
                                         {activeLanguages.map((lang) => (
-                                            <Grid item xs={12} md={activeLanguages.length > 1 ? 4 : 12} key={`${fieldKey}-${index}-text-${lang}`}>
+                                            <Grid size={{ xs: 12 }} md={activeLanguages.length> 1 ? 4 : 12} key={`${fieldKey}-${index}-text-${lang}`}>
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -567,7 +567,7 @@ export default function Form({
                                                 />
                                             </Grid>
                                         ))}
-                                        <Grid item xs={12} sm={6} md={4}>
+                                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                             <TextField
                                                 fullWidth
                                                 size="small"
@@ -596,7 +596,7 @@ export default function Form({
                 // Simplified logo editor for logo_grid block
                 if (selectedBlockType === 'logo_grid' && fieldKey === 'logos') {
                     return (
-                        <Grid item xs={12} key={fieldKey}>
+                        <Grid size={{ xs: 12 }} key={fieldKey}>
                             <Box sx={{ mb: 2 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                                     <Typography variant="subtitle2">{label}</Typography>
@@ -624,7 +624,7 @@ export default function Form({
                                         </Box>
                                         <Grid container spacing={2}>
                                             {activeLanguages.map((lang) => (
-                                                <Grid item xs={12} md={activeLanguages.length > 1 ? 4 : 12} key={`logo-${logoIndex}-name-${lang}`}>
+                                                <Grid size={{ xs: 12 }} md={activeLanguages.length> 1 ? 4 : 12} key={`logo-${logoIndex}-name-${lang}`}>
                                                     <TextField
                                                         fullWidth
                                                         size="small"
@@ -634,7 +634,7 @@ export default function Form({
                                                     />
                                                 </Grid>
                                             ))}
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <MediaPicker
                                                     label="Logo Image"
                                                     value={logo.image_url ?? ''}
@@ -642,7 +642,7 @@ export default function Form({
                                                     helperText="PNG/SVG recommended"
                                                 />
                                             </Grid>
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -667,7 +667,7 @@ export default function Form({
 
                 // Standard card list editor
                 return (
-                    <Grid item xs={12} key={fieldKey}>
+                    <Grid size={{ xs: 12 }} key={fieldKey}>
                         <Box sx={{ mb: 2 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                                 <Typography variant="subtitle2">{label}</Typography>
@@ -687,7 +687,7 @@ export default function Form({
                                     <Typography variant="caption" display="block" gutterBottom>Heading</Typography>
                                     <Grid container spacing={2} sx={{ mb: 2 }}>
                                         {activeLanguages.map((lang) => (
-                                            <Grid item xs={12} md={activeLanguages.length > 1 ? 4 : 12} key={`card-${cardIndex}-heading-${lang}`}>
+                                            <Grid size={{ xs: 12 }} md={activeLanguages.length> 1 ? 4 : 12} key={`card-${cardIndex}-heading-${lang}`}>
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -702,7 +702,7 @@ export default function Form({
                                     <Typography variant="caption" display="block" gutterBottom>Quote</Typography>
                                     <Grid container spacing={2} sx={{ mb: 2 }}>
                                         {activeLanguages.map((lang) => (
-                                            <Grid item xs={12} md={activeLanguages.length > 1 ? 4 : 12} key={`card-${cardIndex}-quote-${lang}`}>
+                                            <Grid size={{ xs: 12 }} md={activeLanguages.length> 1 ? 4 : 12} key={`card-${cardIndex}-quote-${lang}`}>
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -715,14 +715,14 @@ export default function Form({
                                     </Grid>
 
                                     <Grid container spacing={2} sx={{ mb: 2 }}>
-                                        <Grid item xs={12} sm={6}>
+                                        <Grid size={{ xs: 12, sm: 6 }}>
                                             <MediaPicker
                                                 label="Image"
                                                 value={card.image_url ?? ''}
                                                 onChange={(url) => updateCard(fieldKey, cardIndex, 'image_url', url)}
                                             />
                                         </Grid>
-                                        <Grid item xs={12} sm={6}>
+                                        <Grid size={{ xs: 12, sm: 6 }}>
                                             <TextField
                                                 fullWidth
                                                 size="small"
@@ -736,7 +736,7 @@ export default function Form({
                                     <Typography variant="caption" display="block" gutterBottom>Link Text</Typography>
                                     <Grid container spacing={2} sx={{ mb: 2 }}>
                                         {activeLanguages.map((lang) => (
-                                            <Grid item xs={12} md={activeLanguages.length > 1 ? 4 : 12} key={`card-${cardIndex}-link_text-${lang}`}>
+                                            <Grid size={{ xs: 12 }} md={activeLanguages.length> 1 ? 4 : 12} key={`card-${cardIndex}-link_text-${lang}`}>
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -765,7 +765,7 @@ export default function Form({
                                                 </Box>
                                                 <Grid container spacing={1}>
                                                     {activeLanguages.map((lang) => (
-                                                        <Grid item xs={12} md={activeLanguages.length > 1 ? 4 : 12} key={`card-${cardIndex}-item-${itemIndex}-${lang}`}>
+                                                        <Grid size={{ xs: 12 }} md={activeLanguages.length> 1 ? 4 : 12} key={`card-${cardIndex}-item-${itemIndex}-${lang}`}>
                                                             <TextField
                                                                 fullWidth
                                                                 size="small"
@@ -775,7 +775,7 @@ export default function Form({
                                                             />
                                                         </Grid>
                                                     ))}
-                                                    <Grid item xs={12} sm={6} md={4}>
+                                                    <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                                         <TextField
                                                             fullWidth
                                                             size="small"
@@ -827,7 +827,7 @@ export default function Form({
                     handleContentChange(fieldKey, next);
                 };
                 return (
-                    <Grid item xs={12} key={fieldKey}>
+                    <Grid size={{ xs: 12 }} key={fieldKey}>
                         <Box sx={{ mb: 2 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                                 <Typography variant="subtitle2">{label}</Typography>
@@ -842,7 +842,7 @@ export default function Form({
                                         </IconButton>
                                     </Box>
                                     <Grid container spacing={2}>
-                                        <Grid item xs={12} sm={3}>
+                                        <Grid size={{ xs: 12, sm: 3 }}>
                                             <TextField
                                                 fullWidth
                                                 size="small"
@@ -853,7 +853,7 @@ export default function Form({
                                             />
                                         </Grid>
                                         {activeLanguages.map((lang) => (
-                                            <Grid item xs={12} sm={3} key={`stat-${i}-label-${lang}`}>
+                                            <Grid size={{ xs: 12, sm: 3 }} key={`stat-${i}-label-${lang}`}>
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -864,7 +864,7 @@ export default function Form({
                                             </Grid>
                                         ))}
                                         {activeLanguages.map((lang) => (
-                                            <Grid item xs={12} sm={3} key={`stat-${i}-suffix-${lang}`}>
+                                            <Grid size={{ xs: 12, sm: 3 }} key={`stat-${i}-suffix-${lang}`}>
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -890,7 +890,7 @@ export default function Form({
 
             default:
                 return (
-                    <Grid item xs={12} sm={6} md={4} key={fieldKey}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={fieldKey}>
                         <TextField
                             fullWidth
                             id={`content-${fieldKey}`}
@@ -918,7 +918,7 @@ export default function Form({
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                     <Grid container spacing={3}>
                         {/* Block Type Selector */}
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors.block_type} disabled={isEditing}>
                                 <InputLabel id="block-type-label">Block Type</InputLabel>
                                 <Select
@@ -942,7 +942,7 @@ export default function Form({
                             </FormControl>
                         </Grid>
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <TextField
                                 fullWidth
                                 type="number"
@@ -955,7 +955,7 @@ export default function Form({
                             />
                         </Grid>
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors.status}>
                                 <InputLabel id="block-status-label">Status</InputLabel>
                                 <Select
@@ -977,7 +977,7 @@ export default function Form({
                         {/* Dynamic Content Fields */}
                         {selectedBlockType && Object.keys(currentFields).length > 0 && (
                             <>
-                                <Grid item xs={12}>
+                                <Grid size={{ xs: 12 }}>
                                     <Divider>Content Fields</Divider>
                                 </Grid>
                                 {Object.entries(currentFields).map(([fieldKey, fieldDef]) =>
@@ -987,13 +987,13 @@ export default function Form({
                         )}
 
                         {/* Config Section */}
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider>Configuration</Divider>
                         </Grid>
 
                         {/* Block Style Presets */}
                         {BLOCK_PRESETS[data.block_type] && (
-                            <Grid item xs={12}>
+                            <Grid size={{ xs: 12 }}>
                                 <Typography variant="caption" sx={{ mr: 1 }}>Quick Presets:</Typography>
                                 {BLOCK_PRESETS[data.block_type].map((preset) => (
                                     <Button
@@ -1012,7 +1012,7 @@ export default function Form({
                             </Grid>
                         )}
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <ColorPickerField
                                 label="Background Color"
                                 value={data.config.background_color}
@@ -1021,7 +1021,7 @@ export default function Form({
                             />
                         </Grid>
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <ColorPickerField
                                 label="Text Color"
                                 value={data.config.text_color}
@@ -1030,7 +1030,7 @@ export default function Form({
                             />
                         </Grid>
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControl fullWidth error={!!errors['config.padding_y']}>
                                 <InputLabel id="config-padding-label">Vertical Padding</InputLabel>
                                 <Select
@@ -1050,7 +1050,7 @@ export default function Form({
                             </FormControl>
                         </Grid>
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -1066,7 +1066,7 @@ export default function Form({
                             )}
                         </Grid>
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <TextField
                                 fullWidth
                                 id="config-css_class"
@@ -1080,7 +1080,7 @@ export default function Form({
 
                         {/* Block-type-specific config */}
                         {(data.block_type === 'hero_banner' || data.block_type === 'quran_verse') && (
-                            <Grid item xs={12} sm={6} md={4}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <FormControl fullWidth>
                                     <InputLabel id="config-layout-label">Layout</InputLabel>
                                     <Select
@@ -1102,7 +1102,7 @@ export default function Form({
                         )}
 
                         {(data.block_type === 'hero_banner' || data.block_type === 'pillar_cards') && (
-                            <Grid item xs={12} sm={6} md={4}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <FormControlLabel
                                     control={
                                         <Switch
@@ -1116,7 +1116,7 @@ export default function Form({
                         )}
 
                         {data.block_type === 'hero_banner' && data.config.show_decorations && (
-                            <Grid item xs={12} sm={6} md={4}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <ColorPickerField
                                     label="Decoration Color"
                                     value={data.config.decoration_color || '#C9A94E'}
@@ -1127,7 +1127,7 @@ export default function Form({
                         )}
 
                         {data.block_type === 'pillar_cards' && (
-                            <Grid item xs={12} sm={6} md={4}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <FormControl fullWidth>
                                     <InputLabel id="config-card-variant-label">Card Variant</InputLabel>
                                     <Select
@@ -1144,7 +1144,7 @@ export default function Form({
                         )}
 
                         {(data.block_type === 'quran_verse' || data.block_type === 'hero_banner') && (
-                            <Grid item xs={12} sm={6} md={4}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <ColorPickerField
                                     label="Accent Color"
                                     value={data.config.accent_color || data.config.decoration_color || '#C9A94E'}
@@ -1156,7 +1156,7 @@ export default function Form({
 
                         {/* ornamental_frame toggle for quran_verse */}
                         {data.block_type === 'quran_verse' && (
-                            <Grid item xs={12} sm={6} md={4}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <FormControlLabel
                                     control={
                                         <Switch
@@ -1171,7 +1171,7 @@ export default function Form({
 
                         {/* Columns config for grid-based blocks */}
                         {['pillar_cards', 'category_grid', 'latest_news', 'logo_grid', 'stats_counter', 'books_grid'].includes(data.block_type) && (
-                            <Grid item xs={12} sm={6} md={4}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <FormControl fullWidth>
                                     <InputLabel id="config-columns-label">Columns</InputLabel>
                                     <Select
@@ -1190,7 +1190,7 @@ export default function Form({
 
                         {data.block_type === 'logo_grid' && (
                             <>
-                                <Grid item xs={12} sm={6} md={4}>
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                     <TextField
                                         fullWidth
                                         label="Logo Max Height (px)"
@@ -1199,7 +1199,7 @@ export default function Form({
                                         onChange={(e) => handleConfigChange('logo_max_height', parseInt(e.target.value) || 60)}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                     <FormControlLabel
                                         control={
                                             <Switch
@@ -1214,7 +1214,7 @@ export default function Form({
                         )}
 
                         {/* Actions */}
-                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+                        <Grid size={{ xs: 12 }} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                             <Button
                                 component={InertiaLink}
                                 href={route('admin.pages.edit', page.id)}

@@ -119,7 +119,7 @@ const SingleGroupList = ({ group, t, cardBg, textColor, accentColor }) => (
     >
         <Grid container spacing={2}>
             {(group.scholars || []).map((s) => (
-                <Grid item xs={12} sm={6} md={4} key={s.id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={s.id}>
                     <Typography
                         sx={{
                             fontFamily: "'Amiri', serif",
@@ -208,7 +208,7 @@ const TabbedGroups = ({
                     >
                         <Grid container spacing={2}>
                             {(group.scholars || []).map((s) => (
-                                <Grid item xs={12} sm={6} md={4} key={s.id}>
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={s.id}>
                                     <Typography
                                         sx={{
                                             fontFamily: "'Amiri', serif",

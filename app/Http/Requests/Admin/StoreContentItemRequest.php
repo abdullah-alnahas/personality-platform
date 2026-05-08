@@ -64,9 +64,9 @@ class StoreContentItemRequest extends FormRequest
             "featured_image" => [
                 "nullable",
                 "image",
-                "mimes:jpeg,png,jpg,gif,webp",
-                "max:2048",
-            ], // 2MB Max
+                "mimes:" . implode(',', config('media.image.allowed_mimes')),
+                "max:" . config('media.image.max_kb', 10240),
+            ],
         ];
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class StorePageRequest extends FormRequest
 {
@@ -18,7 +19,12 @@ class StorePageRequest extends FormRequest
             'title' => 'required|array',
             'title.en' => 'required|string|max:255',
             'title.*' => 'nullable|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:pages,slug',
+            'slug' => [
+                'nullable', 'string', 'max:255',
+                'regex:' . config('reserved.slug_pattern'),
+                Rule::notIn(config('reserved.slugs', [])),
+                Rule::unique('pages', 'slug'),
+            ],
             'status' => 'required|in:published,draft',
             'is_homepage' => 'boolean',
             'layout' => 'nullable|in:default,full-width,landing',

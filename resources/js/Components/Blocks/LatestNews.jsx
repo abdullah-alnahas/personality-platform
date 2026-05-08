@@ -64,7 +64,7 @@ export default function LatestNews({ block }) {
                             "";
 
                         return (
-                            <Grid item xs={12} sm={6} md={mdCols} key={item.id}>
+                            <Grid size={{ xs: 12, sm: 6, md: mdCols }} key={item.id}>
                                 <Card
                                     sx={{
                                         height: "100%",

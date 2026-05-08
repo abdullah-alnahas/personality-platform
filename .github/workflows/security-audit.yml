@@ -1,0 +1,59 @@
+name: Security audit
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # Weekly Monday 06:00 UTC — catches newly-disclosed CVEs.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  composer-audit:
+    name: Composer audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --no-progress --no-interaction --prefer-dist
+
+      - name: Run composer audit
+        run: composer audit --no-dev --locked --format=plain --abandoned=report
+
+  npm-audit:
+    name: npm audit (production)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci --omit=dev
+
+      - name: Run npm audit
+        # Fail on high or critical only — dev tooling churns moderate CVEs constantly.
+        run: npm audit --omit=dev --audit-level=high

@@ -14,7 +14,8 @@ import {
 } from "@mui/material";
 
 export default function Contact() {
-    const { flash } = usePage().props;
+    const { flash, honeypotField: hpField } = usePage().props;
+    const honeypotField = hpField || "_confirm_email";
     const {
         data,
         setData,
@@ -27,7 +28,7 @@ export default function Contact() {
         name: "",
         email: "",
         message: "",
-        _confirm_email: "", // honeypot — must be present but empty
+        [honeypotField]: "", // honeypot — must be present but empty
     });
     React.useEffect(() => {
         if (recentlySuccessful) {
@@ -69,6 +70,25 @@ export default function Contact() {
                             onSubmit={handleSubmit}
                             noValidate
                         >
+                            <Box
+                                component="input"
+                                type="text"
+                                name={honeypotField}
+                                value={data[honeypotField]}
+                                onChange={(e) => setData(honeypotField, e.target.value)}
+                                tabIndex={-1}
+                                autoComplete="off"
+                                aria-hidden="true"
+                                sx={{
+                                    position: "absolute",
+                                    left: "-9999px",
+                                    width: 1,
+                                    height: 1,
+                                    opacity: 0,
+                                    overflow: "hidden",
+                                    pointerEvents: "none",
+                                }}
+                            />
                             <TextField
                                 margin="normal"
                                 required

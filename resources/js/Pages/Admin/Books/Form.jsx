@@ -58,7 +58,7 @@ export default function Form({ book }) {
     };
 
     const tField = (key, lang, label) => (
-        <Grid item xs={12} md={4} key={`${key}-${lang}`}>
+        <Grid size={{ xs: 12, md: 4 }} key={`${key}-${lang}`}>
             <TextField
                 fullWidth
                 size="small"
@@ -94,7 +94,7 @@ export default function Form({ book }) {
                 <Box component="form" onSubmit={handleSubmit}>
                     <Grid container spacing={3}>
                         {/* Title */}
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Typography variant="subtitle2" gutterBottom>
                                 Title *
                             </Typography>
@@ -106,7 +106,7 @@ export default function Form({ book }) {
                         </Grid>
 
                         {/* Subtitle */}
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Typography variant="subtitle2" gutterBottom>
                                 Subtitle
                             </Typography>
@@ -118,13 +118,13 @@ export default function Form({ book }) {
                         </Grid>
 
                         {/* Description */}
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Typography variant="subtitle2" gutterBottom>
                                 Description
                             </Typography>
                             <Grid container spacing={2}>
                                 {activeLanguages.map((l) => (
-                                    <Grid item xs={12} md={4} key={`desc-${l}`}>
+                                    <Grid size={{ xs: 12, md: 4 }} key={`desc-${l}`}>
                                         <TextField
                                             fullWidth
                                             size="small"
@@ -144,12 +144,12 @@ export default function Form({ book }) {
                             </Grid>
                         </Grid>
 
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider />
                         </Grid>
 
                         {/* Cover image URL */}
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 fullWidth
                                 size="small"
@@ -163,7 +163,7 @@ export default function Form({ book }) {
                         </Grid>
 
                         {/* Buy link */}
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 fullWidth
                                 size="small"
@@ -176,7 +176,7 @@ export default function Form({ book }) {
                         </Grid>
 
                         {/* Category tag */}
-                        <Grid item xs={12} sm={4}>
+                        <Grid size={{ xs: 12, sm: 4 }}>
                             <TextField
                                 fullWidth
                                 size="small"
@@ -190,7 +190,7 @@ export default function Form({ book }) {
                         </Grid>
 
                         {/* Display order */}
-                        <Grid item xs={12} sm={4}>
+                        <Grid size={{ xs: 12, sm: 4 }}>
                             <TextField
                                 fullWidth
                                 size="small"
@@ -204,7 +204,7 @@ export default function Form({ book }) {
                         </Grid>
 
                         {/* Status */}
-                        <Grid item xs={12} sm={4}>
+                        <Grid size={{ xs: 12, sm: 4 }}>
                             <FormControl fullWidth size="small">
                                 <InputLabel>Status</InputLabel>
                                 <Select
@@ -226,7 +226,7 @@ export default function Form({ book }) {
                         </Grid>
 
                         {/* Featured */}
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -244,7 +244,7 @@ export default function Form({ book }) {
                         </Grid>
 
                         {/* Submit */}
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Button
                                 type="submit"
                                 variant="contained"

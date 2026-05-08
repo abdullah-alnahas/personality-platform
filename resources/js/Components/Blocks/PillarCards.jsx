@@ -77,7 +77,7 @@ export default function PillarCards({ block }) {
                     const subItems = card.items || [];
 
                     return (
-                        <Grid item xs={12} sm={6} md={mdCols} key={index}>
+                        <Grid size={{ xs: 12, sm: 6, md: mdCols }} key={index}>
                             <Card
                                 elevation={isDark ? 2 : 0}
                                 sx={{

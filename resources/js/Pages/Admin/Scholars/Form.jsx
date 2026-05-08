@@ -54,13 +54,13 @@ export default function Form({ scholar }) {
     };
 
     const translatableRow = (key, label, multiline = false) => (
-        <Grid item xs={12} key={key}>
+        <Grid size={{ xs: 12 }} key={key}>
             <Typography variant="subtitle2" gutterBottom>
                 {label}
             </Typography>
             <Grid container spacing={2}>
                 {activeLanguages.map((l) => (
-                    <Grid item xs={12} md={4} key={`${key}-${l}`}>
+                    <Grid size={{ xs: 12, md: 4 }} key={`${key}-${l}`}>
                         <TextField
                             fullWidth
                             size="small"
@@ -106,7 +106,7 @@ export default function Form({ scholar }) {
                         {translatableRow("name", "Name *")}
                         {translatableRow("group_name", "Group / Region Name")}
 
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <TextField
                                 fullWidth
                                 required
@@ -121,7 +121,7 @@ export default function Form({ scholar }) {
                             />
                         </Grid>
 
-                        <Grid item xs={12} sm={3}>
+                        <Grid size={{ xs: 12, sm: 3 }}>
                             <TextField
                                 fullWidth
                                 size="small"
@@ -134,7 +134,7 @@ export default function Form({ scholar }) {
                             />
                         </Grid>
 
-                        <Grid item xs={12} sm={3}>
+                        <Grid size={{ xs: 12, sm: 3 }}>
                             <FormControl fullWidth size="small">
                                 <InputLabel>Status</InputLabel>
                                 <Select
@@ -155,7 +155,7 @@ export default function Form({ scholar }) {
                             </FormControl>
                         </Grid>
 
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 fullWidth
                                 size="small"
@@ -167,13 +167,13 @@ export default function Form({ scholar }) {
                             />
                         </Grid>
 
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Divider />
                         </Grid>
 
                         {translatableRow("bio", "Short Bio / Credentials", true)}
 
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Button
                                 type="submit"
                                 variant="contained"

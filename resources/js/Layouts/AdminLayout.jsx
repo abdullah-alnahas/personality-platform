@@ -34,6 +34,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 import WebIcon from "@mui/icons-material/Web";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import SchoolIcon from "@mui/icons-material/School";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useLocale } from "@/Hooks/useLocale"; // Import the hook
 
 const drawerWidth = 240;
@@ -109,6 +110,19 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                             <DashboardIcon />
                         </ListItemIcon>
                         <ListItemText primary="Dashboard" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        component="a"
+                        href={route("home")}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <ListItemIcon>
+                            <OpenInNewIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="View Site" />
                     </ListItemButton>
                 </ListItem>
                 <Divider sx={{ my: 1 }} />
@@ -316,7 +330,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                                 id="admin-language-select-header"
                                 value={currentLocale || ""}
                                 onChange={handleLanguageChange}
-                                disableUnderline
+                                variant="standard"
                                 IconComponent={(props) => (
                                     <LanguageIcon
                                         {...props}
@@ -330,6 +344,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                                 }
                                 sx={{
                                     color: "inherit",
+                                    "&:before, &:after": { borderBottom: "none !important" },
                                     "& .MuiSelect-icon": { color: "inherit" },
                                     "& .MuiSelect-select": {
                                         pr: 0.5,

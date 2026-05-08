@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Head, Link as InertiaLink, useForm } from "@inertiajs/react";
+import { Head, Link as InertiaLink, useForm, usePage } from "@inertiajs/react";
 import {
     TextField,
     Button,
@@ -14,11 +14,12 @@ import {
 import GuestLayout from "@/Layouts/GuestLayout";
 
 export default function Login({ status, canResetPassword }) {
+    const honeypotField = usePage().props.honeypotField || "_confirm_email";
     const { data, setData, post, processing, errors, reset } = useForm({
         email: "",
         password: "",
         remember: false,
-        _confirm_email: "", // honeypot — must stay empty; bots fill it, humans don't
+        [honeypotField]: "", // honeypot — must stay empty; bots fill it, humans don't
     });
     useEffect(() => {
         return () => {
@@ -50,9 +51,9 @@ export default function Login({ status, canResetPassword }) {
                 <Box
                     component="input"
                     type="text"
-                    name="_confirm_email"
-                    value={data._confirm_email}
-                    onChange={(e) => setData("_confirm_email", e.target.value)}
+                    name={honeypotField}
+                    value={data[honeypotField]}
+                    onChange={(e) => setData(honeypotField, e.target.value)}
                     tabIndex={-1}
                     autoComplete="off"
                     aria-hidden="true"

@@ -65,6 +65,12 @@ class HandleInertiaRequests extends Middleware
                 "success" => fn() => $request->session()->get("success"),
                 "error" => fn() => $request->session()->get("error"),
             ],
+            "honeypotField" => config('security.honeypot.field', '_confirm_email'),
+            "mediaUploadMax" => [
+                "kb" => (int) config('media.image.max_kb', 10240),
+                "label" => config('media.max_label', '10 MB'),
+                "mimes" => config('media.image.allowed_mimes', ['jpeg', 'png', 'jpg', 'gif', 'webp']),
+            ],
             // Renaming to match what app.jsx expects, or update app.jsx
             "current_locale" => $currentLocaleCode,
             "available_locales" => $availableLocales,

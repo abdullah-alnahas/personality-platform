@@ -53,18 +53,12 @@ export default function ShowCategory({ category, items }) {
             <Grid container spacing={3}>
                 {results && results.length > 0 ? (
                     results.map((item) => (
-                        <Grid
-                            item
-                            xs={12}
-                            sm={6}
-                            md={4}
-                            key={`cat-item-${item.id}`}
-                        >
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={`cat-item-${item.id}`}>
                             <ContentCard item={item} />
                         </Grid>
                     ))
                 ) : (
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                         <Typography>
                             No items found in this category.
                         </Typography>

@@ -85,7 +85,7 @@ const StatsCounter = ({ block }) => {
 
                 <Grid container spacing={4} justifyContent="center">
                     {stats.map((stat, idx) => (
-                        <Grid item xs={12} sm={6} md={colSize} key={idx}>
+                        <Grid size={{ xs: 12, sm: 6, md: colSize }} key={idx}>
                             <Box
                                 sx={{
                                     textAlign: "center",

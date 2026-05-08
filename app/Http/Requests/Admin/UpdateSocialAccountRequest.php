@@ -22,11 +22,11 @@ class UpdateSocialAccountRequest extends FormRequest
      */
     public function rules(): array
     {
-        $platforms = ['facebook', 'instagram', 'youtube', 'telegram', 'x', 'twitter', 'linkedin', 'tiktok', 'other'];
+        $platforms = ['facebook', 'instagram', 'youtube', 'telegram', 'x', 'twitter', 'linkedin', 'tiktok', 'whatsapp', 'linktree', 'phone', 'email', 'other'];
 
         return [
              'platform' => ['sometimes', 'required', 'string', Rule::in($platforms)],
-             'url' => ['sometimes', 'required', 'url', 'max:2048'],
+             'url' => ['sometimes', 'required', 'string', 'max:2048', 'regex:/^(https?:\/\/|mailto:|tel:)/i'],
              'account_name' => ['nullable', 'array'],
              'account_name.*' => ['nullable', 'string', 'max:255'],
              'display_order' => ['nullable', 'integer', 'min:0'],

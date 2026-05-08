@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use App\Listeners\SendAdminLoginNotification;
 
 // Import Models and Observers
 use App\Models\Setting;
@@ -30,6 +32,9 @@ use App\Models\Page;
 use App\Observers\PageObserver;
 use App\Models\PageBlock;
 use App\Observers\PageBlockObserver;
+use App\Observers\RolePermissionObserver;
+use Spatie\Permission\Models\Permission as SpatiePermission;
+use Spatie\Permission\Models\Role as SpatieRole;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -40,6 +45,7 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         Registered::class => [SendEmailVerificationNotification::class],
+        Login::class => [SendAdminLoginNotification::class],
     ];
 
     /**
@@ -60,6 +66,8 @@ class EventServiceProvider extends ServiceProvider
         Language::observe(LanguageObserver::class);
         Page::observe(PageObserver::class);
         PageBlock::observe(PageBlockObserver::class);
+        SpatieRole::observe(RolePermissionObserver::class);
+        SpatiePermission::observe(RolePermissionObserver::class);
     }
 
     /**

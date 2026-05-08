@@ -434,3 +434,81 @@ php artisan cache:clear
 ```
 
 > **Tip**: If you only changed content (no code changes), you do not need to redeploy. Content changes are managed entirely through the admin panel.
+
+---
+
+## 13. Pre-Deploy Security Gate
+
+Run **before** every production rsync / SFTP push:
+
+```bash
+./scripts/preflight-prod-check.sh
+```
+
+Checks: APP_ENV=production, APP_DEBUG=false, APP_KEY set, DB_USERNAME ≠ root, SESSION_SECURE_COOKIE=true, ADMIN_SEED_PASSWORD ≥16 chars, TRUSTED_PROXIES ≠ `*`, composer audit clean, npm audit (high+) clean. Exits non-zero on any fail.
+
+Bypass dep audits for emergency hotfix only:
+
+```bash
+SKIP_DEPS=1 ./scripts/preflight-prod-check.sh
+```
+
+A failing preflight is non-recoverable — fix the flagged config before continuing.
+
+---
+
+## 14. phpMyAdmin Hardening
+
+phpMyAdmin is a high-value target. **Never expose it on a public URL with default access.** Pick one of:
+
+### Option A (preferred): SSH tunnel only
+
+Restrict the phpMyAdmin URL via cPanel **Directory Privacy** (HTTP basic auth) **and** an IP allow-list. For ad-hoc DB access prefer:
+
+```bash
+ssh -L 33060:127.0.0.1:3306 user@host
+mysql -h 127.0.0.1 -P 33060 -u app_user -p personality_platform
+```
+
+### Option B: delete the install entirely
+
+If phpMyAdmin was only used for the initial schema import, remove it after seeding. SSH + `mysql` CLI handles everything afterward.
+
+> **Never** rely on the phpMyAdmin URL being "obscure" — Shodan / ZGrab fingerprint default installs in seconds.
+
+---
+
+## 15. robots.txt
+
+`public/robots.txt` is **gone** — `routes/web.php` now serves `/robots.txt` dynamically and **omits** `/admin`. Search engines naturally skip 401/302-gated paths; explicit `Disallow:` entries simply advertise the admin URL to crawlers and recon tools.
+
+If you rename the admin prefix via `ADMIN_PATH`, the dynamic robots.txt continues to leak nothing.
+
+---
+
+## 16. Live `.env` Hygiene Checklist
+
+`.env.example` ships safe defaults; the **live `.env` you copy to the server** must explicitly set:
+
+```bash
+APP_ENV=production
+APP_DEBUG=false
+LOG_LEVEL=warning
+APP_KEY=base64:<run "php artisan key:generate --show">
+
+DB_USERNAME=app_user            # least-privilege grant per §2
+DB_PASSWORD=<random 24+ chars>
+
+SESSION_SECURE_COOKIE=true
+TRUSTED_PROXIES=<Cloudflare CIDRs from §11.4>
+
+ADMIN_SEED_EMAIL=<unique mailbox you control>
+ADMIN_SEED_PASSWORD=<random 16+ chars — printed once at seed time>
+
+HONEYPOT_FIELD=<rotate per deploy, e.g. _email_repeat_2026q2>
+
+MAIL_MAILER=smtp                # required for login-notification mails
+MAIL_FROM_ADDRESS=<noreply@yourdomain>
+```
+
+**Never** commit `.env` to git, and **never** copy your dev `.env` directly to production.

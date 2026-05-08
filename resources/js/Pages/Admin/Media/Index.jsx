@@ -33,7 +33,7 @@ const formatFileSize = (bytes) => {
 };
 
 export default function Index({ mediaItems, can }) {
-    const { data, links, current_page, last_page, total } = mediaItems;
+    const { data = [], current_page = 1, last_page = 1, total = 0 } = mediaItems || {};
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState(null);
 
@@ -92,7 +92,7 @@ export default function Index({ mediaItems, can }) {
                 {data.length > 0 ? (
                     <Grid container spacing={2}>
                         {data.map((media) => (
-                            <Grid xs={12} sm={6} md={4} lg={3} key={media.id}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={media.id}>
                                 {" "}
                                 {/* Grid v2 */}
                                 <Card
@@ -194,7 +194,7 @@ export default function Index({ mediaItems, can }) {
                         No media items found.
                     </Typography>
                 )}
-                {total > 0 && links.length > 3 && (
+                {total > 0 && last_page > 1 && (
                     <Box
                         sx={{
                             display: "flex",

@@ -72,7 +72,7 @@ const BooksGrid = ({ block }) => {
                 ) : (
                     <Grid container spacing={3} justifyContent="center">
                         {books.map((book) => (
-                            <Grid item xs={6} sm={4} md={mdCols} key={book.id}>
+                            <Grid size={{ xs: 6, sm: 4, md: mdCols }} key={book.id}>
                                 <Card
                                     sx={{
                                         backgroundColor: "transparent",

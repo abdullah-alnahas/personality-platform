@@ -31,11 +31,11 @@ Route::middleware(['page.cache', 'csp'])->group(function () {
     Route::get("/", [PageDisplayController::class, "homepage"])->name("home");
 
     Route::get("/item/{slug}", [ContentController::class, "showItem"])
-        ->where("slug", "[a-zA-Z0-9-]+")
+        ->where("slug", "[a-z][a-z0-9-]{0,254}")
         ->name("content.show-item");
 
     Route::get("/category/{slug}", [ContentController::class, "showCategory"])
-        ->where("slug", "[a-zA-Z0-9-]+")
+        ->where("slug", "[a-z][a-z0-9-]{0,254}")
         ->name("content.show-category");
 
     Route::get("/about", AboutPageController::class)->name("about");
@@ -50,9 +50,47 @@ Route::middleware(['page.cache', 'csp'])->group(function () {
 
     // Dynamic pages (catch-all for page slugs - must be after all specific routes)
     Route::get("/page/{slug}", [PageDisplayController::class, "show"])
-        ->where("slug", "[a-zA-Z0-9-]+")
+        ->where("slug", "[a-z][a-z0-9-]{0,254}")
         ->name("page.show");
 });
+
+// CSP violation report sink. Browsers POST application/csp-report or
+// application/json. Throttle aggressively — a single XSS attempt can fire
+// hundreds of reports. No CSRF (browsers don't include the token).
+Route::post('/csp-report', function (\Illuminate\Http\Request $request) {
+    $payload = $request->json()->all() ?: $request->all();
+    \Illuminate\Support\Facades\Log::channel(config('logging.csp_channel', 'stack'))
+        ->warning('CSP violation', [
+            'ip' => $request->ip(),
+            'ua' => substr((string) $request->userAgent(), 0, 200),
+            'report' => $payload,
+        ]);
+    return response()->noContent();
+})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])
+  ->middleware('throttle:30,1')
+  ->name('csp.report');
+
+// robots.txt — rendered dynamically so admin path is never disclosed.
+// Search engines naturally skip auth-gated paths; explicit Disallow entries
+// merely advertise their existence to anyone who fetches the file.
+Route::get('/robots.txt', function () {
+    $lines = [
+        'User-agent: *',
+        'Allow: /',
+        'Allow: /item/',
+        'Allow: /category/',
+        'Allow: /about',
+        'Allow: /contact',
+        'Allow: /search',
+        '',
+        'Sitemap: ' . url('/sitemap.xml'),
+    ];
+
+    return response(implode("\n", $lines) . "\n", 200, [
+        'Content-Type' => 'text/plain; charset=UTF-8',
+        'Cache-Control' => 'public, max-age=3600',
+    ]);
+})->name('robots');
 
 // Non-cacheable POST routes (still get CSP + rate limiting)
 Route::middleware(['csp', 'throttle:5,1'])->group(function () {
@@ -157,7 +195,7 @@ Route::prefix(config('admin.path', 'admin'))
                 ->middleware("can:manage media");
             Route::post("media", [MediaController::class, "store"])
                 ->name("media.store")
-                ->middleware("can:manage media");
+                ->middleware(["can:manage media", "throttle:upload"]);
             Route::delete("media/{medium?}", [MediaController::class, "destroy"])
                 ->name("media.destroy")
                 ->middleware("can:manage media");

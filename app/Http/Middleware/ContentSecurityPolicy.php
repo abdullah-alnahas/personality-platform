@@ -51,6 +51,13 @@ class ContentSecurityPolicy
             "base-uri 'self'",
         ];
 
+        // CSP violation reporting. Production sends a copy to /csp-report so
+        // injection attempts surface in logs even when the policy already blocks
+        // them. Local skipped — Vite HMR generates noisy false positives.
+        if (!$isLocal) {
+            $directives[] = "report-uri " . url('/csp-report');
+        }
+
         $response->headers->set(
             'Content-Security-Policy',
             implode('; ', $directives)

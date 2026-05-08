@@ -10,28 +10,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import LaunchIcon from '@mui/icons-material/Launch';
-// Import specific social icons (or use a mapping component)
-import FacebookIcon from '@mui/icons-material/Facebook';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import YouTubeIcon from '@mui/icons-material/YouTube';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import TelegramIcon from '@mui/icons-material/Telegram';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import LinkIcon from '@mui/icons-material/Link'; // Default icon
+import SocialIcon from '@/Components/SocialIcon';
 
-const SocialPlatformIcon = ({ platform }) => {
-    switch (platform?.toLowerCase()) {
-        case 'facebook': return <FacebookIcon fontSize="inherit" />;
-        case 'x': return <TwitterIcon fontSize="inherit" />; // Use Twitter for X
-        case 'twitter': return <TwitterIcon fontSize="inherit" />;
-        case 'youtube': return <YouTubeIcon fontSize="inherit" />;
-        case 'instagram': return <InstagramIcon fontSize="inherit" />;
-        case 'telegram': return <TelegramIcon fontSize="inherit" />;
-        case 'linkedin': return <LinkedInIcon fontSize="inherit" />;
-        // Add TikTok or others if needed
-        default: return <LinkIcon fontSize="inherit" />;
-    }
-};
+const SocialPlatformIcon = ({ platform }) => (
+    <Box sx={{ fontSize: 'inherit', display: 'inline-flex', '& svg': { fontSize: 'inherit' } }}>
+        <SocialIcon platform={platform} />
+    </Box>
+);
 
 // Helper function to display translated name
 const getTranslatedField = (fieldObject, locale = 'en', fallback = 'N/A') => {

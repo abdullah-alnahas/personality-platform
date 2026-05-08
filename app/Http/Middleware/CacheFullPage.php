@@ -36,6 +36,14 @@ class CacheFullPage
             return $next($request);
         }
 
+        // Cache-deception defence: paths ending in a static-asset-like extension
+        // (e.g., /profile/.css, /admin/dashboard.png) trick caching proxies into
+        // storing dynamic HTML under a public URL. Laravel's router has already
+        // matched, so the extension is part of the slug — bail out of caching.
+        if (preg_match('/\.[a-z0-9]{2,5}$/i', $request->path())) {
+            return $next($request);
+        }
+
         // Don't cache pages that render forms — a cached CSRF token would be stale
         // for subsequent visitors and cause 419 CSRF mismatch on submission.
         $formRoutes = ['contact.show', 'subscribe'];
@@ -66,7 +74,12 @@ class CacheFullPage
             /** @var Response $response */
             $response = response($cached['body'], $cached['status'])
                 ->withHeaders($cached['headers']);
-            $response->headers->set('X-Cache', 'HIT');
+            // X-Cache headers are kept out of production responses — exposing
+            // HIT/MISS leaks user-activity timing and lets attackers infer
+            // who else has hit the cache. Local dev keeps them for debugging.
+            if (config('app.debug')) {
+                $response->headers->set('X-Cache', 'HIT');
+            }
 
             return $response;
         }
@@ -95,7 +108,9 @@ class CacheFullPage
                 'headers' => $headers,
             ], self::TTL);
 
-            $response->headers->set('X-Cache', 'MISS');
+            if (config('app.debug')) {
+                $response->headers->set('X-Cache', 'MISS');
+            }
         }
 
         return $response;

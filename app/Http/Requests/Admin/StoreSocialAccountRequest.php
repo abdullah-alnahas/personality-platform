@@ -24,11 +24,11 @@ class StoreSocialAccountRequest extends FormRequest
     public function rules(): array
     {
         // Supported platforms - can be moved to config later
-        $platforms = ['facebook', 'instagram', 'youtube', 'telegram', 'x', 'twitter', 'linkedin', 'tiktok', 'other'];
+        $platforms = ['facebook', 'instagram', 'youtube', 'telegram', 'x', 'twitter', 'linkedin', 'tiktok', 'whatsapp', 'linktree', 'phone', 'email', 'other'];
 
         return [
             'platform' => ['required', 'string', Rule::in($platforms)],
-            'url' => ['required', 'url', 'max:2048'],
+            'url' => ['required', 'string', 'max:2048', 'regex:/^(https?:\/\/|mailto:|tel:)/i'],
             'account_name' => ['nullable', 'array'], // Translatable name
             'account_name.*' => ['nullable', 'string', 'max:255'],
             'display_order' => ['nullable', 'integer', 'min:0'],
