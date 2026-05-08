@@ -115,6 +115,7 @@ createInertiaApp({
 
         // DynamicThemeProvider uses live Inertia props so theme direction
         // updates when the user switches language without a full page reload.
+        // Must be rendered INSIDE <App> so usePage() finds the Inertia context.
         const DynamicThemeProvider = ({ children }) => {
             const { props: liveProps } = usePage();
             const theme = React.useMemo(
@@ -124,14 +125,26 @@ createInertiaApp({
             return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
         };
 
-        root.render(
-            <DynamicThemeProvider>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <CssBaseline />
-                    <App {...props} />
-                </LocalizationProvider>
-            </DynamicThemeProvider>,
-        );
+        const renderPage = ({ Component, key, props: pageProps }) => {
+            const child = <Component key={key} {...pageProps} />;
+            const withLayout = typeof Component.layout === 'function'
+                ? Component.layout(child)
+                : Array.isArray(Component.layout)
+                    ? Component.layout.concat(child).reverse().reduce(
+                        (children, Layout) => React.createElement(Layout, { children, ...pageProps }),
+                    )
+                    : child;
+            return (
+                <DynamicThemeProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <CssBaseline />
+                        {withLayout}
+                    </LocalizationProvider>
+                </DynamicThemeProvider>
+            );
+        };
+
+        root.render(<App {...props}>{renderPage}</App>);
     },
     progress: {
         color: "#2B3D2F",

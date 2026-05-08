@@ -2,13 +2,16 @@ import React from "react";
 import { Head, usePage, useForm } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import RichTextEditor from "@/Components/RichTextEditor";
+import MediaPicker from "@/Components/MediaPicker";
+
+const SETTING_IMAGE_KEYS = new Set(["logo_url"]);
 import {
     Box,
     Typography,
     TextField,
     Button,
     Paper,
-    Grid2 as Grid,
+    Grid,
     FormHelperText,
     Divider,
     Switch,
@@ -127,6 +130,24 @@ export default function Edit({
             case "text":
             case "email":
             case "number":
+                if (type === "text" && SETTING_IMAGE_KEYS.has(key)) {
+                    return (
+                        <Grid xs={12} md={6} key={`${key}-${defaultLocale}`}>
+                            <MediaPicker
+                                label={labelBase}
+                                value={data[key]?.[defaultLocale] ?? ""}
+                                onChange={(url) =>
+                                    handleFieldChange(key, defaultLocale, url, type)
+                                }
+                                error={!!errors[`${key}.${defaultLocale}`]}
+                                helperText={
+                                    errors[`${key}.${defaultLocale}`] ||
+                                    "Pick from library or paste a URL"
+                                }
+                            />
+                        </Grid>
+                    );
+                }
                 return activeLanguages.map((lang) => (
                     <Grid
                         xs={12}

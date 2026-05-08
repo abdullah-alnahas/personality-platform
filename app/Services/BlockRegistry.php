@@ -16,6 +16,11 @@ class BlockRegistry
                 'cta_text' => ['type' => 'translatable_text'],
                 'cta_link' => ['type' => 'text'],
                 'overlay_opacity' => ['type' => 'number', 'default' => 0.5],
+                // Optional overlay card (e.g., the "العلم الواجب" card on the Islam initiative hero)
+                'secondary_heading' => ['type' => 'translatable_text'],
+                'secondary_body' => ['type' => 'translatable_richtext'],
+                'secondary_cta_text' => ['type' => 'translatable_text'],
+                'secondary_cta_link' => ['type' => 'text'],
             ],
             'config_defaults' => [
                 'full_width' => true,
@@ -24,6 +29,8 @@ class BlockRegistry
                 'layout' => 'centered',
                 'show_decorations' => false,
                 'decoration_color' => '#C9A94E',
+                // When secondary_heading is set, show the floating card overlay
+                'secondary_card' => false,
             ],
         ],
         'text_with_image' => [
@@ -199,9 +206,12 @@ class BlockRegistry
             'label' => 'Stats Counter',
             'icon' => 'bar_chart',
             'fields' => [
-                'heading'  => ['type' => 'translatable_text', 'required' => true],
-                'subtitle' => ['type' => 'translatable_text'],
-                'stats'    => ['type' => 'stat_list', 'required' => true],
+                'heading'              => ['type' => 'translatable_text', 'required' => true],
+                'subtitle'             => ['type' => 'translatable_text'],
+                'stats'                => ['type' => 'stat_list', 'required' => true],
+                // Optional dark image overlay (e.g., "التأهيل العلمي والدعوي" section)
+                'background_image_url' => ['type' => 'text'],
+                'body'                 => ['type' => 'translatable_richtext'],
                 // stat_list items support: value (string), label (translatable), suffix (translatable)
             ],
             'config_defaults' => [
@@ -210,6 +220,29 @@ class BlockRegistry
                 'accent_color'     => '#C9A94E',
                 'columns'          => 3,
                 'padding_y'        => 'lg',
+                'overlay_opacity'  => 0.6,
+            ],
+        ],
+
+        'platform_cta' => [
+            'label' => 'Platform CTA',
+            'icon' => 'rocket_launch',
+            'fields' => [
+                'heading'    => ['type' => 'translatable_text', 'required' => true],
+                'brand_name' => ['type' => 'translatable_text'],
+                'body'       => ['type' => 'translatable_richtext'],
+                'icon_url'   => ['type' => 'text'],
+                'cta_text'   => ['type' => 'translatable_text'],
+                'cta_link'   => ['type' => 'text'],
+                'pattern_image_url' => ['type' => 'text'],
+            ],
+            'config_defaults' => [
+                'background_color' => '#F5F0E8',
+                'text_color'       => '#2B3D2F',
+                'accent_color'     => '#6B7B4C',
+                'padding_y'        => 'xl',
+                'pattern_position' => 'left',
+                'pattern_opacity'  => 0.18,
             ],
         ],
         'books_grid' => [

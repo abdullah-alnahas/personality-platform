@@ -79,9 +79,9 @@ class PrototypeNavigationSeeder extends Seeder
         // Dropdown children
         $initiativeChildren = [
             ['ar' => 'مبادرة الإسلام',  'en' => 'Islam Initiative',  'tr' => 'İslam Girişimi',  'url' => '/page/islam-initiative', 'order' => 0],
-            ['ar' => 'مبادرة الإيمان',  'en' => 'Iman Initiative',   'tr' => 'İman Girişimi',   'url' => '#iman',                  'order' => 1],
-            ['ar' => 'مبادرة الإحسان',  'en' => 'Ihsan Initiative',  'tr' => 'İhsan Girişimi',  'url' => '#ihsan',                 'order' => 2],
-            ['ar' => 'مبادرة الساعة',   'en' => 'Signs Initiative',  'tr' => 'Kıyamet Girişimi','url' => '#saa',                   'order' => 3],
+            ['ar' => 'مبادرة الإيمان',  'en' => 'Iman Initiative',   'tr' => 'İman Girişimi',   'url' => '/page/iman-initiative',  'order' => 1],
+            ['ar' => 'مبادرة الإحسان',  'en' => 'Ihsan Initiative',  'tr' => 'İhsan Girişimi',  'url' => '/page/ihsan-initiative', 'order' => 2],
+            ['ar' => 'مبادرة الساعة',   'en' => 'Signs Initiative',  'tr' => 'Kıyamet Girişimi','url' => '/page/signs-initiative', 'order' => 3],
         ];
 
         foreach ($initiativeChildren as $child) {
@@ -131,9 +131,9 @@ class PrototypeNavigationSeeder extends Seeder
         // ── Footer col 2: المبادرات ───────────────────────────────────
         $footerInitiatives = [
             ['ar' => 'مبادرات الإسلام',  'en' => 'Islam',  'url' => '/page/islam-initiative', 'order' => 0],
-            ['ar' => 'مبادرات الإيمان',  'en' => 'Iman',   'url' => '#iman',                  'order' => 1],
-            ['ar' => 'مبادرات الإحسان',  'en' => 'Ihsan',  'url' => '#ihsan',                 'order' => 2],
-            ['ar' => 'مبادرات الساعة',   'en' => 'Signs',  'url' => '#saa',                   'order' => 3],
+            ['ar' => 'مبادرات الإيمان',  'en' => 'Iman',   'url' => '/page/iman-initiative',  'order' => 1],
+            ['ar' => 'مبادرات الإحسان',  'en' => 'Ihsan',  'url' => '/page/ihsan-initiative', 'order' => 2],
+            ['ar' => 'مبادرات الساعة',   'en' => 'Signs',  'url' => '/page/signs-initiative', 'order' => 3],
         ];
 
         foreach ($footerInitiatives as $item) {
@@ -170,9 +170,9 @@ class PrototypeNavigationSeeder extends Seeder
 
         // ── Footer col 4: الدعم ───────────────────────────────────────
         $support = [
-            ['ar' => 'سياسة الخصوصية', 'en' => 'Privacy Policy',   'url' => '/privacy',  'order' => 0],
-            ['ar' => 'شروط الاستخدام', 'en' => 'Terms of Use',     'url' => '/terms',    'order' => 1],
-            ['ar' => 'تواصل معنا',     'en' => 'Contact Us',       'url' => '/contact',  'order' => 2],
+            ['ar' => 'سياسة الخصوصية', 'en' => 'Privacy Policy',   'url' => '/page/privacy', 'order' => 0],
+            ['ar' => 'شروط الاستخدام', 'en' => 'Terms of Use',     'url' => '/page/terms',   'order' => 1],
+            ['ar' => 'تواصل معنا',     'en' => 'Contact Us',       'url' => '/contact',      'order' => 2],
         ];
 
         foreach ($support as $item) {

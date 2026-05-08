@@ -7,7 +7,7 @@ import {
     Typography,
     Container,
     Paper,
-    Grid2 as Grid,
+    Grid,
     TextField,
     Button,
     Alert,

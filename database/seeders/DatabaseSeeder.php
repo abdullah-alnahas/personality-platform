@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             PrototypeHomepageSeeder::class,
             PrototypeAboutPageSeeder::class,
             PrototypeIslamCategorySeeder::class,
+            PrototypeInitiativePagesSeeder::class,
+            PrototypeLegalPagesSeeder::class,
             PrototypeNavigationSeeder::class,
             PrototypeBooksAndScholarsSeeder::class,
         ]);

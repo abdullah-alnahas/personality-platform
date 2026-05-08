@@ -150,7 +150,13 @@ Route::prefix(config('admin.path', 'admin'))
             Route::get("media", [MediaController::class, "index"])
                 ->name("media.index")
                 ->middleware("can:manage media");
-            Route::delete("media/{medium}", [MediaController::class, "destroy"]) // Use {medium} to match variable name in controller
+            Route::get("media/picker", [MediaController::class, "picker"])
+                ->name("media.picker")
+                ->middleware("can:manage media");
+            Route::post("media", [MediaController::class, "store"])
+                ->name("media.store")
+                ->middleware("can:manage media");
+            Route::delete("media/{medium?}", [MediaController::class, "destroy"])
                 ->name("media.destroy")
                 ->middleware("can:manage media");
             // Languages CRUD (Requires 'manage languages' permission)

@@ -230,6 +230,14 @@ export default function PublicLayout({ children, title: pageTitle }) {
     );
     const logoUrl = getTranslatedField(settings?.logo_url?.value, currentLocale, "");
     const logoWidth = parseInt(getTranslatedField(settings?.logo_width?.value, currentLocale, "120"), 10) || 120;
+    const headerCtaText = getTranslatedField(settings?.header_cta_text?.value, currentLocale, "");
+    const headerCtaUrl = getTranslatedField(settings?.header_cta_url?.value, currentLocale, "");
+    const footerColTitles = {
+        footer_col1: getTranslatedField(settings?.footer_col1_title?.value, currentLocale, ""),
+        footer_col2: getTranslatedField(settings?.footer_col2_title?.value, currentLocale, ""),
+        footer_col3: getTranslatedField(settings?.footer_col3_title?.value, currentLocale, ""),
+        footer_col4: getTranslatedField(settings?.footer_col4_title?.value, currentLocale, ""),
+    };
     const headerNavItems = navigationItems?.header ?? [];
     const footerCol1Items =
         navigationItems?.footer_col1?.filter((item) => !item.parent_id) ?? [];
@@ -661,8 +669,36 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             </FormControl>
                         )}
                         <Box
-                            sx={{ display: { xs: "none", md: "block" }, ml: 1 }}
+                            sx={{ display: { xs: "none", md: "flex" }, ml: 1, gap: 1, alignItems: "center" }}
                         >
+                            {headerCtaText && (
+                                <Button
+                                    component={
+                                        (headerCtaUrl || '').startsWith('http')
+                                            ? 'a'
+                                            : InertiaLink
+                                    }
+                                    href={headerCtaUrl || '#'}
+                                    variant="contained"
+                                    size="small"
+                                    sx={{
+                                        backgroundColor: '#C9F050',
+                                        color: '#1E2A22',
+                                        fontWeight: 700,
+                                        borderRadius: '999px',
+                                        textTransform: 'none',
+                                        px: 2.5,
+                                        py: 0.75,
+                                        boxShadow: 'none',
+                                        '&:hover': {
+                                            backgroundColor: '#B8DC44',
+                                            boxShadow: 'none',
+                                        },
+                                    }}
+                                >
+                                    {headerCtaText}
+                                </Button>
+                            )}
                             {auth.user && (
                                 <Button
                                     component={InertiaLink}
@@ -775,17 +811,17 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             )}
                         </Grid>
 
-                        {/* Nav columns - render whichever have items */}
+                        {/* Nav columns — title from settings, all items rendered as links */}
                         {[
-                            { items: footerCol1Items, key: 'footer1' },
-                            { items: footerCol2Items, key: 'footer2' },
-                            { items: footerCol3Items, key: 'footer3' },
-                            { items: footerCol4Items, key: 'footer4' },
+                            { items: footerCol1Items, key: 'footer1', title: footerColTitles.footer_col1 },
+                            { items: footerCol2Items, key: 'footer2', title: footerColTitles.footer_col2 },
+                            { items: footerCol3Items, key: 'footer3', title: footerColTitles.footer_col3 },
+                            { items: footerCol4Items, key: 'footer4', title: footerColTitles.footer_col4 },
                         ]
-                            .filter((col) => col.items.length > 0)
+                            .filter((col) => col.items.length > 0 || col.title)
                             .map((col) => (
                                 <Grid item xs={6} sm={3} md={2} key={col.key}>
-                                    {col.items[0]?.label && (
+                                    {col.title && (
                                         <Typography
                                             variant="subtitle2"
                                             gutterBottom
@@ -798,14 +834,10 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                                 mb: 1.5,
                                             }}
                                         >
-                                            {getTranslatedField(
-                                                col.items[0]?.label,
-                                                currentLocale,
-                                                '',
-                                            )}
+                                            {col.title}
                                         </Typography>
                                     )}
-                                    {col.items.slice(1).map((item) => (
+                                    {col.items.map((item) => (
                                         <MuiLink
                                             key={`${col.key}-${item.id}`}
                                             component={

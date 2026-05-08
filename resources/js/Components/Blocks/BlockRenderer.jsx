@@ -15,6 +15,7 @@ import LogoGrid from "@/Components/Blocks/LogoGrid";
 import StatsCounter from "@/Components/Blocks/StatsCounter";
 import BooksGrid from "@/Components/Blocks/BooksGrid";
 import ScholarCards from "@/Components/Blocks/ScholarCards";
+import PlatformCta from "@/Components/Blocks/PlatformCta";
 
 const blockComponents = {
     hero_banner: HeroBanner,
@@ -32,6 +33,7 @@ const blockComponents = {
     stats_counter: StatsCounter,
     books_grid: BooksGrid,
     scholar_cards: ScholarCards,
+    platform_cta: PlatformCta,
 };
 
 export default function BlockRenderer({ block }) {
@@ -63,7 +65,8 @@ export default function BlockRenderer({ block }) {
         block.block_type === "logo_grid" ||
         block.block_type === "stats_counter" ||
         block.block_type === "books_grid" ||
-        block.block_type === "scholar_cards";
+        block.block_type === "scholar_cards" ||
+        block.block_type === "platform_cta";
 
     return (
         <Box

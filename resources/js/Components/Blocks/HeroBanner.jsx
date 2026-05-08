@@ -18,6 +18,13 @@ export default function HeroBanner({ block }) {
     const portraitImage = content.portrait_image_url || '';
     const overlayOpacity = content.overlay_opacity ?? 0.5;
 
+    // Optional floating overlay card (e.g. "العلم الواجب" on the Islam hero).
+    const secondaryHeading = getTranslatedField(content.secondary_heading, currentLocale);
+    const secondaryBody = getTranslatedField(content.secondary_body, currentLocale);
+    const secondaryCtaText = getTranslatedField(content.secondary_cta_text, currentLocale);
+    const secondaryCtaLink = content.secondary_cta_link || '';
+    const showSecondaryCard = !!secondaryHeading;
+
     const minHeight = config.min_height || '70vh';
     const textColor = config.text_color || '#ffffff';
     const layout = config.layout || 'centered';
@@ -321,6 +328,68 @@ export default function HeroBanner({ block }) {
                 )}
 
                 {ctaButton}
+
+                {showSecondaryCard && (
+                    <Box
+                        sx={{
+                            mt: { xs: 4, md: 6 },
+                            mx: 'auto',
+                            maxWidth: 460,
+                            backgroundColor: 'rgba(245, 240, 232, 0.94)',
+                            color: '#2B3D2F',
+                            p: { xs: 3, md: 4 },
+                            borderRadius: 2,
+                            boxShadow: '0 12px 40px rgba(0,0,0,0.25)',
+                            textAlign: 'center',
+                            direction: textDirection,
+                        }}
+                    >
+                        <Typography
+                            variant="h5"
+                            sx={{
+                                fontFamily: "'Amiri', serif",
+                                fontWeight: 700,
+                                color: '#2B3D2F',
+                                mb: secondaryBody ? 1.5 : 0,
+                            }}
+                        >
+                            {secondaryHeading}
+                        </Typography>
+                        {secondaryBody && (
+                            // sanitize via sanitizeHtml — DOMPurify-backed.
+                            <Box
+                                component="div"
+                                dangerouslySetInnerHTML={{ __html: sanitizeHtml(secondaryBody) }}
+                                sx={{
+                                    fontSize: '1rem',
+                                    lineHeight: 1.7,
+                                    color: '#3A4A3F',
+                                    '& p': { mb: 1 },
+                                }}
+                            />
+                        )}
+                        {secondaryCtaText && (
+                            <Button
+                                {...(secondaryCtaLink && (secondaryCtaLink.startsWith('http')
+                                    ? { component: 'a', href: secondaryCtaLink, target: '_blank', rel: 'noopener noreferrer' }
+                                    : { component: InertiaLink, href: secondaryCtaLink }))}
+                                variant="contained"
+                                sx={{
+                                    mt: 2,
+                                    backgroundColor: '#C9F050',
+                                    color: '#1E2A22',
+                                    fontWeight: 700,
+                                    borderRadius: 999,
+                                    px: 3,
+                                    boxShadow: 'none',
+                                    '&:hover': { backgroundColor: '#B8DC44', boxShadow: 'none' },
+                                }}
+                            >
+                                {secondaryCtaText}
+                            </Button>
+                        )}
+                    </Box>
+                )}
             </Container>
         </Box>
     );

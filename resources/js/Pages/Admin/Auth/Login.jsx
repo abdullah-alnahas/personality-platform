@@ -7,7 +7,7 @@ import {
     FormControlLabel,
     Box,
     Typography,
-    Grid2 as Grid,
+    Grid,
     Alert,
     Link as MuiLink,
 } from "@mui/material";

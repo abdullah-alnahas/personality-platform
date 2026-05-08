@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Head, Link as InertiaLink, useForm, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import RichTextEditor from '@/Components/RichTextEditor';
+import MediaPicker from '@/Components/MediaPicker';
+
+const IMAGE_FIELD_PATTERN = /(image_url|background_image_url|portrait_image_url|logo_url|photo_url|icon_url)$/i;
+const isImageField = (key) => typeof key === 'string' && IMAGE_FIELD_PATTERN.test(key);
 import {
     Box, Typography, TextField, Button, Paper, Grid,
     FormControl, InputLabel, Select, MenuItem, FormHelperText,
@@ -402,6 +406,20 @@ export default function Form({
                 );
 
             case 'text':
+                if (isImageField(fieldKey)) {
+                    return (
+                        <Grid item xs={12} sm={6} md={6} key={fieldKey}>
+                            <MediaPicker
+                                required={isRequired}
+                                label={label}
+                                value={data.content[fieldKey] ?? ''}
+                                onChange={(url) => handleContentChange(fieldKey, url)}
+                                error={!!errors[`content.${fieldKey}`]}
+                                helperText={errors[`content.${fieldKey}`]}
+                            />
+                        </Grid>
+                    );
+                }
                 return (
                     <Grid item xs={12} sm={6} md={4} key={fieldKey}>
                         <TextField
@@ -617,13 +635,11 @@ export default function Form({
                                                 </Grid>
                                             ))}
                                             <Grid item xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    size="small"
-                                                    label="Logo Image URL"
+                                                <MediaPicker
+                                                    label="Logo Image"
                                                     value={logo.image_url ?? ''}
-                                                    onChange={(e) => updateLogo(fieldKey, logoIndex, 'image_url', e.target.value)}
-                                                    helperText="URL to logo image (PNG/SVG recommended)"
+                                                    onChange={(url) => updateLogo(fieldKey, logoIndex, 'image_url', url)}
+                                                    helperText="PNG/SVG recommended"
                                                 />
                                             </Grid>
                                             <Grid item xs={12} sm={6}>
@@ -700,12 +716,10 @@ export default function Form({
 
                                     <Grid container spacing={2} sx={{ mb: 2 }}>
                                         <Grid item xs={12} sm={6}>
-                                            <TextField
-                                                fullWidth
-                                                size="small"
-                                                label="Image URL"
+                                            <MediaPicker
+                                                label="Image"
                                                 value={card.image_url ?? ''}
-                                                onChange={(e) => updateCard(fieldKey, cardIndex, 'image_url', e.target.value)}
+                                                onChange={(url) => updateCard(fieldKey, cardIndex, 'image_url', url)}
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={6}>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Container, Typography, Grid } from "@mui/material";
 import { useLocale } from "@/Hooks/useLocale";
+import { sanitizeHtml } from "@/utils/sanitize";
 
 const StatsCounter = ({ block }) => {
     const { currentLocale, isRTL, getTranslatedField: t } = useLocale();
@@ -12,6 +13,9 @@ const StatsCounter = ({ block }) => {
     const bgColor = config.background_color || "#2B3D2F";
     const textColor = config.text_color || "#ffffff";
     const accentColor = config.accent_color || "#C9A94E";
+    const bgImage = content.background_image_url || "";
+    const overlayOpacity = config.overlay_opacity ?? 0.6;
+    const bodyHtml = t(content.body) || "";
 
     const colSize = Math.max(1, Math.min(12, Math.floor(12 / columns)));
 
@@ -19,9 +23,24 @@ const StatsCounter = ({ block }) => {
         <Box
             component="section"
             sx={{
+                position: "relative",
                 backgroundColor: bgColor,
+                backgroundImage: bgImage ? `url(${bgImage})` : undefined,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
                 color: textColor,
                 py: config.padding_y === "xl" ? 10 : config.padding_y === "lg" ? 7 : 5,
+                "&::before": bgImage
+                    ? {
+                          content: '""',
+                          position: "absolute",
+                          inset: 0,
+                          backgroundColor: bgColor,
+                          opacity: overlayOpacity,
+                          zIndex: 0,
+                      }
+                    : undefined,
+                "& > *": { position: "relative", zIndex: 1 },
             }}
         >
             <Container maxWidth="lg">
@@ -44,10 +63,24 @@ const StatsCounter = ({ block }) => {
                     <Typography
                         variant="body1"
                         align="center"
-                        sx={{ mb: 6, opacity: 0.85 }}
+                        sx={{ mb: bodyHtml ? 3 : 6, opacity: 0.85 }}
                     >
                         {t(content.subtitle)}
                     </Typography>
+                )}
+                {bodyHtml && (
+                    // sanitize() uses DOMPurify (isomorphic-dompurify) — safe HTML only.
+                    <Box
+                        sx={{
+                            mb: 6,
+                            mx: "auto",
+                            maxWidth: 720,
+                            opacity: 0.9,
+                            textAlign: "center",
+                            "& p": { mb: 1.5 },
+                        }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(bodyHtml) }}
+                    />
                 )}
 
                 <Grid container spacing={4} justifyContent="center">

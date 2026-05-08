@@ -126,6 +126,66 @@ class SettingsSeeder extends Seeder
                 "type" => "text",
                 "group" => "general",
             ],
+
+            // Header CTA pill button (e.g. "اتصل بنا")
+            [
+                "key" => "header_cta_text",
+                "value" => [
+                    "en" => "Contact Us",
+                    "ar" => "اتصل بنا",
+                    "tr" => "Bize Ulaşın",
+                ],
+                "type" => "text",
+                "group" => "header",
+            ],
+            [
+                "key" => "header_cta_url",
+                "value" => ["en" => "/contact"],
+                "type" => "text",
+                "group" => "header",
+            ],
+
+            // Footer column titles (rendered as section labels above the nav links)
+            [
+                "key" => "footer_col1_title",
+                "value" => [
+                    "en" => "About the Platform",
+                    "ar" => "عن المنصة",
+                    "tr" => "Platform Hakkında",
+                ],
+                "type" => "text",
+                "group" => "footer",
+            ],
+            [
+                "key" => "footer_col2_title",
+                "value" => [
+                    "en" => "Initiatives",
+                    "ar" => "المبادرات",
+                    "tr" => "Girişimler",
+                ],
+                "type" => "text",
+                "group" => "footer",
+            ],
+            [
+                "key" => "footer_col3_title",
+                "value" => [
+                    "en" => "Related Links",
+                    "ar" => "روابط ذات صلة",
+                    "tr" => "İlgili Bağlantılar",
+                ],
+                "type" => "text",
+                "group" => "footer",
+            ],
+            [
+                "key" => "footer_col4_title",
+                "value" => [
+                    "en" => "Support",
+                    "ar" => "الدعم",
+                    "tr" => "Destek",
+                ],
+                "type" => "text",
+                "group" => "footer",
+            ],
         ];
 
         foreach ($settings as $setting) {
