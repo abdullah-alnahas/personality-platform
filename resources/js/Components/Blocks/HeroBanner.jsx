@@ -74,7 +74,7 @@ export default function HeroBanner({ block }) {
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        backgroundColor: '#2B3D2F',
+                        backgroundColor: '#2D4128',
                         zIndex: 0,
                     }}
                 />

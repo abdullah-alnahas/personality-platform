@@ -411,7 +411,7 @@ class PrototypeHomepageSeeder extends Seeder
                     'tr' => 'Şeyh Avn El-Kaddumi',
                 ],
                 'cta_link' => '/page/about',
-                'overlay_opacity' => 0.6,
+                'overlay_opacity' => 0.35,
             ],
             'config' => [
                 'full_width' => true,

@@ -119,22 +119,33 @@ class PrototypeAboutPageSeeder extends Seeder
             ],
         ]);
 
-        // ─── Rich Text (biography body) ───
+        // ─── Text + Portrait (biography section, matches prototype) ───
         PageBlock::create([
             'page_id' => $page->id,
-            'block_type' => 'rich_text',
+            'block_type' => 'text_with_image',
             'display_order' => $order++,
             'status' => 'published',
             'content' => [
-                'body' => [
-                    'en' => '<h2>Biography</h2><p>Sheikh Awn Mueen Al-Qaddoumi is a distinguished Islamic scholar from Jordan, known for his deep knowledge of Islamic jurisprudence, hadith sciences, and Quranic studies.</p><p>He studied under numerous renowned scholars across the Islamic world, from Jordan to Yemen to the Hejaz, building an extensive chain of scholarly transmission (<em>isnad</em>) that connects him to the great imams of Islamic tradition.</p><p>He has founded and led several charitable and educational organizations, dedicating his life to the preservation and transmission of Islamic knowledge.</p>',
-                    'ar' => '<h2>السيرة الذاتية</h2><p>الشيخ عون معين القدومي عالم إسلامي بارز من الأردن، يُعرف بعلمه العميق في الفقه الإسلامي وعلوم الحديث والدراسات القرآنية.</p><p>تلقى العلم على يد عدد كبير من العلماء المشهورين في أنحاء العالم الإسلامي، من الأردن إلى اليمن إلى الحجاز، مما أكسبه سلسلة إسناد واسعة تصله بأئمة التراث الإسلامي العظام.</p><p>أسس وقاد العديد من المؤسسات الخيرية والتعليمية، مكرسًا حياته لحفظ العلم الشرعي ونقله.</p>',
-                    'tr' => '<h2>Biyografi</h2><p>Şeyh Avn Muin El-Kaddumi, İslam hukuku, hadis ilimleri ve Kur\'an çalışmalarındaki derin bilgisiyle tanınan Ürdünlü seçkin bir İslam alimidir.</p><p>İslam dünyasının dört bir yanında, Ürdün\'den Yemen\'e, Hicaz\'a kadar birçok tanınmış alimden ders almış, İslam geleneğinin büyük imamlarına uzanan geniş bir ilmi silsile oluşturmuştur.</p>',
+                'heading' => [
+                    'en' => 'Awn Mueen Al-Qaddoumi',
+                    'ar' => 'عون معين القدّومي',
+                    'tr' => 'Avn Muin El-Kaddumi',
                 ],
+                'body' => [
+                    'en' => '<p>An Islamic scholar and preacher from Jordan, the General Supervisor of the Al-Ma\'arij Institute for Sharia Studies and the Al-Hawra\' Institute for Qualification and Building in Jordan. He is a founder and partner in a number of institutional dawah works, with a wide presence in media, television, radio, and youth and religious activities.</p><p>He has participated in journeys and dawah conferences across the Islamic world, with several authored works in various Sharia and dawah fields. Born in Amman on Friday, 11 Ramadan 1402 AH (2 July 1982 CE).</p>',
+                    'ar' => '<p>داعية إسلامي من الأردن، والمشرف العام على معهد المعارج للدراسات الشرعية، ومعهد الحوراء للتأهيل والبناء في الأردن، ومؤسس ومشارك لعدد من الأعمال الدعوية المؤسسية، له حضوره الواسع في الإعلام والبرامج التلفزيونية والإذاعية والفعاليات الشبابية والدينية.</p><p>وله مشاركات في رحلات ومؤتمرات دعوية على مستوى العالم الإسلامي، وله مؤلفات عدة في مجالات شرعية ودعوية متعددة. ولد في عمّان الجمعة ١١ رمضان ١٤٠٢ هـ الموافق ٢ تموز ١٩٨٢.</p>',
+                    'tr' => '<p>Ürdünlü İslam alimi ve davetçi. Ürdün\'deki El-Maaric Şeriat Çalışmaları Enstitüsü ve El-Hevra Yetiştirme ve İnşa Enstitüsü\'nün Genel Müdürü. Birçok kurumsal davet çalışmasının kurucusu ve ortağıdır.</p>',
+                ],
+                'image_url' => '/images/prototype/sheikh-portrait.png',
+                'cta_text' => ['en' => '', 'ar' => '', 'tr' => ''],
+                'cta_link' => '',
             ],
             'config' => [
-                'max_width' => '800px',
-                'background_color' => '#ffffff',
+                'image_position' => 'left',
+                'background_color' => '#FFFFFF',
+                'text_color' => '#2A2A28',
+                'show_decorations' => true,
+                'padding_y' => 'lg',
             ],
         ]);
 
