@@ -39,7 +39,10 @@ import EmailIcon from "@mui/icons-material/Email";
 import ContactMailIcon from "@mui/icons-material/ContactMail";
 import PeopleIcon from "@mui/icons-material/People";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { useLocale } from "@/Hooks/useLocale"; // Import the hook
+import { useColorMode } from "@/Hooks/useColorMode";
 
 const drawerWidth = 240;
 
@@ -47,6 +50,7 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const { flash, auth, ziggy } = usePage().props;
     const { currentLocale, availableLocales, isRTL } = useLocale(); // Use the hook
+    const { mode: colorMode, toggleMode } = useColorMode();
 
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -432,6 +436,18 @@ export default function AdminLayout({ children, title = "Admin Panel" }) {
                     >
                         {auth.user.name}
                     </Typography>
+                    <IconButton
+                        color="inherit"
+                        aria-label="toggle color mode"
+                        onClick={toggleMode}
+                        sx={{ mr: 0.5 }}
+                    >
+                        {colorMode === "dark" ? (
+                            <LightModeIcon />
+                        ) : (
+                            <DarkModeIcon />
+                        )}
+                    </IconButton>
                     <IconButton
                         color="inherit"
                         aria-label="logout"

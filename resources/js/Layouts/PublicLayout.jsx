@@ -38,9 +38,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 import CookieConsentBanner from "@/Components/CookieConsentBanner";
 import SocialIcon from "@/Components/SocialIcon";
 import { safeUrl } from "@/utils/sanitize";
+import { useColorMode } from "@/Hooks/useColorMode";
 const getTranslatedField = (fieldObject, locale = "en", fallback = "") => {
     if (fieldObject == null) return fallback;
     if (typeof fieldObject !== "object") return String(fieldObject) || fallback;
@@ -214,6 +217,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
         available_locales: availableLocales,
         current_locale: currentLocale,
     } = usePage().props;
+    const { mode: colorMode, toggleMode } = useColorMode();
     const currentLang = availableLocales?.find((l) => l.code === currentLocale);
     const isRTL = currentLang?.is_rtl || currentLocale === 'ar';
     const {
@@ -681,6 +685,34 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                 </Select>
                             </FormControl>
                         )}
+                        <Tooltip
+                            title={
+                                colorMode === "dark"
+                                    ? currentLocale === "ar"
+                                        ? "الوضع المضيء"
+                                        : currentLocale === "tr"
+                                          ? "Aydınlık mod"
+                                          : "Light mode"
+                                    : currentLocale === "ar"
+                                      ? "الوضع المظلم"
+                                      : currentLocale === "tr"
+                                        ? "Karanlık mod"
+                                        : "Dark mode"
+                            }
+                        >
+                            <IconButton
+                                onClick={toggleMode}
+                                size="small"
+                                aria-label="toggle color mode"
+                                sx={{ ml: 1, color: "text.secondary" }}
+                            >
+                                {colorMode === "dark" ? (
+                                    <LightModeIcon fontSize="small" />
+                                ) : (
+                                    <DarkModeIcon fontSize="small" />
+                                )}
+                            </IconButton>
+                        </Tooltip>
                         <Box
                             sx={{ display: { xs: "none", md: "flex" }, ml: 1, gap: 1, alignItems: "center" }}
                         >

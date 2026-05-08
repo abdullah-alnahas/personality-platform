@@ -8,9 +8,246 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// No need to import useLocale here, it will be used by components
+
+import { ColorModeContext } from "@/Hooks/useColorMode";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+
+const COLOR_MODE_KEY = "pp_color_mode";
+
+const readSetting = (settings, key, fallback) => {
+    const raw = settings?.[key]?.value;
+    if (raw == null) return fallback;
+    if (typeof raw === "object") {
+        const v = raw.en ?? raw[Object.keys(raw)[0]];
+        return v ? v : fallback;
+    }
+    return raw || fallback;
+};
+
+const resolveMode = (userChoice, defaultChoice) => {
+    const choice = userChoice || defaultChoice || "auto";
+    if (choice === "light" || choice === "dark") return choice;
+    if (typeof window !== "undefined" && window.matchMedia) {
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+    }
+    return "light";
+};
+
+const buildTheme = (pageProps, mode) => {
+    const currentLocaleCode = pageProps?.current_locale || "en";
+    const availableLocales = pageProps?.available_locales || [];
+    const currentSelectedLocale = availableLocales.find(
+        (l) => l.code === currentLocaleCode,
+    );
+    const direction = currentSelectedLocale?.is_rtl ? "rtl" : "ltr";
+
+    if (typeof document !== "undefined") {
+        document.documentElement.dir = direction;
+        document.documentElement.lang = currentLocaleCode;
+        document.documentElement.dataset.theme = mode;
+    }
+
+    const settings = pageProps?.settings || {};
+    const isDark = mode === "dark";
+
+    const palette = isDark
+        ? {
+              primary: readSetting(settings, "theme_primary_color_dark", "#8FAD83"),
+              primaryDark: readSetting(settings, "theme_primary_dark_dark", "#6E8B62"),
+              secondary: readSetting(settings, "theme_secondary_color_dark", "#C9F050"),
+              background: readSetting(settings, "theme_background_color_dark", "#0F1411"),
+              paper: readSetting(settings, "theme_paper_color_dark", "#181D19"),
+              text: readSetting(settings, "theme_text_color_dark", "#E8E5DC"),
+              textSecondary: readSetting(settings, "theme_text_secondary_color_dark", "#9AA197"),
+          }
+        : {
+              primary: readSetting(settings, "theme_primary_color", "#4A6741"),
+              primaryDark: readSetting(settings, "theme_primary_dark", "#2D4128"),
+              secondary: readSetting(settings, "theme_secondary_color", "#B5D26B"),
+              background: readSetting(settings, "theme_background_color", "#F7F4ED"),
+              paper: readSetting(settings, "theme_paper_color", "#FFFFFF"),
+              text: readSetting(settings, "theme_text_color", "#2A2A28"),
+              textSecondary: readSetting(settings, "theme_text_secondary_color", "#6B6862"),
+          };
+
+    const themeHeadingFont = readSetting(
+        settings,
+        "theme_heading_font",
+        direction === "rtl"
+            ? "'Amiri', 'Traditional Arabic', 'Tajawal', serif"
+            : "'Amiri', 'Georgia', 'Times New Roman', serif",
+    );
+    const themeBodyFont = readSetting(
+        settings,
+        "theme_body_font",
+        [
+            ...(direction === "rtl" ? ["Tajawal", "Noto Sans Arabic"] : []),
+            "Cairo",
+            "Roboto",
+            '"Helvetica Neue"',
+            "Arial",
+            "sans-serif",
+        ].join(","),
+    );
+    const borderRadius = parseInt(
+        readSetting(settings, "theme_border_radius", "10"),
+        10,
+    ) || 10;
+
+    // Surface elevation tints for dark mode (parchment-like cool down for light)
+    const dividerColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
+    const subtleBg = isDark ? "#20272A" : "#EFEAE0";
+    const cardShadow = isDark
+        ? "0 2px 8px rgba(0,0,0,0.45)"
+        : "0 2px 8px rgba(74,103,65,0.08)";
+
+    return createTheme({
+        direction,
+        shape: { borderRadius },
+        palette: {
+            mode,
+            primary: {
+                main: palette.primary,
+                dark: palette.primaryDark,
+                light: isDark ? "#A8C29C" : "#7A9670",
+                contrastText: isDark ? "#0F1411" : "#FFFFFF",
+            },
+            secondary: {
+                main: palette.secondary,
+                contrastText: isDark ? "#0F1411" : "#1E2A22",
+            },
+            background: { default: palette.background, paper: palette.paper },
+            text: { primary: palette.text, secondary: palette.textSecondary },
+            divider: dividerColor,
+            error: { main: isDark ? "#E08585" : "#B45656" },
+            warning: { main: isDark ? "#E5B970" : "#B8924C" },
+            success: { main: palette.primary },
+            islamic: {
+                surface: subtleBg,
+                primary: palette.primary,
+                primaryDark: palette.primaryDark,
+                accent: palette.secondary,
+                paper: palette.paper,
+            },
+        },
+        typography: {
+            fontFamily: themeBodyFont,
+            // 1.25 modular scale for visual rhythm (Aesthetic-Usability)
+            h1: {
+                fontFamily: themeHeadingFont,
+                fontWeight: 700,
+                fontSize: direction === "rtl" ? "3.0rem" : "2.6rem",
+                lineHeight: 1.25,
+                letterSpacing: "-0.01em",
+            },
+            h2: {
+                fontFamily: themeHeadingFont,
+                fontWeight: 700,
+                fontSize: direction === "rtl" ? "2.4rem" : "2.05rem",
+                lineHeight: 1.3,
+            },
+            h3: {
+                fontFamily: themeHeadingFont,
+                fontWeight: 600,
+                fontSize: direction === "rtl" ? "1.95rem" : "1.65rem",
+                lineHeight: 1.35,
+            },
+            h4: {
+                fontFamily: themeHeadingFont,
+                fontWeight: 600,
+                fontSize: direction === "rtl" ? "1.6rem" : "1.35rem",
+                lineHeight: 1.4,
+            },
+            h5: {
+                fontFamily: themeHeadingFont,
+                fontWeight: 500,
+                fontSize: direction === "rtl" ? "1.35rem" : "1.15rem",
+                lineHeight: 1.45,
+            },
+            h6: {
+                fontFamily: themeHeadingFont,
+                fontWeight: 500,
+                fontSize: direction === "rtl" ? "1.1rem" : "1.0rem",
+                lineHeight: 1.5,
+            },
+            body1: { lineHeight: 1.65 },
+            body2: { lineHeight: 1.6 },
+            button: { textTransform: "none", fontWeight: 600 },
+        },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: {
+                    body: {
+                        transition:
+                            "background-color 240ms ease, color 240ms ease",
+                    },
+                    "::selection": {
+                        background: palette.primary,
+                        color: "#FFFFFF",
+                    },
+                    a: { color: palette.primary },
+                    // Subtle scrollbar in dark mode
+                    "*::-webkit-scrollbar": { width: 10, height: 10 },
+                    "*::-webkit-scrollbar-track": {
+                        background: "transparent",
+                    },
+                    "*::-webkit-scrollbar-thumb": {
+                        background: dividerColor,
+                        borderRadius: 8,
+                    },
+                    "*::-webkit-scrollbar-thumb:hover": {
+                        background: isDark
+                            ? "rgba(255,255,255,0.18)"
+                            : "rgba(0,0,0,0.18)",
+                    },
+                },
+            },
+            MuiButton: {
+                styleOverrides: {
+                    root: {
+                        borderRadius,
+                        textTransform: "none",
+                        fontWeight: 600,
+                        boxShadow: "none",
+                        "&:hover": { boxShadow: "none" },
+                    },
+                    containedSecondary: {
+                        color: isDark ? "#0F1411" : "#1E2A22",
+                    },
+                },
+            },
+            MuiAppBar: {
+                styleOverrides: {
+                    root: {
+                        backgroundColor: palette.paper,
+                        color: palette.text,
+                        backgroundImage: "none",
+                    },
+                },
+            },
+            MuiCard: {
+                styleOverrides: {
+                    root: {
+                        borderRadius: borderRadius + 2,
+                        boxShadow: cardShadow,
+                        backgroundImage: "none",
+                    },
+                },
+            },
+            MuiPaper: {
+                styleOverrides: {
+                    root: { backgroundImage: "none" },
+                },
+            },
+            MuiTextField: { defaultProps: { variant: "outlined" } },
+            MuiSelect: { defaultProps: { variant: "outlined" } },
+            MuiLink: { defaultProps: { underline: "hover" } },
+        },
+    });
+};
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -22,134 +259,65 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        const readSetting = (settings, key, fallback) => {
-            const raw = settings?.[key]?.value;
-            if (raw == null) return fallback;
-            if (typeof raw === "object") {
-                const v = raw.en ?? raw[Object.keys(raw)[0]];
-                return v ? v : fallback;
-            }
-            return raw || fallback;
-        };
-
-        const createAppTheme = (pageProps) => {
-            // Access locale info from pageProps, which should be updated by Inertia
-            const currentLocaleCode = pageProps?.current_locale || "en";
-            const availableLocales = pageProps?.available_locales || [];
-            const currentSelectedLocale = availableLocales.find(
-                (lang) => lang.code === currentLocaleCode,
-            );
-            const direction = currentSelectedLocale?.is_rtl ? "rtl" : "ltr";
-
-            document.documentElement.dir = direction;
-            document.documentElement.lang = currentLocaleCode;
-
-            const settings = pageProps?.settings || {};
-
-            // Islamic design palette — defaults; overridden by site_settings if set
-            const islamicColors = {
-                darkGreen: readSetting(settings, "theme_primary_color", "#2B3D2F"),
-                deepGreen: readSetting(settings, "theme_primary_dark", "#1E2A22"),
-                olive: '#6B7B4C',
-                oliveLight: '#8B9A6B',
-                cream: readSetting(settings, "theme_background_color", "#F5F0E8"),
-                creamLight: '#FAF7F2',
-                gold: readSetting(settings, "theme_secondary_color", "#C9A94E"),
-                goldLight: '#D4B96A',
-                warmWhite: '#FEFCF8',
-            };
-
-            const textColor = readSetting(settings, "theme_text_color", "#2C2C2C");
-            const themeHeadingFont = readSetting(
-                settings,
-                "theme_heading_font",
-                direction === 'rtl'
-                    ? "'Amiri', 'Traditional Arabic', 'Tajawal', serif"
-                    : "'Amiri', 'Georgia', 'Times New Roman', serif",
-            );
-            const themeBodyFont = readSetting(
-                settings,
-                "theme_body_font",
-                [
-                    ...(direction === "rtl" ? ["Tajawal", "Noto Sans Arabic"] : []),
-                    "Cairo",
-                    "Roboto",
-                    '"Helvetica Neue"',
-                    "Arial",
-                    "sans-serif",
-                ].join(","),
-            );
-            const borderRadius = parseInt(
-                readSetting(settings, "theme_border_radius", "8"),
-                10,
-            ) || 8;
-
-            const headingFontFamily = themeHeadingFont;
-            const bodyFontFamily = themeBodyFont;
-
-            return createTheme({
-                direction: direction,
-                shape: { borderRadius },
-                palette: {
-                    primary: { main: islamicColors.darkGreen, light: islamicColors.olive, dark: islamicColors.deepGreen, contrastText: '#ffffff' },
-                    secondary: { main: islamicColors.gold, light: islamicColors.goldLight, contrastText: '#1a1a1a' },
-                    background: { default: islamicColors.cream, paper: '#FFFFFF' },
-                    text: { primary: textColor, secondary: '#5A5A5A' },
-                    error: { main: '#D32F2F' },
-                    islamic: islamicColors,
-                },
-                typography: {
-                    fontFamily: bodyFontFamily,
-                    h1: { fontFamily: headingFontFamily, fontWeight: 700, fontSize: direction === 'rtl' ? '3.2rem' : '2.8rem', lineHeight: 1.3 },
-                    h2: { fontFamily: headingFontFamily, fontWeight: 700, fontSize: direction === 'rtl' ? '2.5rem' : '2.2rem', lineHeight: 1.3 },
-                    h3: { fontFamily: headingFontFamily, fontWeight: 600, fontSize: direction === 'rtl' ? '2.0rem' : '1.8rem', lineHeight: 1.4 },
-                    h4: { fontFamily: headingFontFamily, fontWeight: 600, fontSize: direction === 'rtl' ? '1.7rem' : '1.5rem', lineHeight: 1.4 },
-                    h5: { fontFamily: headingFontFamily, fontWeight: 500, fontSize: direction === 'rtl' ? '1.4rem' : '1.25rem', lineHeight: 1.5 },
-                    h6: { fontFamily: headingFontFamily, fontWeight: 500, fontSize: direction === 'rtl' ? '1.15rem' : '1.0rem', lineHeight: 1.5 },
-                },
-                components: {
-                    MuiButton: {
-                        styleOverrides: {
-                            root: {
-                                borderRadius: 8,
-                                textTransform: 'none',
-                                fontWeight: 500,
-                            },
-                        },
-                    },
-                    MuiAppBar: {
-                        styleOverrides: {
-                            root: {
-                                backgroundColor: '#FFFFFF',
-                                color: '#2C2C2C',
-                            },
-                        },
-                    },
-                    MuiCard: {
-                        styleOverrides: {
-                            root: {
-                                borderRadius: 12,
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                            },
-                        },
-                    },
-                    MuiTextField: { defaultProps: { variant: 'outlined' } },
-                    MuiSelect: { defaultProps: { variant: 'outlined' } },
-                },
-            });
-        };
-
-        // DynamicThemeProvider uses live Inertia props so theme direction
-        // updates when the user switches language without a full page reload.
-        // Must be rendered INSIDE <App> so usePage() finds the Inertia context.
         const DynamicThemeProvider = ({ children }) => {
             const { props: liveProps } = usePage();
+
+            const defaultMode = readSetting(
+                liveProps?.settings,
+                "theme_mode_default",
+                "auto",
+            );
+
+            const [userChoice, setUserChoice] = React.useState(() => {
+                if (typeof window === "undefined") return "auto";
+                return window.localStorage.getItem(COLOR_MODE_KEY) || "auto";
+            });
+
+            const [systemDark, setSystemDark] = React.useState(() => {
+                if (typeof window === "undefined" || !window.matchMedia)
+                    return false;
+                return window.matchMedia("(prefers-color-scheme: dark)").matches;
+            });
+
+            React.useEffect(() => {
+                if (typeof window === "undefined" || !window.matchMedia) return;
+                const mq = window.matchMedia("(prefers-color-scheme: dark)");
+                const onChange = (e) => setSystemDark(e.matches);
+                mq.addEventListener?.("change", onChange);
+                return () => mq.removeEventListener?.("change", onChange);
+            }, []);
+
+            const effectiveChoice =
+                userChoice === "auto" ? defaultMode : userChoice;
+            const mode =
+                effectiveChoice === "auto"
+                    ? systemDark
+                        ? "dark"
+                        : "light"
+                    : effectiveChoice;
+
+            const setMode = React.useCallback((next) => {
+                setUserChoice(next);
+                if (typeof window !== "undefined") {
+                    if (next === "auto") {
+                        window.localStorage.removeItem(COLOR_MODE_KEY);
+                    } else {
+                        window.localStorage.setItem(COLOR_MODE_KEY, next);
+                    }
+                }
+            }, []);
+
+            const toggleMode = React.useCallback(() => {
+                setMode(mode === "dark" ? "light" : "dark");
+            }, [mode, setMode]);
+
             const theme = React.useMemo(
-                () => createAppTheme(liveProps),
+                () => buildTheme(liveProps, mode),
                 [
                     liveProps?.current_locale,
                     liveProps?.available_locales,
                     liveProps?.settings,
+                    mode,
                 ],
             );
 
@@ -163,18 +331,34 @@ createInertiaApp({
                 document.body.classList.toggle("no-decorations", !enabled);
             }, [liveProps?.settings]);
 
-            return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+            const ctxValue = React.useMemo(
+                () => ({ mode, userChoice, setMode, toggleMode }),
+                [mode, userChoice, setMode, toggleMode],
+            );
+
+            return (
+                <ColorModeContext.Provider value={ctxValue}>
+                    <ThemeProvider theme={theme}>{children}</ThemeProvider>
+                </ColorModeContext.Provider>
+            );
         };
 
         const renderPage = ({ Component, key, props: pageProps }) => {
             const child = <Component key={key} {...pageProps} />;
-            const withLayout = typeof Component.layout === 'function'
-                ? Component.layout(child)
-                : Array.isArray(Component.layout)
-                    ? Component.layout.concat(child).reverse().reduce(
-                        (children, Layout) => React.createElement(Layout, { children, ...pageProps }),
-                    )
-                    : child;
+            const withLayout =
+                typeof Component.layout === "function"
+                    ? Component.layout(child)
+                    : Array.isArray(Component.layout)
+                      ? Component.layout
+                            .concat(child)
+                            .reverse()
+                            .reduce((children, Layout) =>
+                                React.createElement(Layout, {
+                                    children,
+                                    ...pageProps,
+                                }),
+                            )
+                      : child;
             return (
                 <DynamicThemeProvider>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -188,6 +372,6 @@ createInertiaApp({
         root.render(<App {...props}>{renderPage}</App>);
     },
     progress: {
-        color: "#2B3D2F",
+        color: "#4A6741",
     },
 });

@@ -210,34 +210,100 @@ class SettingsSeeder extends Seeder
             ],
 
             // Theme / Site Design Group
+            // Modern calm palette (sage forest + warm gold). Tuned for WCAG AA
+            // body-text contrast and a quiet, focus-encouraging feel per
+            // lawsofux.com (Aesthetic-Usability) and 60-30-10 colour rule.
+            // Light palette:
             [
                 "key" => "theme_primary_color",
-                "value" => ["en" => "#2B3D2F"],
+                "value" => ["en" => "#4A6741"],
                 "type" => "color",
                 "group" => "theme",
             ],
             [
                 "key" => "theme_primary_dark",
-                "value" => ["en" => "#1E2A22"],
+                "value" => ["en" => "#2D4128"],
                 "type" => "color",
                 "group" => "theme",
             ],
             [
                 "key" => "theme_secondary_color",
-                "value" => ["en" => "#C9A94E"],
+                "value" => ["en" => "#B5D26B"],
                 "type" => "color",
                 "group" => "theme",
             ],
             [
                 "key" => "theme_background_color",
-                "value" => ["en" => "#F5F0E8"],
+                "value" => ["en" => "#F7F4ED"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_paper_color",
+                "value" => ["en" => "#FFFFFF"],
                 "type" => "color",
                 "group" => "theme",
             ],
             [
                 "key" => "theme_text_color",
-                "value" => ["en" => "#2C2C2C"],
+                "value" => ["en" => "#2A2A28"],
                 "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_text_secondary_color",
+                "value" => ["en" => "#6B6862"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            // Dark palette (used when user toggles to dark mode):
+            [
+                "key" => "theme_primary_color_dark",
+                "value" => ["en" => "#8FAD83"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_primary_dark_dark",
+                "value" => ["en" => "#6E8B62"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_secondary_color_dark",
+                "value" => ["en" => "#C9F050"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_background_color_dark",
+                "value" => ["en" => "#0F1411"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_paper_color_dark",
+                "value" => ["en" => "#181D19"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_text_color_dark",
+                "value" => ["en" => "#E8E5DC"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            [
+                "key" => "theme_text_secondary_color_dark",
+                "value" => ["en" => "#9AA197"],
+                "type" => "color",
+                "group" => "theme",
+            ],
+            // Default mode for first-time visitors: light | dark | auto (system)
+            [
+                "key" => "theme_mode_default",
+                "value" => ["en" => "auto"],
+                "type" => "text",
                 "group" => "theme",
             ],
             [
@@ -254,7 +320,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 "key" => "theme_border_radius",
-                "value" => ["en" => "8"],
+                "value" => ["en" => "10"],
                 "type" => "number",
                 "group" => "theme",
             ],
