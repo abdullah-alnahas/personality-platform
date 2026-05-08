@@ -27,12 +27,21 @@ class ContentSecurityPolicy
         /** @var Response $response */
         $response = $next($request);
 
-        $vite = app()->environment('local') ? 'http://127.0.0.1:5173 ws://127.0.0.1:5173' : '';
+        $isLocal = app()->environment('local');
+        $vite = $isLocal ? 'http://127.0.0.1:5173 ws://127.0.0.1:5173' : '';
         $fonts = 'https://fonts.googleapis.com https://fonts.gstatic.com https://fonts.bunny.net';
+
+        // In local dev Vite injects HMR / React-refresh inline scripts that
+        // don't carry the per-request nonce. Browsers ignore 'unsafe-inline'
+        // whenever a nonce is present, so we drop the nonce in local and rely
+        // on 'unsafe-inline'; production keeps the nonce-based policy.
+        $scriptSrc = $isLocal
+            ? "'self' 'unsafe-inline' {$vite}"
+            : "'self' 'nonce-{$nonce}'";
 
         $directives = [
             "default-src 'self'",
-            "script-src 'self' 'nonce-{$nonce}'" . (app()->environment('local') ? " 'unsafe-inline'" : '') . " {$vite}",
+            "script-src {$scriptSrc}",
             "style-src 'self' 'unsafe-inline' {$fonts}",
             "img-src 'self' data: https:",
             "font-src 'self' {$fonts} https:",
