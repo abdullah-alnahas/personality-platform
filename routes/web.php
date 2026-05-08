@@ -62,8 +62,10 @@ Route::middleware(['csp', 'throttle:5,1'])->group(function () {
     Route::post("/subscribe", SubscriptionController::class)->name("subscribe");
 });
 
-// Admin Routes
+// Admin Routes — wrapped in csp middleware so admin pages get the same
+// Content-Security-Policy + security headers as the public site.
 Route::prefix(config('admin.path', 'admin'))
+    ->middleware(['csp'])
     ->name("admin.")
     ->group(function () {
         // Authentication Routes (Guest Only)

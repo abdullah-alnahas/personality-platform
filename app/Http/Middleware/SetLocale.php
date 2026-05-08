@@ -45,9 +45,8 @@ class SetLocale
             $langParam = $request->query("lang");
             if (in_array($langParam, $activeLanguageCodes)) {
                 $requestedLocale = $langParam;
-                Log::debug(
-                    "[SetLocale] Locale '{$requestedLocale}' found in query parameter and is active."
-                );
+                // verbose locale-detection logs removed — they spammed
+                // production logs (audit H1.M4)
             } else {
                 Log::warning(
                     "[SetLocale] Locale '{$langParam}' from query parameter '{$langParam}' is not active or invalid. Active: " .
@@ -60,9 +59,6 @@ class SetLocale
             $sessionLocale = Session::get($sessionKey);
             if (in_array($sessionLocale, $activeLanguageCodes)) {
                 $requestedLocale = $sessionLocale;
-                Log::debug(
-                    "[SetLocale] Locale '{$requestedLocale}' found in session and is active."
-                );
             } else {
                 Log::warning(
                     "[SetLocale] Locale '{$sessionLocale}' from session is not active or invalid. Removing from session. Active: " .
@@ -84,18 +80,6 @@ class SetLocale
                     $requestedLocale = $browserLocaleShort;
                     break;
                 }
-            }
-            if ($requestedLocale) {
-                Log::debug(
-                    "[SetLocale] Locale '{$requestedLocale}' detected from browser and is active."
-                );
-            } else {
-                Log::debug(
-                    "[SetLocale] No browser locale matched active languages. Browser locales: " .
-                        implode(", ", $browserLocales) .
-                        ". Active: " .
-                        implode(",", $activeLanguageCodes)
-                );
             }
         }
 
@@ -128,10 +112,6 @@ class SetLocale
         if (class_exists(\Illuminate\Support\Carbon::class)) {
             \Illuminate\Support\Carbon::setLocale($finalLocale);
         }
-
-        Log::debug(
-            "[SetLocale] Final application locale set to: {$finalLocale}"
-        );
 
         return $next($request);
     }

@@ -62,11 +62,15 @@ class ContentSecurityPolicy
             'camera=(), microphone=(), geolocation=(), payment=()'
         );
 
-        // HSTS: only set on HTTPS to avoid breaking HTTP dev environments
+        // Disable legacy XSS auditor (modern guidance: 0, not 1).
+        $response->headers->set('X-XSS-Protection', '0');
+
+        // HSTS: only set on HTTPS to avoid breaking HTTP dev environments.
+        // Adding "preload" lets the domain be submitted to hstspreload.org once stable.
         if ($request->isSecure()) {
             $response->headers->set(
                 'Strict-Transport-Security',
-                'max-age=31536000; includeSubDomains'
+                'max-age=31536000; includeSubDomains; preload'
             );
         }
 

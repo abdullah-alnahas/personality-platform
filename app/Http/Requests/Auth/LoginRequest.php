@@ -43,16 +43,20 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): void
     {
+        // Rate-limit FIRST so the same lockout applies to bots that fill the
+        // honeypot — otherwise a bot could probe forever as long as it always
+        // submits a value for _confirm_email.
+        $this->ensureIsNotRateLimited();
+
         // Honeypot: a real browser never fills this field; bots usually do.
         // ConvertEmptyStringsToNull middleware converts '' → null, so check for both.
         // Return generic auth error so the rejection reason is not revealed.
         if (!empty($this->input('_confirm_email'))) {
+            $this->recordFailedAttempt();
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
         }
-
-        $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             $this->recordFailedAttempt();

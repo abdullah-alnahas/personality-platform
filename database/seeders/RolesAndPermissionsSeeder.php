@@ -44,11 +44,14 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Define Roles and Assign Permissions
         // Ensure 'manage quotes' is correctly assigned to Editor if intended
+        // Editor role — least privilege content management.
+        // 'manage media' is intentionally NOT granted: media uploads carry the
+        // highest risk surface (SVG/path-traversal historically) and are an
+        // admin-only operation. Grant explicitly per editor where needed.
         $editorPermissions = [
             "view admin",
             "manage categories",
             "manage content items",
-            "manage media",
             "manage quotes",
             "manage pages",
             "manage books",

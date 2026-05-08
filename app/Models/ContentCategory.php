@@ -89,42 +89,10 @@ class ContentCategory extends Model
         $rawLocale = $locale ?? App::currentLocale();
         $locale = in_array($rawLocale, $allowedLocales, true) ? $rawLocale : 'ar';
 
-        $dbDriver = $query->getConnection()->getDriverName();
-
-        // Customize JSON extraction based on database driver if needed
-        // This example is primarily for MySQL/MariaDB.
-        // For PostgreSQL, it would be: "{$column}->>'{$locale}'"
-        // For SQLite, JSON functions might need to be enabled or handled differently.
-        if ($dbDriver === "mysql" || $dbDriver === "mariadb") {
-            return $query->orderBy(
-                DB::raw(
-                    "JSON_UNQUOTE(JSON_EXTRACT(`{$this->getTable()}`.`{$column}`, '$.\"{$locale}\"'))"
-                ),
-                $direction
-            );
-        } elseif ($dbDriver === "pgsql") {
-            // All three variables are whitelisted above — safe to interpolate.
-            return $query->orderByRaw(
-                "({$this->getTable()}.{$column}->>'{$locale}') {$direction}"
-            );
-        }
-        // Add other database driver specifics if necessary, or fallback to no specific ordering if JSON functions are not straightforward.
-        // For simplicity, if not mysql/pgsql, it won't apply special JSON ordering.
-        // You might want to throw an exception or log a warning for unsupported drivers.
-        // As a basic fallback (less efficient as it fetches all then sorts in PHP, doesn't work directly with query builder for DB sort):
-        // return $query; // Or handle as an error / unsupported feature for other DBs
-
-        // For now, let's assume MySQL/MariaDB or PostgreSQL as common choices with Laravel.
-        // If using SQLite for testing, this might not work without extra setup.
-        // If the driver is not recognized for specific JSON ordering, it will fall through and not apply it.
-        // It's better to just apply the order and let it fail if the DB doesn't support it,
-        // rather than silently not ordering, or to make the JSON_EXTRACT specific to MySQL only.
-        // Let's stick to MySQL/MariaDB for this example for now.
-        return $query->orderBy(
-            DB::raw(
-                "JSON_UNQUOTE(JSON_EXTRACT(`{$this->getTable()}`.`{$column}`, '$.\"{$locale}\"'))"
-            ),
-            $direction
-        );
+        // Eloquent's JSON column syntax compiles to driver-appropriate JSON
+        // extraction with parameter binding under the hood — replaces the
+        // earlier `DB::raw` interpolation foot-gun while preserving behaviour
+        // on MySQL/MariaDB and adding PostgreSQL/SQLite support for free.
+        return $query->orderBy("{$column}->{$locale}", $direction);
     }
 }

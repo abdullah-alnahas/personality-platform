@@ -34,12 +34,21 @@ class EngagementController extends Controller
         if (method_exists($modelClass, 'scopePublished')) {
             $query->published();
         }
+        // Pages must additionally be reachable (have a slug) to count as engagement.
+        if ($modelClass === Page::class) {
+            $query->whereNotNull('slug');
+        }
         if (!$query->exists()) {
             return response()->json(['message' => 'Content not found.'], 404);
         }
 
         // Hash the IP to avoid storing cleartext PII (GDPR-friendly).
         $ipHash = hash('sha256', $request->ip() . config('app.key'));
+
+        // Hash the user-agent to a coarse fingerprint instead of storing the
+        // raw 500-char string — the raw UA is PII-adjacent and never read back
+        // for any feature, only used for deduplication.
+        $uaHash = hash('sha256', (string) $request->userAgent() . config('app.key'));
 
         $isDuplicate = ContentEngagement::where('content_type', $validated['content_type'])
             ->where('content_id', $validated['content_id'])
@@ -57,7 +66,7 @@ class EngagementController extends Controller
             'content_id'   => $validated['content_id'],
             'engagement_type' => $validated['type'],
             'ip_address'   => $ipHash,
-            'user_agent'   => mb_substr((string) $request->userAgent(), 0, 500),
+            'user_agent'   => substr($uaHash, 0, 64),
         ]);
 
         return response()->json([
