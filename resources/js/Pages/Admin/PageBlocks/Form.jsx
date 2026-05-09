@@ -15,37 +15,67 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
-/** Inline color picker: text field + native color input swatch */
-const ColorPickerField = ({ label, value, onChange, helperText }) => (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <TextField
-            fullWidth
-            size="small"
-            label={label}
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
-            helperText={helperText}
-        />
-        <Box
-            component="input"
-            type="color"
-            value={value || '#ffffff'}
-            onChange={(e) => onChange(e.target.value)}
-            sx={{
-                width: 40,
-                height: 40,
-                p: 0,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                cursor: 'pointer',
-                flexShrink: 0,
-                '&::-webkit-color-swatch-wrapper': { p: 0 },
-                '&::-webkit-color-swatch': { border: 'none', borderRadius: 1 },
-            }}
-        />
-    </Box>
-);
+/** Inline color picker: text field + native color input swatch.
+ *  Supports hex, rgb(a), hsl(a), and named values (transparent, currentColor).
+ *  When the value isn't a 7-char hex, the swatch shows a CSS-rendered preview
+ *  rather than forcing a substitute hex into the field. */
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+
+const ColorPickerField = ({ label, value, onChange, helperText }) => {
+    const isHex = typeof value === 'string' && HEX_RE.test(value.trim());
+    const swatchHex = isHex ? value : '#ffffff';
+    return (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TextField
+                fullWidth
+                size="small"
+                label={label}
+                value={value || ''}
+                onChange={(e) => onChange(e.target.value)}
+                helperText={helperText}
+                placeholder="#hex, rgba(...), or transparent"
+            />
+            {isHex ? (
+                <Box
+                    component="input"
+                    type="color"
+                    value={swatchHex}
+                    onChange={(e) => onChange(e.target.value)}
+                    title="Pick a color"
+                    sx={{
+                        width: 40,
+                        height: 40,
+                        p: 0,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 1,
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        '&::-webkit-color-swatch-wrapper': { p: 0 },
+                        '&::-webkit-color-swatch': { border: 'none', borderRadius: 1 },
+                    }}
+                />
+            ) : (
+                <Box
+                    title={value ? `Preview: ${value}` : 'No color set'}
+                    sx={{
+                        width: 40,
+                        height: 40,
+                        flexShrink: 0,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 1,
+                        backgroundColor: value || 'transparent',
+                        backgroundImage:
+                            'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)',
+                        backgroundSize: '8px 8px',
+                        backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px',
+                    }}
+                />
+            )}
+        </Box>
+    );
+};
 
 /** Block style presets — all aligned with the new sage palette
  *  primary #4A6741, primary-dark #2D4128, secondary lime #B5D26B,
