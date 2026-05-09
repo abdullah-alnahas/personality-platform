@@ -95,7 +95,7 @@ const ScholarCards = ({ block }) => {
                         textColor={textColor}
                         accentColor={accentColor}
                     />
-                ) : (
+                ) : (config.layout || 'columns') === 'tabs' ? (
                     <TabbedGroups
                         groups={groups}
                         activeTab={activeTab}
@@ -105,6 +105,14 @@ const ScholarCards = ({ block }) => {
                         textColor={textColor}
                         accentColor={accentColor}
                         isRTL={isRTL}
+                    />
+                ) : (
+                    <ColumnGroups
+                        groups={groups}
+                        t={t}
+                        cardBg={cardBg}
+                        textColor={textColor}
+                        accentColor={accentColor}
                     />
                 )}
             </Container>
@@ -241,6 +249,85 @@ const TabbedGroups = ({
             </Box>
         ))}
     </>
+);
+
+const ColumnGroups = ({ groups, t, cardBg, textColor, accentColor }) => (
+    <Grid container spacing={3} alignItems="stretch">
+        {groups.map((group) => (
+            <Grid
+                size={{ xs: 12, md: groups.length >= 3 ? 4 : 6 }}
+                key={group.group_key}
+            >
+                <Paper
+                    elevation={0}
+                    sx={{
+                        backgroundColor: cardBg,
+                        borderRadius: 3,
+                        p: { xs: 3, md: 4 },
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
+                >
+                    <Typography
+                        variant="h5"
+                        align="center"
+                        sx={{
+                            fontFamily: "'Amiri', serif",
+                            fontWeight: 700,
+                            color: accentColor,
+                            mb: 3,
+                            pb: 2,
+                            borderBottom: `2px solid ${accentColor}33`,
+                        }}
+                    >
+                        {t(group.group_name)}
+                    </Typography>
+                    <Box
+                        component="ul"
+                        sx={{
+                            listStyle: 'none',
+                            p: 0,
+                            m: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1,
+                        }}
+                    >
+                        {(group.scholars || []).map((s) => (
+                            <Box
+                                component="li"
+                                key={s.id}
+                                sx={{
+                                    fontFamily: "'Amiri', serif",
+                                    fontSize: '1rem',
+                                    color: textColor,
+                                    py: 0.75,
+                                    borderBottom: `1px solid ${accentColor}1A`,
+                                    '&:last-child': { borderBottom: 'none' },
+                                }}
+                            >
+                                {t(s.name)}
+                                {t(s.bio) && (
+                                    <Typography
+                                        variant="caption"
+                                        display="block"
+                                        sx={{
+                                            fontFamily: "'Tajawal', sans-serif",
+                                            opacity: 0.65,
+                                            mt: 0.25,
+                                        }}
+                                    >
+                                        {t(s.bio)}
+                                    </Typography>
+                                )}
+                            </Box>
+                        ))}
+                    </Box>
+                </Paper>
+            </Grid>
+        ))}
+    </Grid>
 );
 
 export default ScholarCards;

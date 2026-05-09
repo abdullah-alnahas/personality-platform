@@ -1132,9 +1132,9 @@ export default function Form({
                             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <ColorPickerField
                                     label="Decoration Color"
-                                    value={data.config.decoration_color || '#C9A94E'}
+                                    value={data.config.decoration_color || 'rgba(181, 210, 107, 0.15)'}
                                     onChange={(v) => handleConfigChange('decoration_color', v)}
-                                    helperText="Gold: #C9A94E, White: #ffffff"
+                                    helperText="e.g. rgba(181, 210, 107, 0.15) — soft lime"
                                 />
                             </Grid>
                         )}
@@ -1160,7 +1160,7 @@ export default function Form({
                             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <ColorPickerField
                                     label="Accent Color"
-                                    value={data.config.accent_color || data.config.decoration_color || '#C9A94E'}
+                                    value={data.config.accent_color || '#B5D26B'}
                                     onChange={(v) => handleConfigChange('accent_color', v)}
                                     helperText="For ornaments/decorations"
                                 />
@@ -1196,6 +1196,23 @@ export default function Form({
                                         {[1, 2, 3, 4, 5, 6].map((n) => (
                                             <MenuItem key={n} value={n}>{n} Column{n > 1 ? 's' : ''}</MenuItem>
                                         ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
+
+                        {data.block_type === 'scholar_cards' && (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="config-scholar-layout-label">Layout</InputLabel>
+                                    <Select
+                                        labelId="config-scholar-layout-label"
+                                        value={data.config.layout || 'columns'}
+                                        label="Layout"
+                                        onChange={(e) => handleConfigChange('layout', e.target.value)}
+                                    >
+                                        <MenuItem value="columns">Side-by-side Columns</MenuItem>
+                                        <MenuItem value="tabs">Tabs (one group at a time)</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>

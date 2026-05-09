@@ -169,7 +169,10 @@ class PrototypeAboutPageSeeder extends Seeder
             ],
             'config' => [
                 'background_color' => '#F7F4ED',
-                'text_color' => '#4A6741',
+                'text_color' => '#2A2A28',
+                'accent_color' => '#4A6741',
+                'layout' => 'columns',
+                'padding_y' => 'xl',
                 'full_width' => true,
             ],
         ]);

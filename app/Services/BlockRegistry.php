@@ -289,12 +289,14 @@ class BlockRegistry
             'fields' => [
                 'heading'     => ['type' => 'translatable_text', 'required' => true],
                 'description' => ['type' => 'translatable_richtext'],
+                'layout'      => ['type' => 'select', 'options' => ['columns', 'tabs'], 'default' => 'columns'],
             ],
             'config_defaults' => [
                 'background_color' => '#F7F4ED',
                 'text_color'       => '#2A2A28',
                 'accent_color'     => '#4A6741',
                 'padding_y'        => 'xl',
+                'layout'           => 'columns',
             ],
         ],
     ];
