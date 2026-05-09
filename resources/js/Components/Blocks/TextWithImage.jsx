@@ -12,6 +12,7 @@ import {
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useLocale } from "@/Hooks/useLocale";
 import { sanitizeHtml } from "@/utils/sanitize";
+import ScatteredStars from "@/Components/Decorative/ScatteredStars";
 
 /**
  * Split layout section with text and image.
@@ -117,19 +118,34 @@ export default function TextWithImage({ block }) {
                     sx={{ order: imageOrder }}
                 >
                     {image && (
-                        <Box
-                            component="img"
-                            src={image}
-                            alt={imageAlt || heading || ""}
-                            sx={{
-                                width: "100%",
-                                height: "auto",
-                                borderRadius: 3,
-                                boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-                                objectFit: "cover",
-                                maxHeight: 500,
-                            }}
-                        />
+                        <Box sx={{ position: 'relative', width: '100%' }}>
+                            {config.show_decorations && (
+                                <ScatteredStars
+                                    count={6}
+                                    color={config.decoration_color || '#4A6741'}
+                                    minSize={28}
+                                    maxSize={84}
+                                    opacity={0.35}
+                                    seed={91}
+                                    sx={{ zIndex: 0 }}
+                                />
+                            )}
+                            <Box
+                                component="img"
+                                src={image}
+                                alt={imageAlt || heading || ""}
+                                sx={{
+                                    position: 'relative',
+                                    zIndex: 1,
+                                    width: "100%",
+                                    height: "auto",
+                                    borderRadius: 3,
+                                    boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+                                    objectFit: "cover",
+                                    maxHeight: 500,
+                                }}
+                            />
+                        </Box>
                     )}
                 </Grid>
             </Grid>

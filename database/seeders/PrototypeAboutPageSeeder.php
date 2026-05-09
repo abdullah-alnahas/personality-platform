@@ -145,6 +145,7 @@ class PrototypeAboutPageSeeder extends Seeder
                 'background_color' => '#FFFFFF',
                 'text_color' => '#2A2A28',
                 'show_decorations' => true,
+                'decoration_color' => '#4A6741',
                 'padding_y' => 'lg',
             ],
         ]);

@@ -47,6 +47,8 @@ class BlockRegistry
             'config_defaults' => [
                 'background_color' => '#ffffff',
                 'padding_y' => 'lg',
+                'show_decorations' => false,
+                'decoration_color' => '#4A6741',
             ],
         ],
         'pillar_cards' => [

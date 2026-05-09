@@ -1144,7 +1144,7 @@ export default function Form({
                             </Grid>
                         )}
 
-                        {(data.block_type === 'hero_banner' || data.block_type === 'pillar_cards') && (
+                        {(data.block_type === 'hero_banner' || data.block_type === 'pillar_cards' || data.block_type === 'text_with_image') && (
                             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <FormControlLabel
                                     control={
@@ -1158,7 +1158,7 @@ export default function Form({
                             </Grid>
                         )}
 
-                        {data.block_type === 'hero_banner' && data.config.show_decorations && (
+                        {(data.block_type === 'hero_banner' || data.block_type === 'text_with_image') && data.config.show_decorations && (
                             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                 <ColorPickerField
                                     label="Decoration Color"
