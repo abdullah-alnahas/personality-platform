@@ -770,11 +770,11 @@ class PrototypeHomepageSeeder extends Seeder
         ]);
 
         // ═══════════════════════════════════════════
-        // Block 13: نسعد بتواصلكم — Newsletter CTA
+        // Block 13: نسعد بتواصلكم — Contact Form (lake background)
         // ═══════════════════════════════════════════
         PageBlock::create([
             'page_id' => $page->id,
-            'block_type' => 'newsletter_cta',
+            'block_type' => 'contact_form',
             'display_order' => $order++,
             'status' => 'published',
             'content' => [
@@ -784,24 +784,38 @@ class PrototypeHomepageSeeder extends Seeder
                     'tr' => 'Sizden haber almaktan memnuniyet duyarız',
                 ],
                 'subtitle' => [
-                    'ar' => 'اشترك لتلقي آخر التحديثات والمحتوى العلمي',
-                    'en' => 'Subscribe to receive the latest updates and scholarly content',
-                    'tr' => 'En son güncellemeleri ve ilmi içerikleri almak için abone olun',
+                    'ar' => 'أرسل لنا رسالتك وسنرد عليك في أقرب وقت',
+                    'en' => 'Send us your message and we will reply soon',
+                    'tr' => 'Bize mesajınızı gönderin, en kısa sürede yanıtlayalım',
                 ],
-                'placeholder_text' => [
-                    'ar' => 'أدخل بريدك الإلكتروني',
-                    'en' => 'Enter your email',
-                    'tr' => 'E-postanızı girin',
+                'name_label' => [
+                    'ar' => 'الاسم',
+                    'en' => 'Name',
+                    'tr' => 'Ad',
                 ],
-                'button_text' => [
-                    'ar' => 'اشترك',
-                    'en' => 'Subscribe',
-                    'tr' => 'Abone Ol',
+                'email_label' => [
+                    'ar' => 'البريد الإلكتروني',
+                    'en' => 'Email',
+                    'tr' => 'E-posta',
                 ],
+                'message_label' => [
+                    'ar' => 'رسالتك',
+                    'en' => 'Your message',
+                    'tr' => 'Mesajınız',
+                ],
+                'submit_text' => [
+                    'ar' => 'إرسال',
+                    'en' => 'Send',
+                    'tr' => 'Gönder',
+                ],
+                'background_image_url' => '/images/prototype/mountain-bg.jpg',
             ],
             'config' => [
-                'background_color' => '#4A6741',
+                'background_color' => '#2D4128',
                 'text_color' => '#ffffff',
+                'accent_color' => '#C9F050',
+                'padding_y' => 'xl',
+                'overlay_opacity' => 0.55,
                 'full_width' => true,
             ],
         ]);
