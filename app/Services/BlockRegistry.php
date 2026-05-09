@@ -28,7 +28,7 @@ class BlockRegistry
                 'text_color' => '#ffffff',
                 'layout' => 'centered',
                 'show_decorations' => false,
-                'decoration_color' => '#C9A94E',
+                'decoration_color' => 'rgba(181, 210, 107, 0.15)',
                 // When secondary_heading is set, show the floating card overlay
                 'secondary_card' => false,
             ],
@@ -83,11 +83,11 @@ class BlockRegistry
             ],
             'config_defaults' => [
                 'text_color' => '#ffffff',
-                'background_color' => '#1a237e',
+                'background_color' => '#2D4128',
                 'ornamental_frame' => true,
                 'padding_y' => 'xl',
                 'layout' => 'overlay',
-                'accent_color' => '#C9A94E',
+                'accent_color' => '#B5D26B',
             ],
         ],
         'category_grid' => [
@@ -133,7 +133,7 @@ class BlockRegistry
             ],
             'config_defaults' => [
                 'style' => 'dark',
-                'background_color' => '#1a1a2e',
+                'background_color' => '#2D4128',
                 'text_color' => '#ffffff',
                 'padding_y' => 'xl',
                 'overlay_opacity' => 0.55,
@@ -164,7 +164,7 @@ class BlockRegistry
                 'background_image_url' => ['type' => 'text'],
             ],
             'config_defaults' => [
-                'background_color' => '#1E2A22',
+                'background_color' => '#2D4128',
                 'text_color' => '#ffffff',
                 'accent_color' => '#C9F050',
                 'padding_y' => 'xl',
@@ -181,7 +181,7 @@ class BlockRegistry
                 'button_text' => ['type' => 'translatable_text'],
             ],
             'config_defaults' => [
-                'background_color' => '#2B3D2F',
+                'background_color' => '#4A6741',
                 'text_color' => '#ffffff',
                 'full_width' => true,
             ],
@@ -208,7 +208,7 @@ class BlockRegistry
                 'cta_link' => ['type' => 'text'],
             ],
             'config_defaults' => [
-                'background_color' => '#1E2A22',
+                'background_color' => '#2D4128',
                 'text_color' => '#ffffff',
                 'columns' => 4,
                 'logo_max_height' => 60,
@@ -237,9 +237,9 @@ class BlockRegistry
                 // stat_list items support: value (string), label (translatable), suffix (translatable)
             ],
             'config_defaults' => [
-                'background_color' => '#2B3D2F',
+                'background_color' => '#4A6741',
                 'text_color'       => '#ffffff',
-                'accent_color'     => '#C9A94E',
+                'accent_color'     => '#C9F050',
                 'columns'          => 3,
                 'padding_y'        => 'lg',
                 'overlay_opacity'  => 0.6,
@@ -259,9 +259,9 @@ class BlockRegistry
                 'pattern_image_url' => ['type' => 'text'],
             ],
             'config_defaults' => [
-                'background_color' => '#F5F0E8',
-                'text_color'       => '#2B3D2F',
-                'accent_color'     => '#6B7B4C',
+                'background_color' => '#F7F4ED',
+                'text_color'       => '#2A2A28',
+                'accent_color'     => '#4A6741',
                 'padding_y'        => 'xl',
                 'pattern_position' => 'left',
                 'pattern_opacity'  => 0.18,
@@ -276,7 +276,7 @@ class BlockRegistry
                 'max_items' => ['type' => 'number', 'default' => 8],
             ],
             'config_defaults' => [
-                'background_color' => '#1E2A22',
+                'background_color' => '#2D4128',
                 'text_color'       => '#ffffff',
                 'columns'          => 4,
                 'show_description' => false,
@@ -291,9 +291,9 @@ class BlockRegistry
                 'description' => ['type' => 'translatable_richtext'],
             ],
             'config_defaults' => [
-                'background_color' => '#F5F0E8',
-                'text_color'       => '#2B3D2F',
-                'accent_color'     => '#2B3D2F',
+                'background_color' => '#F7F4ED',
+                'text_color'       => '#2A2A28',
+                'accent_color'     => '#4A6741',
                 'padding_y'        => 'xl',
             ],
         ],

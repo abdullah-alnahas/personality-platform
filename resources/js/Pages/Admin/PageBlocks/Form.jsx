@@ -47,45 +47,55 @@ const ColorPickerField = ({ label, value, onChange, helperText }) => (
     </Box>
 );
 
-/** Block style presets */
+/** Block style presets — all aligned with the new sage palette
+ *  primary #4A6741, primary-dark #2D4128, secondary lime #B5D26B,
+ *  cream bg #F7F4ED, paper #FFFFFF, text #2A2A28, accent-bright #C9F050. */
 const BLOCK_PRESETS = {
     hero_banner: [
-        { label: 'Islamic Dark', config: { background_color: '#2B3D2F', text_color: '#ffffff', show_decorations: true, decoration_color: '#C9A94E', layout: 'split' } },
-        { label: 'Deep Green Centered', config: { background_color: '#1E2A22', text_color: '#ffffff', show_decorations: true, decoration_color: '#D4B96A', layout: 'centered' } },
-        { label: 'Cream Light', config: { background_color: '#F5F0E8', text_color: '#2B3D2F', show_decorations: false, layout: 'centered' } },
+        { label: 'Sage Split', config: { background_color: '#4A6741', text_color: '#ffffff', show_decorations: true, decoration_color: 'rgba(181, 210, 107, 0.15)', layout: 'split' } },
+        { label: 'Deep Sage Centered', config: { background_color: '#2D4128', text_color: '#ffffff', show_decorations: true, decoration_color: 'rgba(201, 240, 80, 0.18)', layout: 'centered' } },
+        { label: 'Cream Light', config: { background_color: '#F7F4ED', text_color: '#2A2A28', show_decorations: false, layout: 'centered' } },
+        { label: 'Paper White', config: { background_color: '#FFFFFF', text_color: '#2A2A28', show_decorations: false, layout: 'centered' } },
     ],
     pillar_cards: [
-        { label: 'Dark Cards on Green', config: { background_color: '#2B3D2F', text_color: '#ffffff', card_variant: 'dark', columns: 3 } },
-        { label: 'Light Cards on Cream', config: { background_color: '#F5F0E8', text_color: '#2C2C2C', card_variant: 'light', columns: 3 } },
+        { label: 'Dark Cards on Sage', config: { background_color: '#4A6741', text_color: '#ffffff', card_variant: 'dark', columns: 3 } },
+        { label: 'Light Cards on Cream', config: { background_color: '#F7F4ED', text_color: '#2A2A28', card_variant: 'light', columns: 3 } },
+        { label: 'Light Cards on Paper', config: { background_color: '#FFFFFF', text_color: '#2A2A28', card_variant: 'light', columns: 3 } },
     ],
     quran_verse: [
-        { label: 'Deep Blue Overlay', config: { background_color: '#1a237e', text_color: '#ffffff', layout: 'overlay', accent_color: '#C9A94E' } },
-        { label: 'Dark Green Card', config: { background_color: '#1E2A22', text_color: '#ffffff', layout: 'card', accent_color: '#C9A94E' } },
+        { label: 'Sage Overlay', config: { background_color: '#2D4128', text_color: '#ffffff', layout: 'overlay', accent_color: '#B5D26B' } },
+        { label: 'Sage Card', config: { background_color: '#4A6741', text_color: '#ffffff', layout: 'card', accent_color: '#C9F050' } },
+        { label: 'Cream Card', config: { background_color: '#F7F4ED', text_color: '#2A2A28', layout: 'card', accent_color: '#4A6741' } },
     ],
     logo_grid: [
-        { label: 'Dark Islamic', config: { background_color: '#1E2A22', text_color: '#ffffff', columns: 4, grayscale: false } },
-        { label: 'Cream Background', config: { background_color: '#F5F0E8', text_color: '#2C2C2C', columns: 4, grayscale: true } },
+        { label: 'Deep Sage', config: { background_color: '#2D4128', text_color: '#ffffff', columns: 4, grayscale: false } },
+        { label: 'Cream Background', config: { background_color: '#F7F4ED', text_color: '#2A2A28', columns: 4, grayscale: true } },
+        { label: 'Paper White', config: { background_color: '#FFFFFF', text_color: '#2A2A28', columns: 4, grayscale: true } },
     ],
     newsletter_cta: [
-        { label: 'Islamic Green', config: { background_color: '#2B3D2F', text_color: '#ffffff' } },
-        { label: 'Gold Accent', config: { background_color: '#C9A94E', text_color: '#1E2A22' } },
+        { label: 'Sage Primary', config: { background_color: '#4A6741', text_color: '#ffffff' } },
+        { label: 'Deep Sage', config: { background_color: '#2D4128', text_color: '#ffffff' } },
+        { label: 'Lime Accent', config: { background_color: '#B5D26B', text_color: '#2D4128' } },
     ],
     featured_quote: [
-        { label: 'Dark Elegance', config: { background_color: '#1a1a2e', text_color: '#ffffff' } },
-        { label: 'Islamic Green', config: { background_color: '#1E2A22', text_color: '#ffffff' } },
+        { label: 'Deep Sage', config: { background_color: '#2D4128', text_color: '#ffffff' } },
+        { label: 'Sage Primary', config: { background_color: '#4A6741', text_color: '#ffffff' } },
+        { label: 'Cream Calm', config: { background_color: '#F7F4ED', text_color: '#2A2A28' } },
     ],
     stats_counter: [
-        { label: 'Islamic Green', config: { background_color: '#2B3D2F', text_color: '#ffffff', accent_color: '#C9A94E', columns: 3 } },
-        { label: 'Deep Dark', config: { background_color: '#1E2A22', text_color: '#ffffff', accent_color: '#C9A94E', columns: 3 } },
-        { label: 'Cream Light', config: { background_color: '#F5F0E8', text_color: '#2B3D2F', accent_color: '#2B3D2F', columns: 3 } },
+        { label: 'Sage Primary', config: { background_color: '#4A6741', text_color: '#ffffff', accent_color: '#C9F050', columns: 3 } },
+        { label: 'Deep Sage', config: { background_color: '#2D4128', text_color: '#ffffff', accent_color: '#B5D26B', columns: 3 } },
+        { label: 'Cream Light', config: { background_color: '#F7F4ED', text_color: '#2A2A28', accent_color: '#4A6741', columns: 3 } },
     ],
     books_grid: [
-        { label: 'Dark Islamic', config: { background_color: '#1E2A22', text_color: '#ffffff', columns: 4 } },
-        { label: 'Deep Navy', config: { background_color: '#1a1a2e', text_color: '#ffffff', columns: 4 } },
+        { label: 'Deep Sage', config: { background_color: '#2D4128', text_color: '#ffffff', columns: 4 } },
+        { label: 'Cream Background', config: { background_color: '#F7F4ED', text_color: '#2A2A28', columns: 4 } },
+        { label: 'Paper White', config: { background_color: '#FFFFFF', text_color: '#2A2A28', columns: 4 } },
     ],
     scholar_cards: [
-        { label: 'Cream Background', config: { background_color: '#F5F0E8', text_color: '#2B3D2F', accent_color: '#2B3D2F' } },
-        { label: 'Dark Green', config: { background_color: '#2B3D2F', text_color: '#ffffff', accent_color: '#C9A94E' } },
+        { label: 'Cream Background', config: { background_color: '#F7F4ED', text_color: '#2A2A28', accent_color: '#4A6741' } },
+        { label: 'Deep Sage', config: { background_color: '#2D4128', text_color: '#ffffff', accent_color: '#B5D26B' } },
+        { label: 'Paper White', config: { background_color: '#FFFFFF', text_color: '#2A2A28', accent_color: '#4A6741' } },
     ],
 };
 
