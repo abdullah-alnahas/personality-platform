@@ -59,12 +59,15 @@ export default function Login({ status, canResetPassword }) {
                     aria-hidden="true"
                     sx={{
                         position: "absolute",
-                        left: "-9999px",
-                        top: "-9999px",
                         width: "1px",
                         height: "1px",
-                        opacity: 0,
+                        margin: "-1px",
+                        padding: 0,
+                        border: 0,
                         overflow: "hidden",
+                        clip: "rect(0, 0, 0, 0)",
+                        whiteSpace: "nowrap",
+                        opacity: 0,
                         pointerEvents: "none",
                     }}
                 />
