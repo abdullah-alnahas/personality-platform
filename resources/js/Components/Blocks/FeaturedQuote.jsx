@@ -3,6 +3,32 @@ import { Box, Typography, Container } from "@mui/material";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import { useLocale } from "@/Hooks/useLocale";
 
+const POSITION_STYLES = {
+    'top-center':   { top: 8,  start: '50%', transform: 'translateX(-50%) rotate(180deg)' },
+    'top-start':    { top: 8,  start: 16,    transform: 'rotate(180deg)' },
+    'top-end':      { top: 8,  end: 16,      transform: 'rotate(180deg)' },
+    'middle-start': { top: '50%', start: 16, transform: 'translateY(-50%) rotate(180deg)' },
+    'middle-end':   { top: '50%', end: 16,   transform: 'translateY(-50%) rotate(180deg)' },
+    'hidden':       null,
+};
+
+function MarkPositioned({ color, opacity, position }) {
+    const cfg = POSITION_STYLES[position] ?? POSITION_STYLES['top-center'];
+    if (!cfg) return null;
+    const sx = {
+        position: 'absolute',
+        fontSize: { xs: 60, md: 80 },
+        color,
+        opacity,
+        zIndex: 0,
+        top: cfg.top,
+        transform: cfg.transform,
+    };
+    if (cfg.start !== undefined) sx.insetInlineStart = cfg.start;
+    if (cfg.end   !== undefined) sx.insetInlineEnd   = cfg.end;
+    return <FormatQuoteIcon sx={sx} aria-hidden="true" />;
+}
+
 export default function FeaturedQuote({ block }) {
     const { getTranslatedField, currentLocale, isRTL } = useLocale();
     const content = block?.content || {};
@@ -22,6 +48,9 @@ export default function FeaturedQuote({ block }) {
     const accentColor = config.accent_color || "primary.main";
     const bgImage = content.background_image_url;
     const overlayOpacity = config.overlay_opacity ?? 0.55;
+    const quoteMarkPosition = config.quote_mark_position || 'top-center';
+    const quoteMarkColor = config.quote_mark_color || accentColor;
+    const markOpacity = config.quote_mark_opacity ?? 0.18;
 
     if (!quoteText) return null;
 
@@ -42,23 +71,18 @@ export default function FeaturedQuote({ block }) {
                     position: "relative",
                 }}
             >
-                {/* Decorative opening quote */}
-                <FormatQuoteIcon
-                    sx={{
-                        fontSize: { xs: 60, md: 80 },
-                        color: accentColor,
-                        opacity: 0.15,
-                        transform: "rotate(180deg)",
-                        display: "block",
-                        mx: "auto",
-                        mb: -2,
-                    }}
+                <MarkPositioned
+                    color={quoteMarkColor}
+                    opacity={markOpacity}
+                    position={quoteMarkPosition}
                 />
 
                 <Typography
                     variant="h4"
                     component="blockquote"
                     sx={{
+                        position: 'relative',
+                        zIndex: 1,
                         color: textColor,
                         fontFamily: isRTL ? "'Amiri', serif" : "'Georgia', 'Times New Roman', serif",
                         fontStyle: isRTL ? "normal" : "italic",
@@ -70,24 +94,14 @@ export default function FeaturedQuote({ block }) {
                         direction: isRTL ? "rtl" : "ltr",
                     }}
                 >
-                    {isRTL ? `«${quoteText}»` : `\u201c${quoteText}\u201d`}
+                    {isRTL ? `«${quoteText}»` : `“${quoteText}”`}
                 </Typography>
-
-                {/* Decorative closing quote */}
-                <FormatQuoteIcon
-                    sx={{
-                        fontSize: { xs: 40, md: 50 },
-                        color: accentColor,
-                        opacity: 0.15,
-                        display: "block",
-                        mx: "auto",
-                        mb: 3,
-                    }}
-                />
 
                 {source && (
                     <Box
                         sx={{
+                            position: 'relative',
+                            zIndex: 1,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",

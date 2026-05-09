@@ -1243,9 +1243,58 @@ export default function Form({
                                     >
                                         <MenuItem value="columns">Side-by-side Columns</MenuItem>
                                         <MenuItem value="tabs">Tabs (one group at a time)</MenuItem>
+                                        <MenuItem value="carousel">Carousel (slide arrows)</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>
+                        )}
+
+                        {data.block_type === 'books_grid' && (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="config-books-layout-label">Layout</InputLabel>
+                                    <Select
+                                        labelId="config-books-layout-label"
+                                        value={data.config.layout || 'grid'}
+                                        label="Layout"
+                                        onChange={(e) => handleConfigChange('layout', e.target.value)}
+                                    >
+                                        <MenuItem value="grid">Grid</MenuItem>
+                                        <MenuItem value="carousel">Carousel (slide arrows)</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
+
+                        {data.block_type === 'featured_quote' && (
+                            <>
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="config-quote-mark-pos-label">Quote Mark Position</InputLabel>
+                                        <Select
+                                            labelId="config-quote-mark-pos-label"
+                                            value={data.config.quote_mark_position || 'top-center'}
+                                            label="Quote Mark Position"
+                                            onChange={(e) => handleConfigChange('quote_mark_position', e.target.value)}
+                                        >
+                                            <MenuItem value="top-center">Top Center</MenuItem>
+                                            <MenuItem value="top-start">Top Start (logical inline-start)</MenuItem>
+                                            <MenuItem value="top-end">Top End</MenuItem>
+                                            <MenuItem value="middle-start">Middle Start</MenuItem>
+                                            <MenuItem value="middle-end">Middle End</MenuItem>
+                                            <MenuItem value="hidden">Hidden</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                                    <ColorPickerField
+                                        label="Quote Mark Color"
+                                        value={data.config.quote_mark_color || ''}
+                                        onChange={(v) => handleConfigChange('quote_mark_color', v)}
+                                        helperText="Empty = use accent color"
+                                    />
+                                </Grid>
+                            </>
                         )}
 
                         {data.block_type === 'logo_grid' && (

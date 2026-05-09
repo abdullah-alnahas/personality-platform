@@ -3,7 +3,7 @@
  * Uses dangerouslySetInnerHTML intentionally for pre-sanitized rich text
  * (description field comes from the admin rich-text editor).
  */
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { sanitizeHtml } from "@/utils/sanitize";
 import {
     Box,
@@ -13,7 +13,10 @@ import {
     Paper,
     Tabs,
     Tab,
+    IconButton,
 } from "@mui/material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useLocale } from "@/Hooks/useLocale";
 
 const ScholarCards = ({ block }) => {
@@ -100,6 +103,15 @@ const ScholarCards = ({ block }) => {
                         groups={groups}
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
+                        t={t}
+                        cardBg={cardBg}
+                        textColor={textColor}
+                        accentColor={accentColor}
+                        isRTL={isRTL}
+                    />
+                ) : (config.layout === 'carousel') ? (
+                    <CarouselGroups
+                        groups={groups}
                         t={t}
                         cardBg={cardBg}
                         textColor={textColor}
@@ -329,5 +341,142 @@ const ColumnGroups = ({ groups, t, cardBg, textColor, accentColor }) => (
         ))}
     </Grid>
 );
+
+const CarouselGroups = ({ groups, t, cardBg, textColor, accentColor, isRTL }) => {
+    const scrollerRef = useRef(null);
+    const scrollBy = (direction) => {
+        const el = scrollerRef.current;
+        if (!el) return;
+        el.scrollBy({ left: el.clientWidth * 0.8 * direction, behavior: "smooth" });
+    };
+    return (
+        <Box sx={{ position: "relative" }}>
+            <IconButton
+                aria-label="previous"
+                onClick={() => scrollBy(isRTL ? 1 : -1)}
+                sx={{
+                    position: "absolute",
+                    top: "50%",
+                    insetInlineStart: -16,
+                    transform: "translateY(-50%)",
+                    zIndex: 2,
+                    backgroundColor: `${accentColor}22`,
+                    color: textColor,
+                    "&:hover": { backgroundColor: `${accentColor}44` },
+                }}
+            >
+                {isRTL ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            </IconButton>
+            <IconButton
+                aria-label="next"
+                onClick={() => scrollBy(isRTL ? -1 : 1)}
+                sx={{
+                    position: "absolute",
+                    top: "50%",
+                    insetInlineEnd: -16,
+                    transform: "translateY(-50%)",
+                    zIndex: 2,
+                    backgroundColor: `${accentColor}22`,
+                    color: textColor,
+                    "&:hover": { backgroundColor: `${accentColor}44` },
+                }}
+            >
+                {isRTL ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+            <Box
+                ref={scrollerRef}
+                sx={{
+                    display: "flex",
+                    gap: 3,
+                    overflowX: "auto",
+                    overflowY: "hidden",
+                    scrollSnapType: "x mandatory",
+                    scrollbarWidth: "none",
+                    "&::-webkit-scrollbar": { display: "none" },
+                    py: 1,
+                }}
+            >
+                {groups.map((group) => (
+                    <Box
+                        key={group.group_key}
+                        sx={{
+                            flex: "0 0 auto",
+                            width: { xs: "85%", sm: "60%", md: "32%" },
+                            scrollSnapAlign: "start",
+                        }}
+                    >
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                backgroundColor: cardBg,
+                                borderRadius: 3,
+                                p: { xs: 3, md: 4 },
+                                height: "100%",
+                                display: "flex",
+                                flexDirection: "column",
+                            }}
+                        >
+                            <Typography
+                                variant="h5"
+                                align="center"
+                                sx={{
+                                    fontFamily: "'Amiri', serif",
+                                    fontWeight: 700,
+                                    color: accentColor,
+                                    mb: 3,
+                                    pb: 2,
+                                    borderBottom: `2px solid ${accentColor}33`,
+                                }}
+                            >
+                                {t(group.group_name)}
+                            </Typography>
+                            <Box
+                                component="ul"
+                                sx={{
+                                    listStyle: "none",
+                                    p: 0,
+                                    m: 0,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 1,
+                                }}
+                            >
+                                {(group.scholars || []).map((s) => (
+                                    <Box
+                                        component="li"
+                                        key={s.id}
+                                        sx={{
+                                            fontFamily: "'Amiri', serif",
+                                            fontSize: "1rem",
+                                            color: textColor,
+                                            py: 0.75,
+                                            borderBottom: `1px solid ${accentColor}1A`,
+                                            "&:last-child": { borderBottom: "none" },
+                                        }}
+                                    >
+                                        {t(s.name)}
+                                        {t(s.bio) && (
+                                            <Typography
+                                                variant="caption"
+                                                display="block"
+                                                sx={{
+                                                    fontFamily: "'Tajawal', sans-serif",
+                                                    opacity: 0.65,
+                                                    mt: 0.25,
+                                                }}
+                                            >
+                                                {t(s.bio)}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                ))}
+                            </Box>
+                        </Paper>
+                    </Box>
+                ))}
+            </Box>
+        </Box>
+    );
+};
 
 export default ScholarCards;

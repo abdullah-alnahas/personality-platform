@@ -3,7 +3,7 @@ import { Box, Typography, Container, Paper, Button, Chip } from '@mui/material';
 import { Link as InertiaLink } from '@inertiajs/react';
 import { useLocale } from '@/Hooks/useLocale';
 import OrnamentalDivider from '@/Components/Decorative/OrnamentalDivider';
-import { safeUrl, safeBackgroundUrl } from '@/utils/sanitize';
+import { safeUrl, safeBackgroundUrl, sanitizeHtml } from '@/utils/sanitize';
 
 const QURAN_FONT_FAMILY = "'KFGQPC Hafs Uthmanic Script', 'Amiri', 'Traditional Arabic', serif";
 const SECONDARY_FONT_FAMILY = "'Amiri', 'Traditional Arabic', serif";
@@ -48,6 +48,30 @@ function BismillahText({ color }) {
 
 function VerseText({ text, color }) {
     if (!text) return null;
+    // verse_text is now translatable_richtext. Authors may color words
+    // individually via Quill. We render through DOMPurify (sanitizeHtml)
+    // so inline <span style="color:..."> survives but scripts/iframes do not.
+    const looksHtml = /<[a-z][\s\S]*>/i.test(text);
+    if (looksHtml) {
+        const cleanHtml = sanitizeHtml(text);
+        return (
+            <Box
+                component="div"
+                // eslint-disable-next-line react/no-danger -- DOMPurify-cleaned via sanitizeHtml
+                dangerouslySetInnerHTML={{ __html: cleanHtml }}
+                sx={{
+                    color,
+                    fontFamily: QURAN_FONT_FAMILY,
+                    fontSize: { xs: '1.8rem', md: '2.2rem' },
+                    lineHeight: 2.2,
+                    textAlign: 'center',
+                    direction: 'rtl',
+                    px: { xs: 1, md: 4 },
+                    '& p': { m: 0 },
+                }}
+            />
+        );
+    }
     return (
         <Typography
             sx={{

@@ -73,7 +73,7 @@ class BlockRegistry
             'icon' => 'menu_book',
             'fields' => [
                 'section_heading' => ['type' => 'translatable_text'],
-                'verse_text' => ['type' => 'translatable_text', 'required' => true],
+                'verse_text' => ['type' => 'translatable_richtext', 'required' => true],
                 'surah_name' => ['type' => 'translatable_text', 'required' => true],
                 'verse_reference' => ['type' => 'text'],
                 'secondary_text' => ['type' => 'translatable_text'],
@@ -139,6 +139,8 @@ class BlockRegistry
                 'text_color' => '#ffffff',
                 'padding_y' => 'xl',
                 'overlay_opacity' => 0.55,
+                'quote_mark_position' => 'top-center',
+                'quote_mark_color' => null,
             ],
         ],
         'social_media_feed' => [
@@ -280,9 +282,11 @@ class BlockRegistry
             'config_defaults' => [
                 'background_color' => '#2D4128',
                 'text_color'       => '#ffffff',
+                'accent_color'     => '#C9A94E',
                 'columns'          => 4,
                 'show_description' => false,
                 'padding_y'        => 'xl',
+                'layout'           => 'grid',
             ],
         ],
         'scholar_cards' => [
@@ -291,7 +295,7 @@ class BlockRegistry
             'fields' => [
                 'heading'     => ['type' => 'translatable_text', 'required' => true],
                 'description' => ['type' => 'translatable_richtext'],
-                'layout'      => ['type' => 'select', 'options' => ['columns', 'tabs'], 'default' => 'columns'],
+                'layout'      => ['type' => 'select', 'options' => ['columns', 'tabs', 'carousel'], 'default' => 'columns'],
             ],
             'config_defaults' => [
                 'background_color' => '#F7F4ED',

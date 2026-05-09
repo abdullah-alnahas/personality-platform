@@ -536,6 +536,96 @@ export default function PublicLayout({ children, title: pageTitle }) {
                 minHeight: "100vh",
             }}
         >
+            {/* Thin utility bar: dark-mode + language selector pinned to the inline-end corner */}
+            <Box
+                sx={{
+                    bgcolor: "background.paper",
+                    borderBottom: "1px solid",
+                    borderColor: "divider",
+                    display: { xs: "none", md: "block" },
+                }}
+            >
+                <Container maxWidth="lg">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            alignItems: "center",
+                            gap: 1,
+                            minHeight: 32,
+                        }}
+                    >
+                        {availableLocales && availableLocales.length > 1 && (
+                            <FormControl variant="standard" size="small" sx={{ minWidth: 60 }}>
+                                <Select
+                                    id="public-language-select-utility"
+                                    value={currentLocale || ""}
+                                    onChange={handleLanguageChange}
+                                    variant="standard"
+                                    IconComponent={(props) => (
+                                        <LanguageIcon
+                                            {...props}
+                                            sx={{ color: "action.active", transform: "none" }}
+                                        />
+                                    )}
+                                    renderValue={(value) =>
+                                        availableLocales
+                                            .find((l) => l.code === value)
+                                            ?.code.toUpperCase() || ""
+                                    }
+                                    sx={{
+                                        color: "text.secondary",
+                                        "&:before, &:after": { borderBottom: "none !important" },
+                                        "& .MuiSelect-icon": { color: "text.secondary" },
+                                        "& .MuiSelect-select": {
+                                            pr: 0.5,
+                                            py: 0.25,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            fontSize: "0.8rem",
+                                            backgroundColor: "transparent",
+                                        },
+                                    }}
+                                >
+                                    {availableLocales.map((lang) => (
+                                        <MenuItem key={`util-lang-${lang.code}`} value={lang.code}>
+                                            {lang.native_name} ({lang.code.toUpperCase()})
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        )}
+                        <Tooltip
+                            title={
+                                colorMode === "dark"
+                                    ? currentLocale === "ar"
+                                        ? "الوضع المضيء"
+                                        : currentLocale === "tr"
+                                          ? "Aydınlık mod"
+                                          : "Light mode"
+                                    : currentLocale === "ar"
+                                      ? "الوضع المظلم"
+                                      : currentLocale === "tr"
+                                        ? "Karanlık mod"
+                                        : "Dark mode"
+                            }
+                        >
+                            <IconButton
+                                onClick={toggleMode}
+                                size="small"
+                                aria-label="toggle color mode"
+                                sx={{ color: "text.secondary", p: 0.5 }}
+                            >
+                                {colorMode === "dark" ? (
+                                    <LightModeIcon fontSize="small" />
+                                ) : (
+                                    <DarkModeIcon fontSize="small" />
+                                )}
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+                </Container>
+            </Box>
             <AppBar
                 position="static"
                 color="default"
@@ -560,7 +650,7 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             sx={{
                                 textDecoration: "none",
                                 color: "inherit",
-                                mr: 2,
+                                mr: 4,
                                 display: { xs: "none", md: "flex" },
                                 alignItems: "center",
                             }}
@@ -592,8 +682,9 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             sx={{
                                 flexGrow: 1,
                                 display: { xs: "none", md: "flex" },
-                                gap: 0.5,
-                                justifyContent: "center",
+                                gap: 1.5,
+                                justifyContent: "flex-start",
+                                ml: 2,
                             }}
                         >
                             {headerNavItems.map((item) => (
@@ -608,8 +699,8 @@ export default function PublicLayout({ children, title: pageTitle }) {
                             component="form"
                             onSubmit={handleSearchSubmit}
                             sx={{
-                                mr: { xs: 0, md: 1 },
-                                ml: { xs: 1, md: 0 },
+                                mr: { xs: 0, md: 1.5 },
+                                ml: { xs: 1, md: 1.5 },
                                 display: { xs: "none", md: "flex" },
                             }}
                         >
@@ -619,100 +710,23 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                 placeholder={uiT.search}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                sx={{
+                                    width: { md: 180, lg: 220 },
+                                    "& .MuiOutlinedInput-root": {
+                                        height: 36,
+                                        borderRadius: 999,
+                                        fontSize: "0.85rem",
+                                    },
+                                }}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <SearchIcon />
+                                            <SearchIcon fontSize="small" />
                                         </InputAdornment>
                                     ),
                                 }}
                             />
                         </Box>
-                        {availableLocales && availableLocales.length > 1 && (
-                            <FormControl
-                                variant="standard"
-                                size="small"
-                                sx={{
-                                    minWidth: 70,
-                                    display: { xs: "none", md: "inline-flex" },
-                                    ml: 1,
-                                }}
-                            >
-                                <Select
-                                    id="public-language-select-header"
-                                    value={currentLocale || ""}
-                                    onChange={handleLanguageChange}
-                                    variant="standard"
-                                    IconComponent={(props) => (
-                                        <LanguageIcon
-                                            {...props}
-                                            sx={{
-                                                color: "action.active",
-                                                transform: "none",
-                                            }}
-                                        />
-                                    )}
-                                    renderValue={(value) =>
-                                        availableLocales
-                                            .find((l) => l.code === value)
-                                            ?.code.toUpperCase() || ""
-                                    }
-                                    sx={{
-                                        color: "text.secondary",
-                                        "&:before, &:after": { borderBottom: "none !important" },
-                                        "& .MuiSelect-icon": {
-                                            color: "text.secondary",
-                                        },
-                                        "& .MuiSelect-select": {
-                                            pr: 0.5,
-                                            py: 0.5,
-                                            display: "flex",
-                                            alignItems: "center",
-                                            fontSize: "0.875rem",
-                                            backgroundColor: "transparent",
-                                        },
-                                    }}
-                                >
-                                    {availableLocales.map((lang) => (
-                                        <MenuItem
-                                            key={`public-lang-${lang.code}`}
-                                            value={lang.code}
-                                        >
-                                            {lang.native_name} (
-                                            {lang.code.toUpperCase()})
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        )}
-                        <Tooltip
-                            title={
-                                colorMode === "dark"
-                                    ? currentLocale === "ar"
-                                        ? "الوضع المضيء"
-                                        : currentLocale === "tr"
-                                          ? "Aydınlık mod"
-                                          : "Light mode"
-                                    : currentLocale === "ar"
-                                      ? "الوضع المظلم"
-                                      : currentLocale === "tr"
-                                        ? "Karanlık mod"
-                                        : "Dark mode"
-                            }
-                        >
-                            <IconButton
-                                onClick={toggleMode}
-                                size="small"
-                                aria-label="toggle color mode"
-                                sx={{ ml: 1, color: "text.secondary" }}
-                            >
-                                {colorMode === "dark" ? (
-                                    <LightModeIcon fontSize="small" />
-                                ) : (
-                                    <DarkModeIcon fontSize="small" />
-                                )}
-                            </IconButton>
-                        </Tooltip>
                         <Box
                             sx={{ display: { xs: "none", md: "flex" }, ml: 1, gap: 1, alignItems: "center" }}
                         >
@@ -732,8 +746,10 @@ export default function PublicLayout({ children, title: pageTitle }) {
                                         fontWeight: 700,
                                         borderRadius: '999px',
                                         textTransform: 'none',
-                                        px: 2.5,
-                                        py: 0.75,
+                                        px: 2.25,
+                                        py: 0.5,
+                                        fontSize: '0.85rem',
+                                        minHeight: 32,
                                         boxShadow: 'none',
                                         '&:hover': {
                                             backgroundColor: '#B8DC44',
