@@ -455,6 +455,8 @@ class PrototypeHomepageSeeder extends Seeder
                 'text_color' => '#4A6741',
                 'accent_color' => '#B5D26B',
                 'padding_y' => 'lg',
+                'quote_mark_position' => 'top-start',
+                'quote_mark_color' => '#4A6741',
             ],
         ]);
 
@@ -514,11 +516,13 @@ class PrototypeHomepageSeeder extends Seeder
             ],
             'config' => [
                 'style' => 'dark',
-                'background_color' => '#4A6741',
-                'text_color' => '#ffffff',
-                'accent_color' => '#B5D26B',
+                'background_color' => '#C8B894',
+                'text_color' => '#2A2A28',
+                'accent_color' => '#4A6741',
                 'padding_y' => 'lg',
-                'overlay_opacity' => 0.55,
+                'overlay_opacity' => 0.35,
+                'quote_mark_position' => 'top-start',
+                'quote_mark_color' => '#4A6741',
             ],
         ]);
 
@@ -663,6 +667,8 @@ class PrototypeHomepageSeeder extends Seeder
                 'accent_color' => '#B5D26B',
                 'padding_y' => 'lg',
                 'overlay_opacity' => 0.7,
+                'quote_mark_position' => 'top-start',
+                'quote_mark_color' => '#B5D26B',
             ],
         ]);
 
@@ -763,9 +769,11 @@ class PrototypeHomepageSeeder extends Seeder
                 'style' => 'dark',
                 'background_color' => '#4A6741',
                 'text_color' => '#ffffff',
-                'accent_color' => '#B5D26B',
+                'accent_color' => '#C9F050',
                 'padding_y' => 'xl',
                 'overlay_opacity' => 0.5,
+                'quote_mark_position' => 'top-start',
+                'quote_mark_color' => '#C9F050',
             ],
         ]);
 

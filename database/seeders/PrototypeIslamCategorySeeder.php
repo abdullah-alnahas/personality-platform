@@ -8,18 +8,18 @@ use App\Models\PageBlock;
 use Illuminate\Database\Seeder;
 
 /**
- * Seeds a rich page-builder page for the "الإسلام" category
- * matching the prototype design (hero, stats, talaqqui, books).
- *
- * Links it to the existing Islam category so /category/islam renders this page.
- *
- * Run: php artisan db:seed --class=PrototypeIslamCategorySeeder
+ * Seeds the Islam initiative page (/category/islam → /page/islam-initiative)
+ * to match prototype image #3:
+ *   1. Hero with Kaaba bg + heading + secondary "العلم الواجب" card + CTA
+ *   2. Stats counter (محو الأمية الدينية في أرقام) — sage green, 3 stats
+ *   3. Stats counter with bg image (التأهيل العلمي والدعوي) — body + 3 stats
+ *   4. Platform CTA (المنصة العلمية / تلقي) — cream bg + logo + CTA
+ *   5. Books carousel (مؤلفات) — navy bg with chevron arrows
  */
 class PrototypeIslamCategorySeeder extends Seeder
 {
     public function run(): void
     {
-        // Create/update the page-builder page for this initiative
         $page = Page::updateOrCreate(
             ['slug' => 'islam-initiative'],
             [
@@ -35,7 +35,7 @@ class PrototypeIslamCategorySeeder extends Seeder
         $page->blocks()->delete();
         $order = 0;
 
-        // ─── Hero Banner (large centered heading) ───
+        // ─── 1. Hero: Kaaba bg + heading + subtitle + secondary "العلم الواجب" card ───
         PageBlock::create([
             'page_id' => $page->id,
             'block_type' => 'hero_banner',
@@ -48,44 +48,44 @@ class PrototypeIslamCategorySeeder extends Seeder
                     'tr' => 'İslam',
                 ],
                 'subtitle' => [
-                    'en' => '<p>Building a generation rooted in the authentic foundations of Islam</p>',
-                    'ar' => '<p>بناء جيل راسخ على أصول الإسلام الصحيحة</p>',
-                    'tr' => '<p>İslam\'ın sahih temelleri üzerine kök salmış bir nesil inşa etmek</p>',
+                    'en' => '<p>The Methodology of Ahl al-Sunnah with the Connected Chain of Transmission</p>',
+                    'ar' => '<p>منهجية أهل السنة بالسند المتصل</p>',
+                    'tr' => '<p>Muttasıl isnâd ile Ehl-i Sünnet metodolojisi</p>',
                 ],
                 'background_image_url' => '/images/prototype/kaaba-bg.jpg',
                 'portrait_image_url' => '',
                 'secondary_heading' => [
-                    'en' => 'Required Knowledge',
+                    'en' => 'The Required Knowledge',
                     'ar' => 'العلم الواجب',
-                    'tr' => 'Gerekli İlim',
+                    'tr' => 'Vacip İlim',
                 ],
                 'secondary_body' => [
-                    'en' => 'A foundational course covering the essential matters that summarize the pillars of religion, faith, Islam, and ihsan that every Muslim is required to learn.',
-                    'ar' => 'دورة العلم الواجب صُممت لتعريف المشتركين على أهم الأمور التي تلخص أركان الدين والإيمان والإسلام والإحسان، وتتضمن تعريفاً شاملاً بكافة الأمور والعلوم الواجب على كل مسلم أن يتعلمها ويتبعها.',
-                    'tr' => 'Din, iman, İslam ve ihsanın rükünlerini özetleyen, her Müslümanın öğrenmesi gereken temel meseleleri kapsayan bir ders.',
+                    'en' => '<p>The Required Knowledge course is designed to introduce participants to the most important matters that summarise the pillars of religion, faith, Islam and ihsan, and contains a comprehensive introduction to all the matters and sciences that every Muslim is required to learn and follow.</p>',
+                    'ar' => '<p>دورة العلم الواجب صُممت لتعريف المشتركين على أهم الأمور التي تلخص أركان الدين والإيمان والإسلام والإحسان، حيث تتضمن الدورة تعريفاً شاملاً بكافة الأمور والعلوم الواجب على كل مسلم أن يتعلمها ويتبعها.</p>',
+                    'tr' => '<p>Vacip İlim dersi, din, iman, İslam ve ihsanın rükünlerini özetleyen, her Müslümanın öğrenmesi ve takip etmesi gereken meselelerin ve ilimlerin kapsamlı bir tanıtımını sunar.</p>',
                 ],
                 'secondary_cta_text' => [
                     'en' => 'Learn Now',
                     'ar' => 'تعلم الآن',
                     'tr' => 'Şimdi Öğren',
                 ],
-                'secondary_cta_link' => '/page/about',
+                'secondary_cta_link' => '/contact',
                 'cta_text' => ['en' => '', 'ar' => '', 'tr' => ''],
                 'cta_link' => '',
                 'overlay_opacity' => 0.45,
             ],
             'config' => [
                 'full_width' => true,
-                'min_height' => '600px',
+                'min_height' => '620px',
                 'text_color' => '#ffffff',
-                'background_color' => '#2D4128',
-                'layout' => 'with-card',
+                'background_color' => '#4A6741',
+                'layout' => 'centered',
                 'show_decorations' => true,
-                'decoration_color' => 'rgba(181,210,107,0.2)',
+                'decoration_color' => 'rgba(181, 210, 107, 0.18)',
             ],
         ]);
 
-        // ─── Stats Counter ("محو الأمية الدينية في أرقام") ───
+        // ─── 2. Stats Counter: محو الأمية الدينية في أرقام (sage green, 3 stats) ───
         PageBlock::create([
             'page_id' => $page->id,
             'block_type' => 'stats_counter',
@@ -97,20 +97,16 @@ class PrototypeIslamCategorySeeder extends Seeder
                     'ar' => 'محو الأمية الدينية في أرقام',
                     'tr' => 'Dini Okuryazarlık Rakamlarla',
                 ],
-                'subtitle' => [
-                    'en' => 'The impact of our Islamic education programs across the Arab world',
-                    'ar' => 'أثر برامجنا التعليمية الإسلامية في العالم العربي',
-                    'tr' => 'Arap dünyasında İslami eğitim programlarımızın etkisi',
-                ],
+                'subtitle' => ['en' => '', 'ar' => '', 'tr' => ''],
                 'stats' => [
                     [
-                        'value' => '40,000',
-                        'suffix' => ['en' => '', 'ar' => '+', 'tr' => '+'],
+                        'value' => '40',
+                        'suffix' => ['en' => 'k', 'ar' => ' ألف', 'tr' => ' bin'],
                         'label' => ['en' => 'Students of Knowledge', 'ar' => 'طالب علم', 'tr' => 'İlim Talebesi'],
                     ],
                     [
-                        'value' => '10,000',
-                        'suffix' => ['en' => '+', 'ar' => '+', 'tr' => '+'],
+                        'value' => '10',
+                        'suffix' => ['en' => 'k', 'ar' => ' ألف', 'tr' => ' bin'],
                         'label' => ['en' => 'Courses', 'ar' => 'دورة', 'tr' => 'Ders'],
                     ],
                     [
@@ -123,59 +119,41 @@ class PrototypeIslamCategorySeeder extends Seeder
             'config' => [
                 'background_color' => '#4A6741',
                 'text_color' => '#ffffff',
-                'accent_color' => '#B5D26B',
+                'accent_color' => '#C9F050',
                 'columns' => 3,
-                'full_width' => true,
-            ],
-        ]);
-
-        // ─── Text with Image (التأهيل العلمي والدعوي — qualification programme) ───
-        PageBlock::create([
-            'page_id' => $page->id,
-            'block_type' => 'text_with_image',
-            'display_order' => $order++,
-            'status' => 'published',
-            'content' => [
-                'heading' => [
-                    'en' => 'Scholarly and Da\'wah Qualification',
-                    'ar' => 'التأهيل العلمي والدعوي',
-                    'tr' => 'İlmî ve Davet Yetiştirme',
-                ],
-                'body' => [
-                    'en' => '<p>A four-tier preacher-formation programme covering foundational dawah, capacity building through field placement, audience-aware preaching, and the formation of institutional dawah projects under direct supervision.</p>',
-                    'ar' => '<p>برنامج تأهيل دعوي على أربعة مستويات: دورات تأصيلية للدعوة وأركانها وحمل الهم الدعوي، ثم برامج تأهيلية تستهدف بناء ذات الداعي ومهاراته، ثم التركيز على مراتب المدعوين ولغة الخطاب، ثم التشكيل والبناء للأعمال الدعوية المؤسسية والإشراف عليها.</p>',
-                    'tr' => '<p>Davet temeli, kapasite inşası, hedef kitleye uygun hitap ve kurumsal davet inşası olmak üzere dört seviyeli kapsamlı bir davetçi yetiştirme programı.</p>',
-                ],
-                'image_url' => '/images/prototype/faith-bg.jpg',
-                'image_alt' => ['en' => 'Qualification programme', 'ar' => 'التأهيل العلمي والدعوي', 'tr' => 'Eğitim'],
-                'image_position' => 'right',
-            ],
-            'config' => [
-                'background_color' => '#2D4128',
-                'text_color' => '#ffffff',
                 'padding_y' => 'lg',
                 'full_width' => true,
             ],
         ]);
 
-        // ─── Stats Counter (التأهيل metrics) ───
+        // ─── 3. Stats Counter with body + bg image: التأهيل العلمي والدعوي ───
         PageBlock::create([
             'page_id' => $page->id,
             'block_type' => 'stats_counter',
             'display_order' => $order++,
             'status' => 'published',
             'content' => [
-                'heading' => ['en' => '', 'ar' => '', 'tr' => ''],
+                'heading' => [
+                    'en' => 'Scholarly and Da\'wah Qualification',
+                    'ar' => 'التأهيل العلمي و الدعوي',
+                    'tr' => 'İlmî ve Davet Yetiştirme',
+                ],
                 'subtitle' => ['en' => '', 'ar' => '', 'tr' => ''],
+                'body' => [
+                    'en' => '<p>A four-tier preacher-formation programme: foundational dawah courses covering the pillars of dawah and bearing its concern, then qualification programmes targeting the formation of the daʿī and his skills and acquiring practical experience through field placement at one of the dawah facilities, then a focus on the categories of recipients of dawah and the language of address and specialisation in dawah work, then composition and construction of institutional dawah projects under direct supervision.</p>',
+                    'ar' => '<p>برنامج تأهيل دعوي، من خلال أربعة مستويات تتضمن دورات تأصيلية للدعوة وأركانها وحمل الهم الدعوي، ثم برامج تأهيلية تستهدف بناء ذات الداعي ومهاراته واكتساب الخبرة الدعوية من خلال الالتحاق بأحد مرافق الدعوة وإنجاز المهمات والمتطلبات، ثم التركيز على مراتب المدعوين ولغة الخطاب والتخصصية في العمل الدعوي، ثم التشكيل والبناء للأعمال الدعوية المؤسسية والإشراف عليها.</p>',
+                    'tr' => '<p>Dört seviyede kapsamlı davetçi yetiştirme programı: davetin temellerini ve rükünlerini anlatan tesisi dersler; davetçinin kişiliğini ve yeteneklerini inşa eden, sahada deneyim kazandıran yetiştirme programları; muhatapların kategorileri ve hitap dili odaklı uzmanlaşma; ve son aşamada kurumsal davet çalışmalarının inşası ve denetimi.</p>',
+                ],
+                'background_image_url' => '/images/prototype/faith-bg.jpg',
                 'stats' => [
                     [
-                        'value' => '70,000',
-                        'suffix' => ['en' => '+', 'ar' => '+', 'tr' => '+'],
+                        'value' => '70',
+                        'suffix' => ['en' => 'k', 'ar' => ' ألف', 'tr' => ' bin'],
                         'label' => ['en' => 'Students of Knowledge', 'ar' => 'طالب علم', 'tr' => 'İlim Talebesi'],
                     ],
                     [
-                        'value' => '10,000',
-                        'suffix' => ['en' => '+', 'ar' => '+', 'tr' => '+'],
+                        'value' => '10',
+                        'suffix' => ['en' => 'k', 'ar' => ' ألف', 'tr' => ' bin'],
                         'label' => ['en' => 'Courses', 'ar' => 'دورة', 'tr' => 'Ders'],
                     ],
                     [
@@ -186,47 +164,59 @@ class PrototypeIslamCategorySeeder extends Seeder
                 ],
             ],
             'config' => [
-                'background_color' => '#2D4128',
+                'background_color' => '#1E2A22',
                 'text_color' => '#ffffff',
-                'accent_color' => '#B5D26B',
+                'accent_color' => '#C9F050',
                 'columns' => 3,
+                'padding_y' => 'xl',
+                'overlay_opacity' => 0.65,
                 'full_width' => true,
             ],
         ]);
 
-        // ─── Text with Image (تلقي platform section) ───
+        // ─── 4. Platform CTA: المنصة العلمية / تلقي (cream bg + logo + CTA) ───
         PageBlock::create([
             'page_id' => $page->id,
-            'block_type' => 'text_with_image',
+            'block_type' => 'platform_cta',
             'display_order' => $order++,
             'status' => 'published',
             'content' => [
                 'heading' => [
-                    'en' => 'The Talaqqi Platform',
-                    'ar' => 'منصة تلقي',
-                    'tr' => 'Telakki Platformu',
+                    'en' => 'The Scholarly Platform',
+                    'ar' => 'المنصة العلمية',
+                    'tr' => 'İlmî Platform',
+                ],
+                'brand_name' => [
+                    'en' => 'Talaqqi',
+                    'ar' => 'تلقي',
+                    'tr' => 'Telakki',
                 ],
                 'body' => [
-                    'en' => '<p>The Talaqqi platform is a digital initiative for authentic Islamic learning — connecting students directly with qualified scholars through a structured, isnad-based curriculum. It offers courses in Quran, Fiqh, Hadith, and Islamic spirituality.</p>',
-                    'ar' => '<p>منصة تلقي هي مبادرة رقمية للتعلم الإسلامي الأصيل، تربط الطلاب مباشرة بالعلماء المؤهلين من خلال مناهج منظمة قائمة على الإسناد. تقدم دورات في القرآن والفقه والحديث والتزكية.</p>',
-                    'tr' => '<p>Telakki platformu, öğrencileri yapılandırılmış ve isnad tabanlı bir müfredat aracılığıyla nitelikli alimlerle doğrudan buluşturan otantik İslami öğrenme için dijital bir girişimdir.</p>',
+                    'en' => '<p>Talaqqi is a specialised educational platform for the presentation of Sharia sciences and tools, through an elite of Ahl al-Sunnah scholars who teach, according to age-appropriate methods, in an interactive and accessible style befitting our era. Talaqqi merges direct scholar-student contact and live classroom delivery with the convenience of MOOCs and open distance learning.</p>',
+                    'ar' => '<p>تلقي هي منصة تعليمية متخصصة في تقديم العلوم الشرعية وآلاتها وذلك من خلال نخبة من علماء أهل السنة يقومون بالتدريس بأساليبهم المنتقدة المتميزة بأسلوب سهل وتفاعلي يناسب العصر. عالجت "تلقي" وظيفة التفاعل المباشر بين المحاضر والطالب عن طريق تقديم المحتوى العلمي فيما يعرف بمسمى المووكس "MOOCs" أو المسافات التعليمية المفتوحة.</p>',
+                    'tr' => '<p>Telakki, Ehl-i Sünnet ulemasının seçkin bir grubunun, çağa uygun, kolay ve etkileşimli bir üslupla şer\'i ilimleri ve araçlarını sunduğu özel bir eğitim platformudur. MOOCs benzeri açık eğitim modeliyle hocalarla doğrudan etkileşim sağlar.</p>',
                 ],
-                'image_url' => '/images/prototype/logo-talaqqi.png',
-                'image_alt' => ['en' => 'Talaqqi Platform', 'ar' => 'منصة تلقي', 'tr' => 'Telakki Platformu'],
-                'image_position' => 'right',
-                'items' => [
-                    ['text' => ['en' => 'Live sessions with certified scholars', 'ar' => 'جلسات مباشرة مع علماء معتمدين']],
-                    ['text' => ['en' => 'Certified isnad-based curriculum', 'ar' => 'منهج معتمد قائم على الإسناد']],
-                    ['text' => ['en' => 'Available in Arabic, English, and Turkish', 'ar' => 'متاح بالعربية والإنجليزية والتركية']],
+                'icon_url' => '/images/prototype/logo-talaqqi.png',
+                'cta_text' => [
+                    'en' => 'Learn Now',
+                    'ar' => 'تعلم الآن',
+                    'tr' => 'Şimdi Öğren',
                 ],
+                'cta_link' => 'https://talaqqi.com',
+                'pattern_image_url' => '/images/prototype/logo-talaqqi-pattern.png',
             ],
             'config' => [
-                'background_color' => '#ffffff',
-                'padding_y' => 'lg',
+                'background_color' => '#F7F4ED',
+                'text_color' => '#2A2A28',
+                'accent_color' => '#4A6741',
+                'padding_y' => 'xl',
+                'pattern_position' => 'left',
+                'pattern_opacity' => 0.18,
+                'full_width' => true,
             ],
         ]);
 
-        // ─── Books Grid ("مؤلفات") ───
+        // ─── 5. Books carousel: مؤلفات (navy bg with chevron arrows) ───
         PageBlock::create([
             'page_id' => $page->id,
             'block_type' => 'books_grid',
@@ -238,51 +228,22 @@ class PrototypeIslamCategorySeeder extends Seeder
                     'ar' => 'مؤلفات',
                     'tr' => 'Yayınlar',
                 ],
-                'subtitle' => [
-                    'en' => 'Books and scholarly works by Sheikh Awn on Islamic sciences',
-                    'ar' => 'كتب وأعمال علمية للشيخ عون في العلوم الإسلامية',
-                    'tr' => 'Şeyh Avn\'ın İslami ilimler üzerine kitap ve ilmi eserleri',
-                ],
+                'subtitle' => ['en' => '', 'ar' => '', 'tr' => ''],
                 'max_items' => 8,
             ],
             'config' => [
-                'background_color' => '#2D4128',
+                'background_color' => '#0E1230',
                 'text_color' => '#ffffff',
+                'accent_color' => '#7FB3FF',
                 'columns' => 4,
+                'layout' => 'carousel',
+                'padding_y' => 'xl',
                 'full_width' => true,
             ],
         ]);
 
-        // ─── Newsletter CTA ───
-        PageBlock::create([
-            'page_id' => $page->id,
-            'block_type' => 'newsletter_cta',
-            'display_order' => $order++,
-            'status' => 'published',
-            'content' => [
-                'heading' => [
-                    'en' => 'Follow the Islam Initiative',
-                    'ar' => 'تابع مبادرة الإسلام',
-                    'tr' => 'İslam Girişimini Takip Edin',
-                ],
-                'subtitle' => [
-                    'en' => 'Get updates on programs, events, and new content',
-                    'ar' => 'احصل على تحديثات حول البرامج والفعاليات والمحتوى الجديد',
-                    'tr' => 'Programlar, etkinlikler ve yeni içerikler hakkında güncellemeler alın',
-                ],
-                'placeholder_text' => ['en' => 'Your email', 'ar' => 'بريدك الإلكتروني', 'tr' => 'E-postanız'],
-                'button_text' => ['en' => 'Subscribe', 'ar' => 'اشترك', 'tr' => 'Abone Ol'],
-            ],
-            'config' => [
-                'background_color' => '#4A6741',
-                'text_color' => '#ffffff',
-                'full_width' => true,
-            ],
-        ]);
-
-        // Link the Islam content category to this page
         ContentCategory::where('slug', 'islam')->update(['page_id' => $page->id]);
 
-        $this->command->info("Islam initiative page seeded with {$order} blocks and linked to Islam category.");
+        $this->command->info("Prototype Islam page seeded with {$order} blocks (hero → stats → stats+body → platform_cta → books carousel).");
     }
 }
